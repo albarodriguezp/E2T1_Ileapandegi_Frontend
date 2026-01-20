@@ -31,6 +31,7 @@
     "npm-run-all2": "^8.0.4",
     "oxlint": "~1.38.0",
     "prettier": "3.7.4",
+    "sass-embedded": "^1.97.2",
     "vite": "^7.3.0",
     "vite-plugin-vue-devtools": "^8.0.5"
   }

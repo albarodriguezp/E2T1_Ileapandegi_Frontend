@@ -1,0 +1,26 @@
+<template>
+  <div class="content">
+    <div class="content2">
+      <h1>INVENTARIO VIEW</h1>
+    </div>
+  </div>
+</template>
+
+<script setup>
+</script>
+
+<style scoped>
+.content {
+  background: black;
+  padding: 2rem; /* espacio alrededor del contenido */
+  min-height: 100vh; /* opcional para que ocupe toda la pantalla */
+  border-radius: 10px;
+}
+
+.content2 {
+  background: white;
+  border-radius: 10px; /* CORRECTO para bordes redondeados */
+  padding: 2rem;
+  color: black;
+}
+</style>

@@ -12,15 +12,16 @@
 <style scoped>
 .content {
   background: #222;
-  padding: 2rem; /* espacio alrededor del contenido */
+  padding: 0.7rem; /* espacio alrededor del contenido */
   min-height: 100vh; /* opcional para que ocupe toda la pantalla */
   width: 100vh;
-  border-radius: 10px;
+  border-radius: 20px;
 }
 
 .content2 {
   background: white;
-  border-radius: 10px;
+  height: 100vh;
+  border-radius: 20px;
   padding: 2rem;
   color: black;
 }

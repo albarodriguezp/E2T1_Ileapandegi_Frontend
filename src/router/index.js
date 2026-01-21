@@ -9,12 +9,12 @@ import PerfilView from '../views/PerfilView.vue'
 
 const routes = [
   { path: '/', name: 'login', component: LoginView },
-  { path: '/home', name: 'inicio', component: InicioView },
-  { path: '/inventario', name: 'inventario', component: InventarioView },
-  { path: '/clientes', name: 'clientes', component: ClientesView },
-  { path: '/portfolio', name: 'portfolio', component: PortfolioView },
-  { path: '/citas', name: 'citas', component: CitasView },
-  { path: '/perfil', name: 'perfil', component: PerfilView },
+  { path: '/home', name: 'inicio', component: InicioView, meta: { requiresAuth: true } },
+  { path: '/inventario', name: 'inventario', component: InventarioView, meta: { requiresAuth: true } },
+  { path: '/clientes', name: 'clientes', component: ClientesView, meta: { requiresAuth: true } },
+  { path: '/portfolio', name: 'portfolio', component: PortfolioView, meta: { requiresAuth: true } },
+  { path: '/citas', name: 'citas', component: CitasView, meta: { requiresAuth: true } },
+  { path: '/perfil', name: 'perfil', component: PerfilView, meta: { requiresAuth: true } },
 ]
 
 const router = createRouter({

@@ -55,21 +55,32 @@
     // Computed para acceder fácilmente a los textos
     const t = computed(() => messages[lang.value])
 
-    const login = () => {
-      fetch('http://localhost:8000/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: usuario.value, password: password.value })
+    const login = async () => {
+  try {
+    const res = await fetch('http://localhost:8000/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: usuario.value,
+        password: password.value
       })
-    .then(res => res.json())
-    .then(data => {
-      localStorage.setItem('token', data.token)
-      router.push('/home')
     })
-    .catch(err => {
-      console.error('Error en login:', err)
-    })
+
+    if (!res.ok) {
+      throw new Error('Credenciales incorrectas')
+    }
+
+    const data = await res.json()
+
+    // Guardar token
+    sessionStorage.setItem('token', data.token)
+
+    router.push('/home')
+  } catch (err) {
+    console.error('Error en login:', err)
   }
+}
+
 </script>
 
 <style lang="scss" scoped>

@@ -6,6 +6,7 @@ import ClientesView from '../views/ClientesView.vue'
 import PortfolioView from '../views/PortfolioView.vue'
 import CitasView from '../views/CitasView.vue'
 import PerfilView from '../views/PerfilView.vue'
+import DiaDetalle from '@/views/DiaDetalle.vue'
 
 const routes = [
   { path: '/', name: 'login', component: LoginView },
@@ -15,6 +16,7 @@ const routes = [
   { path: '/portfolio', name: 'portfolio', component: PortfolioView },
   { path: '/citas', name: 'citas', component: CitasView },
   { path: '/perfil', name: 'perfil', component: PerfilView },
+  { path: '/dia/:dia', name: 'DiaDetalle', component: DiaDetalle},
 ]
 
 const router = createRouter({

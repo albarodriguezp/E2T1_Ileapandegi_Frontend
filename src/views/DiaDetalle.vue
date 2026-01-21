@@ -1,22 +1,18 @@
 <template>
   <div class="content">
     <div class="content2">
-      <h1 class="mb-2">Citas {{mes}}</h1>
-      <Mes/>
+        <BarraBusqueda/>
+      <h1>Citas del dia {{ dia }}</h1>
     </div>
   </div>
 </template>
 
 <script setup>
-import Mes from '@/components/Mes.vue';
-const hoy = new Date();
-const meses = [
-  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-]
-const mes = meses[hoy.getMonth()];
+    import BarraBusqueda from '@/components/BarraBusqueda.vue'
+    import { useRoute } from 'vue-router'
 
-
+    const route = useRoute()
+    const dia = route.params.dia
 </script>
 
 <style scoped>

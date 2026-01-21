@@ -1,5 +1,5 @@
 <template>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
 
   <div class="login-page">
     <!-- Fondo borroso -->
@@ -16,70 +16,66 @@
 
     <!-- Card -->
     <div class="card login-card shadow">
-        <h3>{{ t.loginTitle }}</h3>
+      <h3>{{ t.loginTitle }}</h3>
 
-        <form @submit.prevent="login">
-          <div class="mb-3">
-            <label class="form-label">{{ t.user }}</label>
-            <input type="text" class="form-control" v-model="usuario" :placeholder="t.userPlaceholder" required/>
+      <form @submit.prevent="login">
+        <div class="mb-3">
+          <label class="form-label">{{ t.user }}</label>
+          <input type="text" class="form-control" v-model="usuario" :placeholder="t.userPlaceholder" required />
+        </div>
+
+        <div class="mb-3 password-wrapper">
+          <label class="form-label">{{ t.password }}</label>
+          <div class="password-field">
+            <input :type="showPassword ? 'text' : 'password'" class="form-control" v-model="password"
+              :placeholder="t.passwordPlaceholder" required />
+            <span class="toggle-password" @click="showPassword = !showPassword">
+              <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+            </span>
           </div>
+        </div>
 
-          <div class="mb-3 password-wrapper">
-            <label class="form-label">{{ t.password }}</label>
-            <div class="password-field">
-              <input :type="showPassword ? 'text' : 'password'" class="form-control" v-model="password" :placeholder="t.passwordPlaceholder" required />
-              <span class="toggle-password" @click="showPassword = !showPassword">
-                <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
-              </span>
-            </div>
-          </div>
-
-          <button class="btn btn-primary">{{ t.button }}</button>
-        </form>
-      </div>
+        <button class="btn btn-primary">{{ t.button }}</button>
+      </form>
+    </div>
   </div>
 </template>
 
 
 <script setup>
-    import { ref, computed } from 'vue'
-    import { messages } from '@/utils/translations.js' // importando el archivo
-    import { useRouter } from 'vue-router'
-    
-    const router = useRouter()
-    const lang = ref(navigator.language.slice(0,2) in messages ? navigator.language.slice(0,2) : 'es')
-    const usuario = ref('')
-    const password = ref('')
-    const showPassword = ref(false)
+import { ref, computed } from 'vue'
+import { messages } from '@/utils/translations.js' // importando el archivo
+import { useRouter } from 'vue-router'
 
-    // Computed para acceder fácilmente a los textos
-    const t = computed(() => messages[lang.value])
+const router = useRouter()
+const lang = ref(navigator.language.slice(0, 2) in messages ? navigator.language.slice(0, 2) : 'es')
+const usuario = ref('')
+const password = ref('')
+const showPassword = ref(false)
 
-    const login = async () => {
-  try {
-    const res = await fetch('http://localhost:8000/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: usuario.value,
-        password: password.value
-      })
-    })
+// Computed para acceder fácilmente a los textos
+const t = computed(() => messages[lang.value])
 
-    if (!res.ok) {
-      throw new Error('Credenciales incorrectas')
+const login = () => {
+  fetch('http://localhost:8000/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: usuario.value, password: password.value })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.access_token) {
+      localStorage.setItem('token', data.access_token)
+      router.push({ name: 'inicio' })
+    } else {
+      console.error('Login fallido', data)
     }
-
-    const data = await res.json()
-
-    // Guardar token
-    sessionStorage.setItem('token', data.token)
-
-    router.push('/home')
-  } catch (err) {
+  })
+  .catch(err => {
     console.error('Error en login:', err)
-  }
+  })
 }
+
 
 </script>
 
@@ -111,6 +107,7 @@
     top: 1rem;
     right: 1rem;
     z-index: 10;
+
     select {
       border-radius: 0.5rem;
       padding: 0.5rem 0.8rem;

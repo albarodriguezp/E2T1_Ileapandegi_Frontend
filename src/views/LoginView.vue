@@ -173,7 +173,7 @@ const login = async () => {
 
   .login-card {
     width: 100%;
-    max-width: 650px;
+    max-width: 377px;
     padding: 3rem 4rem;
     border-radius: 1.8rem;
     background: rgba(255, 255, 255, 0.82);

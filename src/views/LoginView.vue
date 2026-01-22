@@ -39,6 +39,32 @@
       </form>
     </div>
   </div>
+
+  <div v-if="showModal" class="modal-backdrop-custom">
+  <div class="modal-card">
+
+    <!-- Header -->
+    <div class="modal-header">
+      <h2>Error de autenticación</h2>
+      <span class="modal-close" @click="showModal = false">×</span>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      <p>{{ modalMessage }}</p>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button class="btn btn-danger" @click="showModal = false">
+        Cerrar
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
 </template>
 
 
@@ -52,29 +78,49 @@ const lang = ref(navigator.language.slice(0, 2) in messages ? navigator.language
 const usuario = ref('')
 const password = ref('')
 const showPassword = ref(false)
+const showModal = ref(false)
+const modalMessage = ref('')
+
 
 // Computed para acceder fácilmente a los textos
 const t = computed(() => messages[lang.value])
 
-const login = () => {
-  fetch('http://localhost:8000/api/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: usuario.value, password: password.value })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.access_token) {
-      localStorage.setItem('token', data.access_token)
-      router.push({ name: 'inicio' })
-    } else {
-      console.error('Login fallido', data)
+const login = async () => {
+  try {
+    const res = await fetch('http://localhost:8000/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: usuario.value,
+        password: password.value
+      })
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) {
+      // 👉 Caso 401 (credenciales incorrectas, etc.)
+      if (res.status === 401) {
+        modalMessage.value = data.message || 'Credenciales incorrectas'
+        showModal.value = true
+      } else {
+        modalMessage.value = 'Error inesperado'
+        showModal.value = true
+      }
+      return
     }
-  })
-  .catch(err => {
-    console.error('Error en login:', err)
-  })
+
+    // 👉 Login correcto
+    localStorage.setItem('token', data.access_token)
+    router.push({ name: 'inicio' })
+
+  } catch (err) {
+    modalMessage.value = 'No se pudo conectar con el servidor'
+    showModal.value = true
+    console.error(err)
+  }
 }
+
 
 
 </script>
@@ -201,4 +247,89 @@ const login = () => {
     }
   }
 }
+
+.modal-backdrop-custom {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-card {
+  background: #fff;
+  width: 420px;
+  max-width: 90%;
+  border-radius: 1rem;
+  padding: 1.5rem 1.8rem;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+  animation: fadeIn 0.2s ease;
+}
+
+/* Header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+
+  h5 {
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .modal-close {
+    font-size: 1.4rem;
+    cursor: pointer;
+    font-weight: 600;
+    color: #333;
+
+    &:hover {
+      color: #000;
+    }
+  }
+}
+
+/* Body */
+.modal-body {
+  margin-bottom: 1.5rem;
+
+  p {
+    margin: 0;
+    color: #333;
+    line-height: 1.4;
+  }
+}
+
+/* Footer */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+
+  .btn-danger {
+    background: #d32f2f;
+    border: none;
+    padding: 0.5rem 1.2rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+
+    &:hover {
+      background: #b71c1c;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 </style>

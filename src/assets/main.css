@@ -21,9 +21,27 @@ a,
   }
 }
 
+/* =====================
+   TABLET (≥ 768px)
+   ===================== */
+@media (min-width: 768px) {
+  #app {
+    max-width: 720px;
+    padding: 1.5rem;
+  }
+}
+
+/* =====================
+   DESKTOP (≥ 1024px)
+   ===================== */
 @media (min-width: 1024px) {
+  #app {
+    max-width: 1280px;
+    padding: 2rem;
+  }
+
   body {
-    display: flex;
+    display: grid;
     place-items: center;
   }
 }

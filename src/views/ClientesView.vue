@@ -8,8 +8,8 @@
         <BarraBusqueda />
       </div>
         <div class="acciones">
-          <button class="btn-eliminar">Eliminar</button>
-          <button class="btn-agregar">Nuevo cliente</button>
+          <button class="btn-eliminar" @click="eliminarMultiples">Eliminar</button>
+          <button class="btn-agregar" @click="abrirModalNuevoCliente">Nuevo cliente</button>
         </div>
 
         <table class="tabla-clientes">
@@ -24,45 +24,88 @@
           </thead>
 
           <tbody>
-            <!-- Aquí irán los datos desde la BD -->
-            <tr>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
+            <tr v-for="cliente in clientes" :key="cliente.id">
+            <td>{{ cliente.id }}</td>
+            <td>{{ cliente.nombre }}</td>
+            <td>{{ cliente.apellidos }}</td>
+            <td>{{ cliente.telefono }}</td>
+
               <td class="acciones-tabla">
-                <button><i class="bi bi-pencil-square editar"></i></button>
-                <button><i class="bi bi-trash eliminar"></i></button>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td class="acciones">
-                <button><i class="bi bi-pencil-square editar"></i></button>
-                <button><i class="bi bi-trash eliminar"></i></button>
+                <button>
+                  <i class="bi bi-check eliminar-multiple"></i>
+                </button>
+
+                <button @click="eliminarCliente(cliente.nombre)">
+                  <i class="bi bi-trash eliminar"></i>
+                </button>
               </td>
             </tr>
           </tbody>
         </table>
 
+        <ModalConfirmacion
+        v-if="mostrarModal"
+        @confirmar="eliminarCliente"
+        @cancelar="mostrarModal = false"
+      />
 
-      
+      <ModalNuevoCliente
+        v-if="mostrarModalCliente"
+        @cerrar="cerrarModalCliente"
+        @guardar="guardarCliente"
+      />
+
+      <ModalInformacion
+        v-if="mostrarModalInformacion"
+        @cerrar="mostrarModalInformacion = false"
+      />
+
     </div>
   </div>
 </template>
 
 <script setup>
-    import BarraBusqueda from '@/components/BarraBusqueda.vue'
+  import { ref } from 'vue'
+  import BarraBusqueda from '@/components/BarraBusqueda.vue'
+  import ModalConfirmacion from '@/components/ModalConfirmacion.vue'
+  import ModalNuevoCliente from '@/components/ModalNuevoCliente.vue'
+  import ModalInformacion from '@/components/ModalInformartivo.vue'
+
+  const clientes = ref([])
+  const mostrarModal = ref(false)
+ 
+  // VARIABLES para modal nuevo cliente
+  const clienteActual = ref(null)
+  const mostrarModalCliente = ref(false)
+  const mostrarModalInformacion = ref(false)
+
+  // FUNCIÓN para abrir modal nuevo cliente
+  const abrirModalNuevoCliente = () => {
+    clienteActual.value = null // limpio el cliente para nuevo
+    mostrarModalCliente.value = true
+  }
+
+  // FUNCIÓN para cerrar modal cliente
+  const cerrarModalCliente = () => {
+    mostrarModalCliente.value = false
+    clienteActual.value = null
+  }
+
+  const guardarCliente = (cliente) => {
+    // Por ejemplo, agregar a la lista local o enviar a la API
+    clientes.value.push(cliente);
+    setTimeout(() => {
+      mostrarModalInformacion.value = true
+    }, 300)
+  };
+  
 </script>
 
 <style scoped>
 .content {
-  background: black;
-  padding: 2rem;
-  min-height: 100vh; 
+  background: #222;
+  padding: 2rem; 
+  min-height: 100vh;
   width: 100vh;
   border-radius: 10px;
 }
@@ -131,6 +174,7 @@
 }
 
 .tabla-clientes {
+  margin-top: 20px;
   width: 100%;
   border-collapse: collapse;
   border-radius: 8px;
@@ -138,7 +182,6 @@
   font-family: Arial, sans-serif;
   padding-top: 8rem; 
 }
-
 
 .tabla-clientes thead {
   background-color: #154E68; 
@@ -173,7 +216,7 @@
   align-items: center;
 }
 
-.editar {
+.eliminiar-multiple {
   color: black;
   cursor: pointer;
 }

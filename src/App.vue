@@ -23,7 +23,6 @@ const route = useRoute()
 .app-layout {
   display: flex;
   min-height: 100vh;
-  background: url('@/assets/img/salon-belleza.jpg') center / cover no-repeat;
   justify-content: center;
 }
 

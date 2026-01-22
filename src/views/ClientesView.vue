@@ -24,5 +24,7 @@
   border-radius: 20px;
   padding: 2rem;
   color: black;
+  height: 90vh;
+
 }
 </style>

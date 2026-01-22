@@ -7,98 +7,210 @@
         </div>
         <BarraBusqueda />
       </div>
-        <div class="acciones">
-          <button class="btn-eliminar" @click="eliminarMultiples">Eliminar</button>
-          <button class="btn-agregar" @click="abrirModalNuevoCliente">Nuevo cliente</button>
-        </div>
 
-        <table class="tabla-clientes">
-          <thead>
-            <tr>
-              <th>ID cliente</th>
-              <th>Nombre</th>
-              <th>Apellidos</th>
-              <th>Teléfono</th>
-              <th>Acciones</th> 
-            </tr>
-          </thead>
+      <div class="acciones">
+        <button class="btn-eliminar" @click="eliminarMultiples">Eliminar</button>
+        <button class="btn-agregar" @click="abrirModalNuevoCliente">Nuevo cliente</button>
+      </div>
 
-          <tbody>
-            <tr v-for="cliente in clientes" :key="cliente.id">
+      <table class="tabla-clientes">
+        <thead>
+          <tr>
+            <th>ID cliente</th>
+            <th>Nombre</th>
+            <th>Apellidos</th>
+            <th>Teléfono</th>
+            <th>Acciones <input type="checkbox" v-model="seleccionadosTodos" @change="seleccionarTodos"></th> 
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="cliente in clientes" :key="cliente.id">
             <td>{{ cliente.id }}</td>
-            <td>{{ cliente.nombre }}</td>
-            <td>{{ cliente.apellidos }}</td>
-            <td>{{ cliente.telefono }}</td>
+            <td>
+              <button class="btn btn-link p-0" @click="abrirModalVerCliente(cliente)">
+                {{ cliente.name }}
+              </button>
+            </td>
+            <td>{{ cliente.surnames }}</td>
+            <td>{{ cliente.telephone }}</td>
+            <td class="acciones-tabla">
+              <button @click="solicitarEliminarCliente(cliente)">
+                <i class="bi bi-trash eliminar"></i>
+              </button>
+              <input type="checkbox" v-model="seleccionados" :value="cliente.id">
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-              <td class="acciones-tabla">
-                <button>
-                  <i class="bi bi-check eliminar-multiple"></i>
-                </button>
-
-                <button @click="eliminarCliente(cliente.nombre)">
-                  <i class="bi bi-trash eliminar"></i>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <ModalConfirmacion
-        v-if="mostrarModal"
-        @confirmar="eliminarCliente"
-        @cancelar="mostrarModal = false"
+      <!-- Modal Confirmación -->
+      <ModalConfirmacion
+        v-if="mostrarModalConfirmacion"
+        :cliente="clienteAEliminar"
+        @confirmar="confirmarEliminarCliente"
+        @cancelar="() => { mostrarModalConfirmacion = false; clienteAEliminar = null }"
       />
 
+      <!-- Modal Nuevo Cliente -->
       <ModalNuevoCliente
         v-if="mostrarModalCliente"
         @cerrar="cerrarModalCliente"
         @guardar="guardarCliente"
       />
 
+      <!-- Modal Informacion -->
       <ModalInformacion
         v-if="mostrarModalInformacion"
-        @cerrar="mostrarModalInformacion = false"
+        @cerrar="() => mostrarModalInformacion = false"
       />
 
+      <!-- Modal Ver Cliente -->
+      <ModalVerCliente
+        v-if="mostrarModalVerCliente"
+        :cliente="clienteSeleccionado"
+        @cerrar="cerrarModalVerCliente"
+      />
     </div>
   </div>
 </template>
 
 <script setup>
-  import { ref } from 'vue'
-  import BarraBusqueda from '@/components/BarraBusqueda.vue'
-  import ModalConfirmacion from '@/components/ModalConfirmacion.vue'
-  import ModalNuevoCliente from '@/components/ModalNuevoCliente.vue'
-  import ModalInformacion from '@/components/ModalInformartivo.vue'
+import { ref, onMounted } from 'vue'
+import BarraBusqueda from '@/components/BarraBusqueda.vue'
+import ModalNuevoCliente from '@/components/ModalNuevoCliente.vue'
+import ModalInformacion from '@/components/ModalInformartivo.vue'
+import ModalConfirmacion from '@/components/ModalConfirmacion.vue'
+import ModalVerCliente from '@/components/ModalVerCliente.vue'
 
-  const clientes = ref([])
-  const mostrarModal = ref(false)
- 
-  // VARIABLES para modal nuevo cliente
-  const clienteActual = ref(null)
-  const mostrarModalCliente = ref(false)
-  const mostrarModalInformacion = ref(false)
+/* ===============================
+   ESTADOS
+================================ */
+const clientes = ref([])
+const cargando = ref(false)
+const error = ref(null)
 
-  // FUNCIÓN para abrir modal nuevo cliente
-  const abrirModalNuevoCliente = () => {
-    clienteActual.value = null // limpio el cliente para nuevo
-    mostrarModalCliente.value = true
+const seleccionados = ref([])
+const seleccionadosTodos = ref(false)
+
+/* Modales */
+const mostrarModalCliente = ref(false)
+const mostrarModalInformacion = ref(false)
+const mostrarModalConfirmacion = ref(false)
+const mostrarModalVerCliente = ref(false)
+
+const clienteSeleccionado = ref(null)
+const clienteAEliminar = ref(null)
+
+/* ===============================
+   FUNCIONES MODALES
+================================ */
+const abrirModalNuevoCliente = () => mostrarModalCliente.value = true
+const cerrarModalCliente = () => mostrarModalCliente.value = false
+
+const abrirModalVerCliente = (cliente) => {
+  clienteSeleccionado.value = { ...cliente }
+  mostrarModalVerCliente.value = true
+}
+
+const cerrarModalVerCliente = () => {
+  clienteSeleccionado.value = null
+  mostrarModalVerCliente.value = false
+}
+
+/* ===============================
+   FUNCIONES ELIMINAR
+================================ */
+const solicitarEliminarCliente = (cliente) => {
+  clienteAEliminar.value = cliente
+  mostrarModalConfirmacion.value = true
+}
+
+const confirmarEliminarCliente = async () => {
+  try {
+    const id = clienteAEliminar.value.id
+    const res = await fetch(`http://localhost:8000/api/clients/${id}`, { method: 'DELETE' })
+    if (!res.ok) throw new Error('Error al eliminar cliente')
+    await obtenerClientes()
+  } catch (err) {
+    console.error(err)
+  } finally {
+    mostrarModalConfirmacion.value = false
+    clienteAEliminar.value = null
   }
+}
 
-  // FUNCIÓN para cerrar modal cliente
-  const cerrarModalCliente = () => {
-    mostrarModalCliente.value = false
-    clienteActual.value = null
+/* ===============================
+   ELIMINAR MULTIPLES CLIENTES
+================================ */
+const eliminarMultiples = () => {
+  if (seleccionados.value.length === 0) return alert("No hay clientes seleccionados")
+  mostrarModalConfirmacion.value = true
+}
+
+const confirmarEliminarMultiples = async () => {
+  try {
+    await Promise.all(
+      seleccionados.value.map(id =>
+        fetch(`http://localhost:8000/api/clients/${id}`, { method: 'DELETE' })
+      )
+    )
+    await obtenerClientes()
+    seleccionados.value = []
+    seleccionadosTodos.value = false
+  } catch (err) {
+    console.error(err)
+  } finally {
+    mostrarModalConfirmacion.value = false
   }
+}
 
-  const guardarCliente = (cliente) => {
-    // Por ejemplo, agregar a la lista local o enviar a la API
-    clientes.value.push(cliente);
-    setTimeout(() => {
-      mostrarModalInformacion.value = true
-    }, 300)
-  };
-  
+/* ===============================
+   SELECCIONAR TODOS
+================================ */
+const seleccionarTodos = () => {
+  seleccionados.value = seleccionadosTodos.value ? clientes.value.map(c => c.id) : []
+}
+
+/* ===============================
+   OBTENER CLIENTES DE LA BD
+================================ */
+const obtenerClientes = async () => {
+  cargando.value = true
+  error.value = null
+  try {
+    const res = await fetch('http://localhost:8000/api/clients')
+    if (!res.ok) throw new Error('Error al obtener clientes')
+    clientes.value = await res.json()
+  } catch (err) {
+    error.value = err.message
+  } finally {
+    cargando.value = false
+  }
+}
+
+/* ===============================
+   GUARDAR CLIENTE
+================================ */
+const guardarCliente = async (cliente) => {
+  try {
+    const res = await fetch('http://localhost:8000/api/clients', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(cliente)
+    })
+    if (!res.ok) throw new Error('Error al guardar cliente')
+    await obtenerClientes()
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+/* ===============================
+   CARGA INICIAL
+================================ */
+onMounted(() => {
+  obtenerClientes()
+})
 </script>
 
 <style scoped>

@@ -16,18 +16,15 @@
 </template>
 
 <style scoped>
-  .modal-backdrop{
-    position: fixed;
-    top: 250px; 
-    left: 0;
-    width: 100vw; 
-    height: 50vh;
-    background-color: rgba(0,0,0,0.0);
-    display: flex; 
-    justify-content: center; 
-    align-items: center;
-    z-index: 1050;
-  }
+  .modal-backdrop {
+  position: fixed;
+  inset: 0; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0,0,0,0.0); 
+  z-index: 1050;
+}
 
   .modal-content{
   background: white;

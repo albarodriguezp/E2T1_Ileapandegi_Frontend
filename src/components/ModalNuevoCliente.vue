@@ -19,11 +19,6 @@
         <input id="telefono" v-model="cliente.telefono" type="tel" />
       </div>
 
-      <div class="form-group">
-        <label for="direccion">Dirección:</label>
-        <input id="direccion" v-model="cliente.direccion" type="text" />
-      </div>
-
       <button class="guardar-btn" @click="guardarCliente">Guardar</button>
     </div>
   </div>
@@ -54,7 +49,7 @@ function cerrarModal() {
 .modal-backdrop {
   position: fixed;
   top: 250px; left: 0;
-  width: 100vw; height: 50vh;
+  width: 100vw; height: 40vh;
   background-color: rgba(0,0,0,0.0);
   display: flex; justify-content: center; align-items: center;
   z-index: 1050;

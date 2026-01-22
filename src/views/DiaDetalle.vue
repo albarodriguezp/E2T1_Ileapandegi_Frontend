@@ -1,38 +1,26 @@
 <template>
   <div class="content">
-    <div class="content2">
-      <h1>Citas del dia {{ dia }}</h1>
-      
-  <div class="grid grid-rows-24">
-  <div
-    v-for="hora in 24"
-    :key="hora"
-    class="fila-hora"
-  >
-    {{ hora }}:00
-    <div v-if="citas[hora]" class="bloque-cita">
-      {{ citas[hora].titulo }}
+    <div class = "content2">
+      <h1>Citas {{ dia }}/{{ mes + 1 }}/{{ ano }}</h1>
+        <div class="contenedor-horario">
+          <div class="columna-horas">
+            <div v-for="hora in horasTurno" :key="hora"></div>
+          </div>
+        </div>
+
     </div>
   </div>
-  </div>
-    </div>
-  </div>
+
 </template>
 
 <script setup>
-    import { useRoute } from 'vue-router'
+import { useRoute } from 'vue-router'
+const route = useRoute()
+const dia = route.params.dia
+const mes = Number(route.params.mes)
+const ano = route.params.ano
 
-    const route = useRoute()
-    const dia = route.params.dia
-
-    import { ref } from 'vue'
-    const citas = ref([
-    { titulo: 'Reunión con Juan', inicio: '09:00', fin: '10:00', descripcion: 'Sala 1' },
-    { titulo: 'Llamada cliente', inicio: '11:00', fin: '11:30', descripcion: 'Zoom' },
-    { titulo: 'Revisar informe', inicio: '14:00', fin: '15:30', descripcion: 'Oficina' }
-    ])
 </script>
-
 <style scoped>
 .content {
   background: #222;

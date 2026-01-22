@@ -27,27 +27,27 @@ import Dia from './Dia.vue';
 import { computed } from 'vue'
 
 function abrirDia(dia){
-    router.push({ name: 'DiaDetalle', params: { dia: dia } })
+    router.push({ name: 'DiaDetalle', params: { dia: dia, mes: mesActual, ano: ano } })
 }
 
 const semana = ['L', 'M', 'X', 'J', 'V']
 const hoy = new Date();
 
-const año = hoy.getFullYear();
+const ano = hoy.getFullYear();
 const mesActual = hoy.getMonth();
 
 const mes = computed(() => {
   const dias = []
 
-  const primerDiaSemana = new Date(año, mesActual, 1).getDay()
+  const primerDiaSemana = new Date(ano, mesActual, 1).getDay()
 
   const offset = primerDiaSemana === 0 ? 6 : primerDiaSemana - 1
   for (let i = 0; i < Math.min(offset, 5); i++) {
     dias.push(null)
   }
-  const ultimoDia = new Date(año, mesActual + 1, 0).getDate()
+  const ultimoDia = new Date(ano, mesActual + 1, 0).getDate()
   for (let d = 1; d <= ultimoDia; d++) {
-    const fecha = new Date(año, mesActual, d)
+    const fecha = new Date(ano, mesActual, d)
     const diaSemana = fecha.getDay()
 
     

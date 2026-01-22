@@ -8,8 +8,6 @@
 
 
 <script setup>
-import { defineEmits } from 'vue'
-
 const emit = defineEmits(['clickDia'])
 
 const props = defineProps({
@@ -17,6 +15,7 @@ const props = defineProps({
     type: Number,
     required: true,
   }
+  
 })
 function handleClick() {
   emit('clickDia', props.numero) 

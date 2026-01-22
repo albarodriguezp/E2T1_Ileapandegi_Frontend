@@ -16,7 +16,7 @@ const routes = [
   { path: '/portfolio', name: 'portfolio', component: PortfolioView },
   { path: '/citas', name: 'citas', component: CitasView },
   { path: '/perfil', name: 'perfil', component: PerfilView },
-  { path: '/dia/:dia', name: 'DiaDetalle', component: DiaDetalle},
+  { path: '/dia/:dia/:mes/:ano', name: 'DiaDetalle', component: DiaDetalle},
 ]
 
 const router = createRouter({

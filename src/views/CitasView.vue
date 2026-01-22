@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     <div class="content2">
-      <h1 class="mb-2">Citas {{mes}}</h1>
+      <h1 class="mb-2">Citas {{mes }}</h1>
       <Mes/>
     </div>
   </div>

@@ -23,8 +23,11 @@ const route = useRoute()
 .app-layout {
   display: flex;
   min-height: 100vh;
+
   background-color: #222;
   border-radius: 20px;
+
+ 
 }
 
 </style>

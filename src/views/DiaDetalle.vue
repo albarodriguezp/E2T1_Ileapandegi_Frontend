@@ -31,7 +31,10 @@
                   top: cita.top + 'px',
                   height: cita.height + 'px'
                 }">
-                {{ cita.titulo }}
+                <p>{{ cita.titulo }}</p>
+                <p>{{ cita.inicio }}</p>
+                <p>-</p>
+                <p>{{ cita.fin }}</p>
               </div>
             </div>
           </div>
@@ -78,8 +81,8 @@ function formatHora(hora) {
 
 //Cambiar por BD
 const citas = [
-  { inicio: 10, fin: 12, titulo: 'Reunión con Juan', silla: 1 },
-  { inicio: 11.5, fin: 13, titulo: 'Llamada cliente', silla: 2 }
+  { inicio: 10, fin: 12, titulo: 'Tinte y peinado', silla: 1 },
+  { inicio: 11, fin: 12.25, titulo: 'Corte de pelo', silla: 2 }
 ]
 
 const citasPosicion = computed(() =>

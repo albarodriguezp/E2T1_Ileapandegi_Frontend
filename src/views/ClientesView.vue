@@ -1,6 +1,7 @@
 <template>
   <div class="content">
     <div class="content2">
+      <h1>Clientes</h1>
       <div class="buscador">
         <div class="icono-circulo">
           <i class="bi bi-search"></i>
@@ -227,6 +228,7 @@ onMounted(() => {
 }
 
 .acciones {
+  margin-top: 1cm;
   display: flex;
   justify-content: flex-end;
   gap: 10px;
@@ -256,6 +258,7 @@ onMounted(() => {
 }
 
 .buscador {
+  margin-top: 1cm;
   margin-bottom: 20px;
   display: flex;
   align-items: center;
@@ -283,7 +286,7 @@ onMounted(() => {
 }
 
 .tabla-clientes {
-  margin-top: 20px;
+  margin-top: 1cm;
   width: 100%;
   border-collapse: collapse;
   border-radius: 8px;

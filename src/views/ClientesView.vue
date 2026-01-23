@@ -45,9 +45,7 @@
       </table>
 
       <!-- Modal Confirmación -->
-      <ModalConfirmacion v-if="mostrarModalConfirmacion" :cliente="clienteAEliminar"
-        @confirmar="confirmarEliminarCliente"
-        @cancelar="() => { mostrarModalConfirmacion = false; clienteAEliminar = null }" />
+      <ModalConfirmacion :mostrar="mostrarModalConfirmacion" :mensaje="mensajeModal" @confirmar="confirmarEliminarConfirmado" @cancelar="cancelarModal"/>
 
       <!-- Modal Nuevo Cliente -->
       <ModalNuevoCliente v-if="mostrarModalCliente" @cerrar="cerrarModalCliente" @guardar="guardarCliente" />
@@ -65,8 +63,8 @@
 import { ref, onMounted } from 'vue'
 import BarraBusqueda from '@/components/BarraBusqueda.vue'
 import ModalNuevoCliente from '@/components/ModalNuevoCliente.vue'
-import ModalInformacion from '@/components/ModalInformartivo.vue'
-import ModalConfirmacion from '@/components/ModalConfirmacion.vue'
+import ModalInformacion from '@/components/ModalInformativo.vue'
+import ModalConfirmacion from'@/components/ModalConfirmacion.vue'
 import ModalVerCliente from '@/components/ModalVerCliente.vue'
 
 /* ===============================
@@ -88,6 +86,10 @@ const mostrarModalVerCliente = ref(false)
 const clienteSeleccionado = ref(null)
 const clienteAEliminar = ref(null)
 
+const mensajeModal = ref('')        // Texto del modal
+const eliminarMultiple = ref(false)  // Saber si es eliminación múltiple
+
+
 /* ===============================
    FUNCIONES MODALES
 ================================ */
@@ -103,12 +105,19 @@ const cerrarModalVerCliente = () => {
   clienteSeleccionado.value = null
   mostrarModalVerCliente.value = false
 }
+const cancelarModal = () => {
+  mostrarModalConfirmacion.value = false;
+  clienteAEliminar.value = null;
+  eliminarMultiple.value = false;
+}
 
 /* ===============================
    FUNCIONES ELIMINAR
 ================================ */
 const solicitarEliminarCliente = (cliente) => {
   clienteAEliminar.value = cliente
+  mensajeModal.value = `¿Deseas eliminar al cliente ${cliente.name}?`
+  eliminarMultiple.value = false
   mostrarModalConfirmacion.value = true
 }
 
@@ -126,31 +135,50 @@ const confirmarEliminarCliente = async () => {
   }
 }
 
-/* ===============================
-   ELIMINAR MULTIPLES CLIENTES
-================================ */
 const eliminarMultiples = () => {
-  if (seleccionados.value.length === 0) return alert("No hay clientes seleccionados")
+  if (seleccionados.value.length === 0) {
+    mensajeModal.value = "No hay clientes seleccionados"
+    eliminarMultiple.value = false
+    mostrarModalConfirmacion.value = true
+    return
+  }
+  mensajeModal.value = `¿Deseas eliminar ${seleccionados.value.length} clientes?`
+  eliminarMultiple.value = true
   mostrarModalConfirmacion.value = true
+  
 }
 
-const confirmarEliminarMultiples = async () => {
+
+const confirmarEliminarConfirmado = async () => {
   try {
-    await Promise.all(
-      seleccionados.value.map(id =>
-        fetch(`http://localhost:8000/api/clients/${id}`, { method: 'DELETE' })
+    if (eliminarMultiple.value) {
+      // Eliminar múltiples clientes de la BD
+      await Promise.all(
+        seleccionados.value.map(id =>
+          fetch(`http://localhost:8000/api/clients/${id}`, { method: 'DELETE' })
+        )
       )
-    )
+      // Limpiar selección
+      seleccionados.value = []
+      seleccionadosTodos.value = false
+    } else if (clienteAEliminar.value) {
+      // Eliminar un solo cliente de la BD
+      const id = clienteAEliminar.value.id
+      const res = await fetch(`http://localhost:8000/api/clients/${id}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('Error al eliminar cliente')
+      clienteAEliminar.value = null
+    }
+
+    // Refrescar la tabla
     await obtenerClientes()
-    seleccionados.value = []
-    seleccionadosTodos.value = false
+
   } catch (err) {
     console.error(err)
   } finally {
     mostrarModalConfirmacion.value = false
+    eliminarMultiple.value = false
   }
 }
-
 /* ===============================
    SELECCIONAR TODOS
 ================================ */
@@ -186,6 +214,8 @@ const obtenerClientes = async () => {
    GUARDAR CLIENTE
 ================================ */
 const guardarCliente = async (cliente) => {
+  const token = localStorage.getItem('token')
+  console.log(token)
   try {
     const res = await fetch('http://localhost:8000/api/clients', {
       method: 'POST',
@@ -223,8 +253,12 @@ onMounted(() => {
 .content2 {
   background: white;
   border-radius: 20px;
+  height: 100vh;
   padding: 2rem;
   color: black;
+  position: relative;
+  overflow: visible;
+  z-index: 1;
 }
 
 .acciones {
@@ -286,7 +320,7 @@ onMounted(() => {
 }
 
 .tabla-clientes {
-  margin-top: 1cm;
+  margin-top: 0.5cm;
   width: 100%;
   border-collapse: collapse;
   border-radius: 8px;

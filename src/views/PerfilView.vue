@@ -1,15 +1,116 @@
 <template>
   <div class="content">
     <div class="content2">
-      <h1>PERFIL VIEW</h1>
+
+      <!-- Título -->
+      <h1>Mi perfil</h1>
+
+      <!-- ===== Información personal ===== -->
+      <div class="perfil-card">
+
+        <div class="perfil-left">
+          <div class="avatar">
+            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="avatar">
+          </div>
+        </div>
+
+        <div class="perfil-right">
+          <div class="form-group">
+            <label>Nombre</label>
+            <input v-model="perfil.nombre" disabled />
+          </div>
+
+          <div class="form-group">
+            <label>Email</label>
+            <input v-model="perfil.email" disabled />
+          </div>
+
+          <div class="form-group">
+            <label>Rol</label>
+            <input v-model="perfil.rol" disabled />
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ===== Progreso ===== -->
+      <div class="progreso">
+        <h2>Mi progreso</h2>
+
+        <div class="progress-item" v-for="item in progreso" :key="item.nombre">
+          <div class="progress-header">
+            <span>{{ item.nombre }}</span>
+            <span>{{ item.valor }}%</span>
+          </div>
+
+          <div class="progress-bar">
+            <div
+              class="progress-fill"
+              :style="{ width: item.valor + '%' }"
+            ></div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
+
+/* ===== Datos perfil ===== */
+const perfil = ref({
+  nombre: '',
+  email: '',
+  rol: ''
+})
+
+/* ===== Progreso ===== */
+const progreso = ref([])
+
+/* ===== Función para cargar datos del usuario ===== */
+const cargarPerfil = async () => {
+  try {
+    // Traemos los datos del perfil
+    const resPerfil = await fetch('http://localhost:8000/api/profile', {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    const dataPerfil = await resPerfil.json()
+    perfil.value.nombre = dataPerfil.name
+    perfil.value.rol = dataPerfil.rol
+    // Si tu API devuelve email separados, por ejemplo: dataPerfil.email
+    perfil.value.email = dataPerfil.email || ''
+
+    // Traemos los datos de progreso
+    const resProgreso = await fetch('http://localhost:8000/api/profile/progress', {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    const dataProgreso = await resProgreso.json()
+
+    // Suponiendo que la API devuelve { servicios_completados: [ { id, nombre }, ... ] }
+    progreso.value = dataProgreso.servicios_completados.map(s => ({
+      nombre: s.nombre,
+      valor: 100 // Puedes poner 100% porque ya está completado
+    }))
+  } catch (error) {
+    console.error('Error al cargar perfil y progreso', error)
+  }
+}
+
+/* ===== Cargar al montar el componente ===== */
+onMounted(() => {
+  cargarPerfil()
+})
 </script>
 
+
 <style scoped>
+/* ===== Layout ===== */
 .content {
   background: #222;
   padding: 2rem;
@@ -23,6 +124,92 @@
   padding: 2rem;
   color: black;
   height: 90vh;
+  overflow-y: auto;
+}
 
+h1 {
+  margin-bottom: 2rem;
+}
+
+/* ===== Perfil ===== */
+.perfil-card {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  margin-bottom: 3rem;
+}
+
+.perfil-left {
+  flex: 0 0 120px;
+}
+
+.avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid #164e63;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.perfil-right {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 0.85rem;
+  margin-bottom: 0.3rem;
+  font-weight: 600;
+}
+
+.form-group input {
+  padding: 0.6rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #f5f5f5;
+}
+
+/* ===== Progreso ===== */
+.progreso h2 {
+  margin-bottom: 1.5rem;
+}
+
+.progress-item {
+  margin-bottom: 1.2rem;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 12px;
+  background: #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #164e63;
+  border-radius: 10px;
+  transition: width 0.4s ease;
 }
 </style>

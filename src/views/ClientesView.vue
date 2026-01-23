@@ -20,7 +20,7 @@
             <th>Nombre</th>
             <th>Apellidos</th>
             <th>Teléfono</th>
-            <th>Acciones <input type="checkbox" v-model="seleccionadosTodos" @change="seleccionarTodos"></th> 
+            <th>Acciones <input type="checkbox" v-model="seleccionadosTodos" @change="seleccionarTodos"></th>
           </tr>
         </thead>
         <tbody>
@@ -44,32 +44,18 @@
       </table>
 
       <!-- Modal Confirmación -->
-      <ModalConfirmacion
-        v-if="mostrarModalConfirmacion"
-        :cliente="clienteAEliminar"
+      <ModalConfirmacion v-if="mostrarModalConfirmacion" :cliente="clienteAEliminar"
         @confirmar="confirmarEliminarCliente"
-        @cancelar="() => { mostrarModalConfirmacion = false; clienteAEliminar = null }"
-      />
+        @cancelar="() => { mostrarModalConfirmacion = false; clienteAEliminar = null }" />
 
       <!-- Modal Nuevo Cliente -->
-      <ModalNuevoCliente
-        v-if="mostrarModalCliente"
-        @cerrar="cerrarModalCliente"
-        @guardar="guardarCliente"
-      />
+      <ModalNuevoCliente v-if="mostrarModalCliente" @cerrar="cerrarModalCliente" @guardar="guardarCliente" />
 
       <!-- Modal Informacion -->
-      <ModalInformacion
-        v-if="mostrarModalInformacion"
-        @cerrar="() => mostrarModalInformacion = false"
-      />
+      <ModalInformacion v-if="mostrarModalInformacion" @cerrar="() => mostrarModalInformacion = false" />
 
       <!-- Modal Ver Cliente -->
-      <ModalVerCliente
-        v-if="mostrarModalVerCliente"
-        :cliente="clienteSeleccionado"
-        @cerrar="cerrarModalVerCliente"
-      />
+      <ModalVerCliente v-if="mostrarModalVerCliente" :cliente="clienteSeleccionado" @cerrar="cerrarModalVerCliente" />
     </div>
   </div>
 </template>
@@ -177,8 +163,15 @@ const seleccionarTodos = () => {
 const obtenerClientes = async () => {
   cargando.value = true
   error.value = null
+    const token = localStorage.getItem('token')
+
   try {
-    const res = await fetch('http://localhost:8000/api/clients')
+    const res = await fetch('http://localhost:8000/api/clients', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    })
     if (!res.ok) throw new Error('Error al obtener clientes')
     clientes.value = await res.json()
   } catch (err) {
@@ -195,7 +188,10 @@ const guardarCliente = async (cliente) => {
   try {
     const res = await fetch('http://localhost:8000/api/clients', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
       body: JSON.stringify(cliente)
     })
     if (!res.ok) throw new Error('Error al guardar cliente')
@@ -232,12 +228,12 @@ onMounted(() => {
 
 .acciones {
   display: flex;
-  justify-content: flex-end; 
+  justify-content: flex-end;
   gap: 10px;
 }
 
 .acciones-tabla {
-  display: flex; 
+  display: flex;
   gap: 10px;
 }
 
@@ -293,11 +289,11 @@ onMounted(() => {
   border-radius: 8px;
   overflow: hidden;
   font-family: Arial, sans-serif;
-  padding-top: 8rem; 
+  padding-top: 8rem;
 }
 
 .tabla-clientes thead {
-  background-color: #154E68; 
+  background-color: #154E68;
   color: white;
 }
 
@@ -338,5 +334,4 @@ onMounted(() => {
   color: red;
   cursor: pointer;
 }
-
 </style>

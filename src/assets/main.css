@@ -5,7 +5,7 @@
   min-height: 100vh;
   margin: 0;
   padding: 0;
-  background: url('@/assets/img/salon-belleza.jpg') center / cover no-repeat;
+  background: #222;
 }
 
 a,

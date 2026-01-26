@@ -46,7 +46,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -57,10 +57,15 @@ const ano = Number(route.params.ano)
 const fechaSeleccionada = computed(() => new Date(ano, mes, dia))
 const esMiercoles = computed(() => fechaSeleccionada.value.getDay() === 3)
 
-// cambiar por bD
-const sillones = [1, 2, 3, 4, 5] 
+/* cambiar por bD
+const sillones = [1, 2, 3, 4, 5] */
 const slotHeight = 40
 const anchoSillon = 150 
+
+const sillones = computed(() => {
+  return [...new Set(citas.value.map(c => c.silla))].sort()
+})
+
 
 const horaInicio = computed(() => esMiercoles.value ? 9 : 10)
 const horaFin = computed(() => esMiercoles.value ? 12.5 : 14.5)
@@ -79,11 +84,61 @@ function formatHora(hora) {
   return `${h}:${m.toString().padStart(2,'0')}`
 }
 
-//Cambiar por BD
+/*Cambiar por BD
 const citas = [
   { inicio: 10, fin: 12, titulo: 'Tinte y peinado', silla: 1 },
   { inicio: 11, fin: 12.25, titulo: 'Corte de pelo', silla: 2 }
-]
+]*/
+
+const citas = ref([])
+const cargando = ref(false)
+const error = ref(null)
+
+const obtenerCitas = async () => {
+  cargando.value = true
+  error.value = null
+
+  const token = localStorage.getItem('token')
+  const fechaStr = `${ano}-${(mes+1).toString().padStart(2,'0')}-${dia.toString().padStart(2,'0')}`
+  console.log(token)
+
+  try {
+    const res = await fetch(
+      `http://localhost:8000/api/appointments/by-date?date=${fechaStr}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    )
+
+    if (!res.ok) {
+      throw new Error('Error al obtener citas')
+    }
+
+    const data = await res.json()
+
+    citas.value = data.map(c => ({
+      ...c,
+      inicio: horaToDecimal(c.inicio),
+      fin: horaToDecimal(c.fin)
+    }))
+
+  } catch (err) {
+    error.value = err.message
+  } finally {
+    cargando.value = false
+  }
+}
+
+
+
+function horaToDecimal(time) {
+  const [h, m] = time.split(':').map(Number)
+  return h + m / 60
+}
+
 
 const citasPosicion = computed(() =>
   citas.map(cita => ({
@@ -96,6 +151,11 @@ const citasPosicion = computed(() =>
 function citasDeSillon(silla) {
   return citasPosicion.value.filter(c => c.silla === silla)
 }
+
+onMounted(() => {
+  obtenerCitas()
+})
+
 </script>
 
 <style scoped>

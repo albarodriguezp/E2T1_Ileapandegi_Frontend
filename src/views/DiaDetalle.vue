@@ -57,15 +57,16 @@ const ano = Number(route.params.ano)
 const fechaSeleccionada = computed(() => new Date(ano, mes, dia))
 const esMiercoles = computed(() => fechaSeleccionada.value.getDay() === 3)
 
-/* cambiar por bD
-const sillones = [1, 2, 3, 4, 5] */
+
+const sillones = [1, 2, 3, 4, 5] 
 const slotHeight = 40
 const anchoSillon = 150 
 
-const sillones = computed(() => {
+
+/*const sillones = computed(() => {
   if (!Array.isArray(citas.value)) return []
   return [...new Set(citas.value.map(c => c.silla))].sort()
-})
+})*/
 
 
 const horaInicio = computed(() => esMiercoles.value ? 9 : 10)
@@ -84,12 +85,6 @@ function formatHora(hora) {
   const m = Math.round((hora - h) * 60)
   return `${h}:${m.toString().padStart(2,'0')}`
 }
-
-/*Cambiar por BD
-const citas = [
-  { inicio: 10, fin: 12, titulo: 'Tinte y peinado', silla: 1 },
-  { inicio: 11, fin: 12.25, titulo: 'Corte de pelo', silla: 2 }
-]*/
 
 const citas = ref([])
 const cargando = ref(false)

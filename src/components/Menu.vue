@@ -41,7 +41,6 @@
   display: flex;
   flex-direction: column;
   padding: 2rem 1rem;
-
   user-select: none;
 }
 

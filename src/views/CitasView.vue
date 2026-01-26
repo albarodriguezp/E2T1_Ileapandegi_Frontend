@@ -1,12 +1,22 @@
 <template>
   <div class="content">
     <div class="content2">
-      <h1>CITAS VIEW</h1>
+      <h1 class="mb-2">Citas {{mes }}</h1>
+      <Mes/>
     </div>
   </div>
 </template>
 
 <script setup>
+import Mes from '@/components/Mes.vue';
+const hoy = new Date();
+const meses = [
+  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+]
+const mes = meses[hoy.getMonth()];
+
+
 </script>
 
 <style scoped>
@@ -15,6 +25,7 @@
   padding: 2rem;
   min-height: 100vh;
   width: 100%;
+
 }
 
 .content2 {

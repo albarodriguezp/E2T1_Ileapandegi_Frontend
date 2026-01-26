@@ -8,11 +8,13 @@ import ClientesView from '../views/ClientesView.vue'
 import PortfolioView from '../views/PortfolioView.vue'
 import CitasView from '../views/CitasView.vue'
 import PerfilView from '../views/PerfilView.vue'
+import DiaDetalle from '@/views/DiaDetalle.vue'
 
 // =====================
 // RUTAS
 // =====================
 const routes = [
+
   {
     path: '/',
     name: 'login',
@@ -53,7 +55,14 @@ const routes = [
     name: 'perfil',
     component: PerfilView,
     meta: { requiresAuth: true }
+  },
+   {
+    path: '/dia/:dia/:mes/:ano',
+    name: 'DiaDetalle',
+    component: DiaDetalle,
+    meta: { requiresAuth: true }
   }
+
 ]
 
 // =====================

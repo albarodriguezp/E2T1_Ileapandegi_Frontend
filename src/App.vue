@@ -24,8 +24,6 @@ const route = useRoute()
   display: flex;
   min-height: 100vh;
   justify-content: center;
-  background-color: #222;
-  border-radius: 20px;
 }
 
 </style>

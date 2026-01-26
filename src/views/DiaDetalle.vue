@@ -63,6 +63,7 @@ const slotHeight = 40
 const anchoSillon = 150 
 
 const sillones = computed(() => {
+  if (!Array.isArray(citas.value)) return []
   return [...new Set(citas.value.map(c => c.silla))].sort()
 })
 
@@ -118,8 +119,10 @@ const obtenerCitas = async () => {
     }
 
     const data = await res.json()
+    console.log('API response:', data)
 
-    citas.value = data.map(c => ({
+    const appointments = Array.isArray(data) ? data : []
+    citas.value = appointments.map(c => ({
       ...c,
       inicio: horaToDecimal(c.inicio),
       fin: horaToDecimal(c.fin)
@@ -140,13 +143,14 @@ function horaToDecimal(time) {
 }
 
 
-const citasPosicion = computed(() =>
-  citas.map(cita => ({
+const citasPosicion = computed(() =>{
+  if (!Array.isArray(citas.value)) return []
+  return citas.value.map(cita => ({
     ...cita,
     top: (cita.inicio - horaInicio.value) * slotHeight / 0.25,
     height: (cita.fin - cita.inicio) * slotHeight / 0.25
   }))
-)
+})
 
 function citasDeSillon(silla) {
   return citasPosicion.value.filter(c => c.silla === silla)

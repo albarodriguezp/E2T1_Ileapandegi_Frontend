@@ -1,53 +1,70 @@
 <template>
   <div class="content">
     <div class="content2">
-      <h1>Citas {{ dia }}/{{ mes + 1 }}/{{ ano }}</h1>
-      <div class="contenido-centrado">
-      <div class="contenedor-horario" :style="{ '--ancho-sillon': anchoSillon + 'px' }">
-        <div class="cabecera-sillones">
-          <div class="columna-horas-header"></div>
-          <div v-for="silla in sillones" :key="silla" class="silla">
-            Silla {{ silla }}
-          </div>
-        </div>
+      <div class="header">
+        <h1>Citas {{ dia }}/{{ mes + 1 }}/{{ ano }}</h1>
+        <button class="btn-nueva-cita" @click="mostrarModal = true">
+          + Nueva Cita
+        </button>
+      </div>
 
-        <div class="cuerpo-horario">
-          <div class="columna-horas">
-            <div v-for="hora in horasTurno" :key="hora" class="slot-hora">
-              {{ formatHora(hora) }}
+      <div class="contenido-centrado">
+        <div class="contenedor-horario" :style="{ '--ancho-sillon': anchoSillon + 'px' }">
+          <div class="cabecera-sillones">
+            <div class="columna-horas-header"></div>
+            <div v-for="silla in sillones" :key="silla" class="silla">
+              Silla {{ silla }}
             </div>
           </div>
 
-          <!-- FONDO GRID PARA LOS SILLONES -->
-          <div class="contenedor-sillones">
-            <div v-for="silla in sillones" :key="silla" class="columna-sillon">
-              <!-- FONDO GRID EN LOS SLOTS -->
-              <div v-for="hora in horasTurno" :key="hora" class="slot-fondo"></div>
-              
-              <!-- Citas del sillon -->
-              <div v-for="cita in citasDeSillon(silla)" :key="cita.titulo"
-                class="bloque-cita"
-                :style="{
-                  top: cita.top + 'px',
-                  height: cita.height + 'px'
-                }">
-                <p>{{ cita.titulo }}</p>
-                <p>{{ cita.inicio }}</p>
-                <p>-</p>
-                <p>{{ cita.fin }}</p>
+          <div class="cuerpo-horario">
+            <div class="columna-horas">
+              <div v-for="hora in horasTurno" :key="hora" class="slot-hora">
+                {{ formatHora(hora) }}
+              </div>
+            </div>
+
+            <!-- FONDO GRID PARA LOS SILLONES -->
+            <div class="contenedor-sillones">
+              <div v-for="silla in sillones" :key="silla" class="columna-sillon">
+                <!-- FONDO GRID EN LOS SLOTS -->
+                <div v-for="hora in horasTurno" :key="hora" class="slot-fondo"></div>
+                
+                <!-- Citas del sillon -->
+                <div v-for="cita in citasDeSillon(silla)" :key="cita.titulo"
+                  class="bloque-cita"
+                  :style="{
+                    top: cita.top + 'px',
+                    height: cita.height + 'px'
+                  }">
+                  <p>{{ cita.titulo }}</p>
+                  <p>{{ cita.inicio }}</p>
+                  <p>-</p>
+                  <p>{{ cita.fin }}</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      </div>
     </div>
+
+    <!-- Modal Nueva Cita -->
+    <ModalNuevaCita
+      v-if="mostrarModal"
+      :fecha="fechaStr"
+      :sillones="sillones"
+      :citas-existentes="citasPosicion"
+      @guardar="handleNuevaCita"
+      @cerrar="mostrarModal = false"
+    />
   </div>
 </template>
 
 <script setup>
 import { computed, ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import ModalNuevaCita from '../components/ModalNuevaCita.vue'
 
 const route = useRoute()
 const dia = Number(route.params.dia)
@@ -57,17 +74,24 @@ const ano = Number(route.params.ano)
 const fechaSeleccionada = computed(() => new Date(ano, mes, dia))
 const esMiercoles = computed(() => fechaSeleccionada.value.getDay() === 3)
 
+const fechaStr = computed(() => 
+  `${ano}-${(mes+1).toString().padStart(2,'0')}-${dia.toString().padStart(2,'0')}`
+)
 
-const sillones = [1, 2, 3, 4, 5] 
 const slotHeight = 40
 const anchoSillon = 150 
+const mostrarModal = ref(false)
 
+// sillones desde front tmb FALTA CAMBIAR POR ESTUDIANTES DEL DÍA
+const sillonesDisponibles = ref([1, 2, 3, 4, 5])
 
-/*const sillones = computed(() => {
-  if (!Array.isArray(citas.value)) return []
-  return [...new Set(citas.value.map(c => c.silla))].sort()
-})*/
-
+const sillones = computed(() => {
+  if (!Array.isArray(citas.value)) return sillonesDisponibles.value
+  
+  const sillonesConCitas = citas.value.map(c => c.silla)
+  const todosSillones = [...new Set([...sillonesDisponibles.value, ...sillonesConCitas])]
+  return todosSillones.sort((a, b) => a - b)
+})
 
 const horaInicio = computed(() => esMiercoles.value ? 9 : 10)
 const horaFin = computed(() => esMiercoles.value ? 12.5 : 14.5)
@@ -95,12 +119,10 @@ const obtenerCitas = async () => {
   error.value = null
 
   const token = localStorage.getItem('token')
-  const fechaStr = `${ano}-${(mes+1).toString().padStart(2,'0')}-${dia.toString().padStart(2,'0')}`
   console.log(token)
-
   try {
     const res = await fetch(
-      `http://localhost:8000/api/appointments/by-date?date=${fechaStr}`,
+      `http://localhost:8000/api/appointments/by-date?date=${fechaStr.value}`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -114,7 +136,6 @@ const obtenerCitas = async () => {
     }
 
     const data = await res.json()
-    console.log('API response:', data)
 
     const appointments = Array.isArray(data) ? data : []
     citas.value = appointments.map(c => ({
@@ -130,15 +151,12 @@ const obtenerCitas = async () => {
   }
 }
 
-
-
 function horaToDecimal(time) {
   const [h, m] = time.split(':').map(Number)
   return h + m / 60
 }
 
-
-const citasPosicion = computed(() =>{
+const citasPosicion = computed(() => {
   if (!Array.isArray(citas.value)) return []
   return citas.value.map(cita => ({
     ...cita,
@@ -151,10 +169,13 @@ function citasDeSillon(silla) {
   return citasPosicion.value.filter(c => c.silla === silla)
 }
 
+function handleNuevaCita(nuevaCita) {
+  obtenerCitas()
+}
+
 onMounted(() => {
   obtenerCitas()
 })
-
 </script>
 
 <style scoped>
@@ -173,6 +194,27 @@ onMounted(() => {
   border-radius: 20px;
   padding: 2rem;
   color: black;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.btn-nueva-cita {
+  background-color: #82d8d8;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.btn-nueva-cita:hover {
+  background-color: #6bc5c5;
 }
 
 .contenedor-horario {
@@ -209,7 +251,6 @@ onMounted(() => {
   border: 1px solid #ddd;
   border-radius: 20px;
   overflow-x: auto;
-
 }
 
 .columna-horas {

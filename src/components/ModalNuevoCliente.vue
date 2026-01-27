@@ -6,20 +6,43 @@
 
       <div class="form-group">
         <label for="nombre">Nombre:</label>
-        <input id="nombre" v-model="cliente.nombre" type="text" />
+        <input id="nombre" v-model="cliente.name" type="text" />
+        <p v-if="errores.name" class="error-msg">{{ errores.name }}</p>
       </div>
 
       <div class="form-group">
         <label for="apellidos">Apellidos:</label>
-        <input id="apellidos" v-model="cliente.apellidos" type="text" />
+        <input id="apellidos" v-model="cliente.surnames" type="text" />
+        <p v-if="errores.surnames" class="error-msg">{{ errores.surnames }}</p>
       </div>
 
       <div class="form-group">
         <label for="telefono">Teléfono:</label>
-        <input id="telefono" v-model="cliente.telefono" type="tel" />
+        <input id="telefono" v-model="cliente.telephone" type="tel" />
+        <p v-if="errores.telephone" class="error-msg">{{ errores.telephone }}</p>
       </div>
 
-      <button class="guardar-btn" @click="guardarCliente">Guardar</button>
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input id="email" v-model="cliente.email" type="email" />
+        <p v-if="errores.email" class="error-msg">{{ errores.email }}</p>
+      </div>
+
+      <div class="form-group">
+        <label>Home client:</label>
+        <div class="radio-group">
+          <label>
+            <input type="radio" v-model="cliente.home_client" :value="true" />
+            Sí
+          </label>
+          <label>
+            <input type="radio" v-model="cliente.home_client" :value="false" />
+            No
+          </label>
+        </div>
+        <p v-if="errores.home_client" class="error-msg">{{ errores.home_client }}</p>
+      </div>
+      <button class="guardar-btn" @click="validarYGuardar">Guardar</button>
     </div>
   </div>
 </template>
@@ -29,13 +52,61 @@ import { reactive } from 'vue'
 const emit = defineEmits(['guardar', 'cerrar'])
 
 const cliente = reactive({
-  nombre: '',
-  apellidos: '',
-  telefono: '',
-  direccion: ''
+  name: '',
+  surnames: '',
+  telephone: '',
+  home_client: null,
+  email: ''
 })
 
-function guardarCliente() {
+// Objeto reactivo para errores por campo
+const errores = reactive({
+  name: '',
+  surnames: '',
+  telephone: '',
+  email: '',
+  home_client: ''
+})
+
+// Función de validación
+function validarCliente(cliente) {
+  // Limpiar errores previos
+  errores.name = ''
+  errores.surnames = ''
+  errores.telephone = ''
+  errores.email = ''
+  errores.home_client = ''
+
+  const letrasRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/
+  if (!cliente.name) errores.name = 'El nombre es obligatorio'
+  else if (!letrasRegex.test(cliente.name)) errores.name = 'Solo se permiten letras'
+
+  if (!cliente.surnames) errores.surnames = 'Los apellidos son obligatorios'
+  else if (!letrasRegex.test(cliente.surnames)) errores.surnames = 'Solo se permiten letras'
+
+  if (cliente.telephone) {
+    const telRegex = /^[0-9+\-\s]+$/
+    if (!telRegex.test(cliente.telephone)) errores.telephone = 'Teléfono no válido'
+    const numeros = cliente.telephone.replace(/\D/g, '')
+
+    if (!/^\d{9}$/.test(numeros)) {
+      errores.telephone = 'El teléfono debe tener 9 números'
+    }
+  }
+  if (cliente.email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(cliente.email)) errores.email = 'Email no válido'
+  }
+  if (cliente.home_client === null) errores.home_client = 'Selecciona Sí o No'
+
+  // Retorna true si no hay errores
+  return !errores.name && !errores.surnames && !errores.telephone && !errores.email && !errores.home_client
+}
+
+// Validar y emitir si todo está correcto
+function validarYGuardar() {
+  const valido = validarCliente(cliente)
+  if (!valido) return
   emit('guardar', { ...cliente })
   cerrarModal()
 }
@@ -46,6 +117,17 @@ function cerrarModal() {
 </script>
 
 <style scoped>
+.radio-group {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.error-msg {
+  color: red;
+  font-size: 0.85em;
+  margin: 2px 0 8px 0;
+}
 .modal-backdrop {
   position: fixed;
   top: 250px; left: 0;

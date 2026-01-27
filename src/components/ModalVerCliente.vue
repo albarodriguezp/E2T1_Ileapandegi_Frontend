@@ -25,11 +25,13 @@
       <div class="mb-3">
         <label class="form-label small">Email:</label>
         <input v-model="form.email" type="email" class="form-control form-control-sm" />
+         <p v-if="errores.email" class="text-danger small mt-1">{{ errores.email }}</p>
       </div>
 
       <div class="mb-3">
         <label class="form-label small">Teléfono:</label>
         <input v-model="form.telephone" type="text" class="form-control form-control-sm" />
+        <p v-if="errores.telephone" class="text-danger small mt-1">{{ errores.telephone }}</p>
       </div>
 
       <div class="mb-3">
@@ -63,6 +65,38 @@ const form = reactive({
   observations: ''
 })
 
+function validarForm() {
+  errores.email = ''
+  errores.telephone = ''
+
+  let valido = true
+
+  // Validar email si hay valor
+  if (form.email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(form.email)) {
+      errores.email = 'Email no válido'
+      valido = false
+    }
+  }
+
+  // Validar teléfono si hay valor
+  if (form.telephone) {
+    const numeros = form.telephone.replace(/\D/g, '')
+    if (!/^\d{9}$/.test(numeros)) {
+      errores.telephone = 'Teléfono debe tener 9 números'
+      valido = false
+    }
+  }
+
+  return valido
+}
+
+const errores = reactive({
+  email: '',
+  telephone: ''
+})
+
 // Cuando cambia el cliente, actualizamos el form
 watch(() => props.cliente, (newCliente) => {
   form.name = newCliente.name || ''
@@ -73,6 +107,7 @@ watch(() => props.cliente, (newCliente) => {
 }, { immediate: true })
 
 const guardar = () => {
+  if (!validarForm()) return
   emit('guardar', { ...form, id: props.cliente.id })
   emit('cerrar')
 }

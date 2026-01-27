@@ -37,10 +37,10 @@
                     top: cita.top + 'px',
                     height: cita.height + 'px'
                   }">
-                  <p>{{ cita.titulo }}</p>
                   <p>{{ cita.inicio }}</p>
                   <p>-</p>
                   <p>{{ cita.fin }}</p>
+                  
                 </div>
               </div>
             </div>
@@ -119,7 +119,7 @@ const obtenerCitas = async () => {
   error.value = null
 
   const token = localStorage.getItem('token')
-  console.log(token)
+
   try {
     const res = await fetch(
       `http://localhost:8000/api/appointments/by-date?date=${fechaStr.value}`,
@@ -139,9 +139,11 @@ const obtenerCitas = async () => {
 
     const appointments = Array.isArray(data) ? data : []
     citas.value = appointments.map(c => ({
-      ...c,
-      inicio: horaToDecimal(c.inicio),
-      fin: horaToDecimal(c.fin)
+      id: c.id,
+      silla: c.seat,
+      comentario: c.comments || 'Sin comentario',
+      inicio: horaToDecimal(c.start_time),
+      fin: horaToDecimal(c.end_time)
     }))
 
   } catch (err) {

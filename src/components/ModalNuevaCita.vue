@@ -76,7 +76,7 @@
 
         <div class="form-group">
           <label for="hora-fin">Hora Fin:</label>
-          <input id="hora-fin" v-model="cita.end_time" type="text" readonly />
+          <input id="hora-fin" v-model="cita.end_time" type="text" />
         </div>
       </div>
 

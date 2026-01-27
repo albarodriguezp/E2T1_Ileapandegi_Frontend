@@ -298,4 +298,54 @@ onMounted(fetchInventario)
   padding: 1rem;
   font-style: italic;
 }
+
+/* ===== Responsive ===== */
+@media (max-width: 1024px) {
+  .content2 {
+    padding: 1.5rem;
+    height: 95vh;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .btn-add {
+    width: 100%;
+  }
+
+  .inventario-table th,
+  .inventario-table td {
+    font-size: 0.8rem;
+    padding: 0.5rem;
+  }
+
+  .search-input {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .content {
+    padding: 0.5rem;
+  }
+
+  .content2 {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+
+  .inventario-table th,
+  .inventario-table td {
+    font-size: 0.75rem;
+    padding: 0.4rem;
+  }
+
+  .btn-add {
+    padding: 0.5rem;
+  }
+}
 </style>

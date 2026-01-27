@@ -9,12 +9,7 @@
       </div>
 
       <!-- Buscador -->
-      <input
-        v-model="search"
-        type="text"
-        placeholder="Buscar por nombre, lote o marca..."
-        class="search-input"
-      />
+      <input v-model="search" type="text" placeholder="Buscar por nombre, lote o marca..." class="search-input" />
 
       <!-- Tabla -->
       <table class="inventario-table">
@@ -62,53 +57,22 @@
     </div>
 
     <!-- ===== MODAL ===== -->
-    <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
-      <div class="modal">
-        <h2>{{ modalTitle }}</h2>
+    <InventarioAddModal v-if="showModal && modalType === 'add'" @close="closeModal" @submit="submitForm" />
 
-        <form v-if="modalType === 'add' || modalType === 'edit'" @submit.prevent="submitForm">
-          <label>Nombre</label>
-          <input v-model="form.name" required />
+    <InventarioEditModal v-if="showModal && modalType === 'edit'" :item="form" @close="closeModal"
+      @submit="submitForm" />
 
-          <label>Lote</label>
-          <input v-model="form.batch" />
-
-          <label>Marca</label>
-          <input v-model="form.brand" />
-
-          <label>Stock</label>
-          <input type="number" v-model.number="form.stock" required />
-
-          <label>Stock mínimo</label>
-          <input type="number" v-model.number="form.min_stock" required />
-
-          <label>Categoría (ID)</label>
-          <input type="number" v-model.number="form.category_id" required />
-
-          <label>Fecha caducidad</label>
-          <input type="date" v-model="form.expiration_date" />
-
-          <label>Descripción</label>
-          <textarea v-model="form.description"></textarea>
-
-          <button type="submit">{{ modalType === 'add' ? 'Agregar' : 'Guardar' }}</button>
-          <button type="button" @click="closeModal">Cancelar</button>
-        </form>
-
-        <div v-if="modalType === 'delete'">
-          <p>¿Seguro que quieres eliminar <strong>{{ form.name }}</strong>?</p>
-          <button @click="deleteItem">Eliminar</button>
-          <button @click="closeModal">Cancelar</button>
-        </div>
-      </div>
-    </div>
+    <InventarioDeleteModal v-if="showModal && modalType === 'delete'" :item="form" @close="closeModal"
+      @confirm="deleteItem" />
 
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-
+import InventarioAddModal from '../components/InventarioAddModal.vue'
+import InventarioEditModal from '../components/InventarioEditModal.vue'
+import InventarioDeleteModal from '../components/InventarioDeleteModal.vue'
 /* ===== Variables ===== */
 const inventario = ref([])
 const search = ref('')
@@ -160,47 +124,38 @@ const formatDate = (date) => date ? new Date(date).toLocaleDateString('es-ES') :
 /* ===== MODAL ===== */
 const openModal = (type, item = {}) => {
   modalType.value = type
+  form.value = { ...item } // clonar el objeto para no mutar el original
   showModal.value = true
-
-  if (type === 'add') {
-    modalTitle.value = 'Agregar Inventario'
-    form.value = { name:'', batch:'', brand:'', stock:0, min_stock:0, category_id:1, expiration_date:'', description:'' }
-  }
-  if (type === 'edit') {
-    modalTitle.value = 'Editar Inventario'
-    form.value = { ...item }
-  }
-  if (type === 'delete') {
-    modalTitle.value = 'Eliminar Inventario'
-    form.value = { ...item }
-  }
 }
 
-const closeModal = () => { showModal.value = false }
+
+const closeModal = () => {
+  showModal.value = false
+  modalType.value = ''   // esto es lo que realmente desmonta el modal
+}
 
 /* ===== CRUD ===== */
-const submitForm = async () => {
-  try {
-    const method = modalType.value === 'add' ? 'POST' : 'PUT'
-    const url = modalType.value === 'add' ? apiUrl : `${apiUrl}/${form.value.id}`
+const submitForm = async (data) => {
+  form.value = data
 
-    const res = await fetch(url, {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(form.value)
-    })
+  const method = modalType.value === 'add' ? 'POST' : 'PUT'
+  const url = modalType.value === 'add'
+    ? apiUrl
+    : `${apiUrl}/${form.value.id}`
 
-    if (!res.ok) throw new Error('Error en el backend')
-    await fetchInventario()
-    closeModal()
+  await fetch(url, {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(form.value)
+  })
 
-  } catch (error) {
-    alert('Error al guardar: ' + error.message)
-  }
+  await fetchInventario()
+  closeModal()
 }
+
 
 const deleteItem = async () => {
   try {
@@ -220,41 +175,127 @@ const deleteItem = async () => {
 onMounted(fetchInventario)
 </script>
 
+
 <style scoped>
 /* ===== Contenido ===== */
-.content { background: #222; padding: 2rem; min-height: 100vh; width: 100%; }
-.content2 { background: white; border-radius: 20px; padding: 2rem; color: black; height: 90vh; }
+.content {
+  background: #222;
+  padding: 2rem;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.content2 {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  color: black;
+  height: 90vh;
+}
 
 /* Header */
-.header { display:flex; justify-content:space-between; align-items:center; }
-.btn-add { background:#2e7d32; color:white; border:none; padding:0.6rem 1.2rem; border-radius:8px; font-weight:600; cursor:pointer; }
-.btn-add:hover { background:#1b5e20; }
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-add {
+  background: #2e7d32;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-add:hover {
+  background: #1b5e20;
+}
 
 /* Search */
-.search-input { width:100%; margin:1rem 0; padding:0.6rem 1rem; border-radius:8px; border:1px solid #ccc; }
+.search-input {
+  width: 100%;
+  margin: 1rem 0;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
 
 /* Table */
-.inventario-table { width:100%; border-collapse:collapse; }
-.inventario-table thead { background:#164e63; color:white; }
-.inventario-table th, .inventario-table td { padding:0.8rem; font-size:0.9rem; }
-.inventario-table tbody tr:nth-child(odd) { background:#c7dadd; }
-.lowStock { color:#c62828; font-weight:700; }
-.actions { display:flex; gap:0.5rem; }
-.btn-edit { background:#1976d2; color:white; border:none; border-radius:6px; padding:0.3rem 0.6rem; }
-.btn-delete { background:#d32f2f; color:white; border:none; border-radius:6px; padding:0.3rem 0.6rem; }
+.inventario-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.inventario-table thead {
+  background: #164e63;
+  color: white;
+}
+
+.inventario-table th,
+.inventario-table td {
+  padding: 0.8rem;
+  font-size: 0.9rem;
+}
+
+.inventario-table tbody tr:nth-child(odd) {
+  background: #c7dadd;
+}
+
+.lowStock {
+  color: #c62828;
+  font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-edit {
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+}
+
+.btn-delete {
+  background: #d32f2f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+}
 
 /* Pagination */
-.pagination { margin-top:1rem; display:flex; justify-content:center; align-items:center; gap:1rem; }
-.pagination button { padding:0.4rem 0.8rem; border-radius:6px; border:none; background:#164e63; color:white; cursor:pointer; }
-.pagination button:disabled { background:#aaa; cursor:not-allowed; }
-.empty { text-align:center; padding:1rem; font-style:italic; }
+.pagination {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
 
-/* ===== MODAL ===== */
-.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center; z-index:10; }
-.modal { background:white; padding:2rem; border-radius:12px; width:400px; max-width:95%; }
-.modal h2 { margin-bottom:1rem; }
-.modal input, .modal textarea { width:100%; margin-bottom:0.8rem; padding:0.5rem; border-radius:6px; border:1px solid #ccc; }
-.modal button { padding:0.6rem 1rem; margin-right:0.5rem; border:none; border-radius:6px; cursor:pointer; }
-.modal button[type="submit"] { background:#2e7d32; color:white; }
-.modal button[type="button"] { background:#aaa; color:white; }
+.pagination button {
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  border: none;
+  background: #164e63;
+  color: white;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  background: #aaa;
+  cursor: not-allowed;
+}
+
+.empty {
+  text-align: center;
+  padding: 1rem;
+  font-style: italic;
+}
 </style>

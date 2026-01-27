@@ -24,10 +24,7 @@
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- scroll -->
-          <div class="wrapper-scroll">
             <div class="cuerpo-horario">
               <div class="columna-horas">
                 <div v-for="hora in horasTurno" :key="hora" class="slot-hora">
@@ -35,13 +32,10 @@
                 </div>
               </div>
 
-              <!-- FONDO GRID PARA LOS SILLONES -->
               <div class="contenedor-sillones">
                 <div v-for="silla in sillones" :key="silla" class="columna-sillon">
-                  <!-- FONDO GRID EN LOS SLOTS -->
                   <div v-for="hora in horasTurno" :key="hora" class="slot-fondo"></div>
                   
-                  <!-- Citas del sillon -->
                   <div v-for="cita in citasDeSillon(silla)" :key="cita.id"
                     class="bloque-cita"
                     :style="{

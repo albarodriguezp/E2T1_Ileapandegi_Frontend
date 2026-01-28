@@ -48,17 +48,19 @@ const anosDisponibles = computed(() => {
 <style scoped>
 .content {
   background: #222;
-  padding: 2rem;
+  padding: 0.7rem;
   min-height: 100vh;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .content2 {
   background: white;
   border-radius: 20px;
-  padding: 2rem;
+  padding: 1.5rem;
   color: black;
-  height: 90vh;
+  min-height: 90vh;
+  box-sizing: border-box;
 }
 
 .header-mes {
@@ -72,7 +74,8 @@ const anosDisponibles = computed(() => {
 
 .selectores {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .selector {
@@ -85,6 +88,7 @@ const anosDisponibles = computed(() => {
   cursor: pointer;
   transition: all 0.2s;
   color: #333;
+  min-width: 120px;
 }
 
 .selector:hover {
@@ -100,5 +104,64 @@ const anosDisponibles = computed(() => {
 
 h1 {
   margin: 0;
+  font-size: 2rem;
+}
+
+
+@media (max-width: 768px) {
+  .content {
+    padding: 0.5rem;
+  }
+
+  .content2 {
+    padding: 1rem;
+  }
+
+  .header-mes {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  .selectores {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .selector {
+    flex: 1;
+    min-width: 100px;
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .content {
+    padding: 0.5rem;
+  }
+
+  .content2 {
+    padding: 1rem;
+    border-radius: 15px;
+  }
+
+  h1 {
+    font-size: 1.25rem;
+  }
+
+  .selectores {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .selector {
+    width: 100%;
+    min-width: unset;
+  }
 }
 </style>

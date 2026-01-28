@@ -82,9 +82,38 @@ const diasMes = computed(() => {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 1rem;
+  width: 100%;
+  box-sizing: border-box;
 }
+
 .cabecera {
   text-align: center;
   font-weight: bold;
+  font-size: 1rem;
+  padding: 0.5rem;
+}
+
+
+@media (max-width: 768px) {
+  .mes {
+    gap: 0.75rem;
+  }
+
+  .cabecera {
+    font-size: 0.9rem;
+    padding: 0.4rem;
+  }
+}
+
+
+@media (max-width: 480px) {
+  .mes {
+    gap: 0.5rem;
+  }
+
+  .cabecera {
+    font-size: 0.75rem;
+    padding: 0.25rem;
+  }
 }
 </style>

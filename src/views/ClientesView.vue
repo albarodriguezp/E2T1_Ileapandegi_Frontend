@@ -2,18 +2,22 @@
   <div class="content">
     <div class="content2">
       <h1>Clientes</h1>
+
+      <!-- Buscador -->
       <div class="buscador">
         <div class="icono-circulo">
           <i class="bi bi-search"></i>
         </div>
-        <BarraBusqueda />
+        <BarraBusqueda v-model="busqueda" placeholder="Buscar por nombre, apellido o teléfono..." />
       </div>
 
+      <!-- Acciones -->
       <div class="acciones">
         <button class="btn-eliminar" @click="eliminarMultiples">Eliminar</button>
         <button class="btn-agregar" @click="abrirModalNuevoCliente">Nuevo cliente</button>
       </div>
 
+      <!-- Tabla clientes -->
       <table class="tabla-clientes">
         <thead>
           <tr>
@@ -21,11 +25,14 @@
             <th>Nombre</th>
             <th>Apellidos</th>
             <th>Teléfono</th>
-            <th>Acciones <input type="checkbox" v-model="seleccionadosTodos" @change="seleccionarTodos"></th>
+            <th>
+              Acciones
+              <input type="checkbox" v-model="seleccionadosTodos" @change="seleccionarTodos">
+            </th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="cliente in clientes" :key="cliente.id">
+          <tr v-for="cliente in clientesFiltrados" :key="cliente.id">
             <td>{{ cliente.id }}</td>
             <td>
               <button class="btn btn-link p-0" @click="abrirModalVerCliente(cliente)">
@@ -41,30 +48,39 @@
               <input type="checkbox" v-model="seleccionados" :value="cliente.id">
             </td>
           </tr>
+
+          <tr v-if="clientesFiltrados.length === 0">
+            <td colspan="5" style="text-align:center; color:gray;">No se encontraron clientes</td>
+          </tr>
         </tbody>
       </table>
 
-      <!-- Modal Confirmación -->
-      <ModalConfirmacion :mostrar="mostrarModalConfirmacion" :mensaje="mensajeModal" @confirmar="confirmarEliminarConfirmado" @cancelar="cancelarModal"/>
-
-      <!-- Modal Nuevo Cliente -->
+      <!-- Modales -->
+      <ModalConfirmacion
+        :mostrar="mostrarModalConfirmacion"
+        :mensaje="mensajeModal"
+        @confirmar="confirmarEliminarConfirmado"
+        @cancelar="cancelarModal"
+      />
       <ModalNuevoCliente v-if="mostrarModalCliente" @cerrar="cerrarModalCliente" @guardar="guardarCliente" />
-
-      <!-- Modal Informacion -->
       <ModalInformacion v-if="mostrarModalInformacion" @cerrar="() => mostrarModalInformacion = false" />
-
-      <!-- Modal Ver Cliente -->
-      <ModalVerCliente v-if="mostrarModalVerCliente" :cliente="clienteSeleccionado" @cerrar="cerrarModalVerCliente"  @guardar="actualizarCliente" />
+      <ModalVerCliente
+        v-if="mostrarModalVerCliente"
+        :cliente="clienteSeleccionado"
+        @cerrar="cerrarModalVerCliente"
+        @guardar="actualizarCliente"
+      />
     </div>
   </div>
 </template>
 
+
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import BarraBusqueda from '@/components/BarraBusqueda.vue'
 import ModalNuevoCliente from '@/components/ModalNuevoCliente.vue'
 import ModalInformacion from '@/components/ModalInformativo.vue'
-import ModalConfirmacion from'@/components/ModalConfirmacion.vue'
+import ModalConfirmacion from '@/components/ModalConfirmacion.vue'
 import ModalVerCliente from '@/components/ModalVerCliente.vue'
 
 /* ===============================
@@ -89,7 +105,34 @@ const clienteAEliminar = ref(null)
 const mensajeModal = ref('')
 const eliminarMultiple = ref(false)
 
+/* Buscador */
+const busqueda = ref('')
 
+// Búsqueda avanzada: varias palabras, cualquier campo
+const clientesFiltrados = computed(() => {
+  if (!busqueda.value) return clientes.value
+
+  const terminos = busqueda.value.toLowerCase().trim().split(/\s+/)
+
+  return clientes.value.filter(cliente => {
+    return terminos.every(term =>
+      cliente.name.toLowerCase().includes(term) ||
+      cliente.surnames.toLowerCase().includes(term) ||
+      (cliente.telephone && cliente.telephone.includes(term))
+    )
+  })
+})
+
+/* ===============================
+   SINCRONIZAR SELECCIÓN CON FILTRO
+================================ */
+watch(clientesFiltrados, (nuevosClientes) => {
+  seleccionados.value = seleccionados.value.filter(id =>
+    nuevosClientes.some(c => c.id === id)
+  )
+  seleccionadosTodos.value = nuevosClientes.length > 0 &&
+                             nuevosClientes.every(c => seleccionados.value.includes(c.id))
+})
 /* ===============================
    FUNCIONES MODALES
 ================================ */

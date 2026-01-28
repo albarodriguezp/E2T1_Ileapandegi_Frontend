@@ -42,9 +42,10 @@
                       top: cita.top + 'px',
                       height: cita.height + 'px'
                     }">
-                    <p>{{ formatHora(cita.inicio) }} - {{ formatHora(cita.fin) }}</p>
-                    <div>{{ cita.comentario }}</div>
-                    
+                    <div @click.stop="openVerCita(cita)" style="cursor:pointer;">
+                      <p>{{ formatHora(cita.inicio) }} - {{ formatHora(cita.fin) }}</p>
+                      <div>{{ cita.comentario }}</div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -54,14 +55,23 @@
       </div>
     </div>
 
+    <!-- Modal Ver Cita -->
+    <ModalVerCita
+      v-if="mostrarVerCita"
+      :id="citaSeleccionadaId"
+      @cerrar="mostrarVerCita = false"
+      @editar="handleEditarCita"
+    />
+
     <!-- Modal Nueva Cita -->
     <ModalNuevaCita
       v-if="mostrarModal"
       :fecha="fechaStr"
       :sillones="sillones"
       :citas-existentes="citasPosicion"
+      :initial-cita="citaParaEditar"
       @guardar="handleNuevaCita"
-      @cerrar="mostrarModal = false"
+      @cerrar="() => { mostrarModal = false; citaParaEditar = null }"
     />
   </div>
 </template>
@@ -70,6 +80,7 @@
 import { computed, ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ModalNuevaCita from '../components/ModalNuevaCita.vue'
+import ModalVerCita from '../components/ModalVerCita.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -88,6 +99,9 @@ const fechaStr = computed(() =>
 const slotHeight = 40
 const anchoSillon = 150 
 const mostrarModal = ref(false)
+const mostrarVerCita = ref(false)
+const citaSeleccionadaId = ref(null)
+const citaParaEditar = ref(null)
 
 // sillones desde front tmb FALTA CAMBIAR POR ESTUDIANTES DEL DÍA
 const sillonesDisponibles = ref([1, 2, 3, 4, 5])
@@ -194,6 +208,21 @@ function cambiarDia(incremento) {
 
 function handleNuevaCita(nuevaCita) {
   obtenerCitas()
+}
+
+function openVerCita(id) {
+  console.log('openVerCita called with:', id)
+  
+  const resolvedId = id && id.id !== undefined ? id.id : id
+  console.log('resolvedId=', resolvedId)
+  citaSeleccionadaId.value = resolvedId
+  mostrarVerCita.value = true
+}
+
+function handleEditarCita(citaDetalle) {
+  mostrarVerCita.value = false
+  citaParaEditar.value = citaDetalle
+  mostrarModal.value = true
 }
 
 // Para cambiar cada vez que cambian los params de la ruta (al cambiar dia)

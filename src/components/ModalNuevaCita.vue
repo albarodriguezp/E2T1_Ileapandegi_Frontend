@@ -57,7 +57,15 @@
           <label for="hora-inicio">Hora Inicio:</label>
           <select id="hora-inicio" v-model="cita.start_time" @change="calcularHoraFin">
             <option value="">Selecciona hora</option>
-            <option v-for="hora in horasDisponibles" :key="hora" :value="hora">
+            <option
+              v-for="hora in horasDisponibles"
+              :key="hora"
+              :value="hora"
+              :disabled="!horasValidas.includes(hora)"
+              :class="{ ocupada: !horasValidas.includes(hora) }"
+              :style="!horasValidas.includes(hora) ? { color: '#c0392b' } : {}"
+              :title="!horasValidas.includes(hora) ? 'No disponible' : ''"
+            >
               {{ hora }}
             </option>
           </select>
@@ -89,7 +97,7 @@
         <strong>Precio Total: {{ precioTotal.toFixed(2) }}€</strong>
       </div>
 
-      <button class="guardar-btn" @click="guardarCita" :disabled="!formularioValido">
+      <button class="guardar-btn" @click="validarYEnviar" :disabled="!formularioValido">
         Guardar Cita
       </button>
     </div>
@@ -97,7 +105,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, computed, onMounted } from 'vue'
+import { reactive, ref, computed, onMounted, watch } from 'vue'
 
 const props = defineProps({
   fecha: String,
@@ -124,8 +132,33 @@ const serviciosSeleccionados = ref([])
 const duracionTotal = ref(0)
 const precioTotal = ref(0)
 
-// Horas libres del sillon
 const horasDisponibles = ref([])
+
+// mira que no existan citas en esa hora
+const horasValidas = computed(() => {
+  if (!cita.seat) return []
+
+  const citasSillon = props.citasExistentes.filter(c => c.silla === cita.seat)
+
+  // mira que las horas esten en el horario del dia
+  if (!horasDisponibles.value.length) actualizarHorasDisponibles()
+
+  return horasDisponibles.value.filter(hora => {
+
+    if (!duracionTotal.value) return true
+
+    const inicioDecimal = horaStringToDecimal(hora)
+    const finDecimal = inicioDecimal + (duracionTotal.value / 60)
+
+    const fechaObj = props.fecha ? new Date(props.fecha) : new Date()
+    const esMiercoles = fechaObj.getDay() === 3
+    const finTurno = esMiercoles ? 12.5 : 14.5
+    if (finDecimal > finTurno) return false
+
+    const solapa = citasSillon.some(c => inicioDecimal < c.fin && finDecimal > c.inicio)
+    return !solapa
+  })
+})
 
 function actualizarHorasDisponibles() {
   if (!cita.seat) {
@@ -133,24 +166,21 @@ function actualizarHorasDisponibles() {
     return
   }
 
-  // cargar citas del sillon
-  const citasSillon = props.citasExistentes.filter(c => c.silla === cita.seat)
-  
+  // mira si es miercoles
+  const fechaObj = props.fecha ? new Date(props.fecha) : new Date()
+  const esMiercoles = fechaObj.getDay() === 3
+
+  const inicio = esMiercoles ? 9 : 10
+  const fin = esMiercoles ? 12.5 : 14.5
+
   const todasLasHoras = []
-  for (let h = 10; h < 14.5; h += 0.25) {
+  for (let h = inicio; h < fin; h += 0.25) {
     const hora = Math.floor(h)
     const min = Math.round((h - hora) * 60)
     todasLasHoras.push(`${hora.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`)
   }
 
-  // Las horas ya cogidas
-  horasDisponibles.value = todasLasHoras.filter(hora => {
-    const horaDecimal = horaStringToDecimal(hora)
-    
-    return !citasSillon.some(cita => {
-      return horaDecimal >= cita.inicio && horaDecimal < cita.fin
-    })
-  })
+  horasDisponibles.value = todasLasHoras
 }
 
 function horaStringToDecimal(hora) {
@@ -186,6 +216,23 @@ function calcularHoraFin() {
   const inicioDecimal = horaStringToDecimal(cita.start_time)
   const finDecimal = inicioDecimal + (duracionTotal.value / 60)
   cita.end_time = horaDecimalToString(finDecimal)
+}
+
+// VALIDACIONES
+function validarYEnviar() {
+  if (!cita.start_time) {
+    alert('Selecciona una hora de inicio válida')
+    return
+  }
+
+  
+  if (!horasValidas.value.includes(cita.start_time)) {
+    alert('La hora seleccionada no es válida')
+    return
+  }
+
+  // ENVIAR
+  guardarCita()
 }
 
 const formularioValido = computed(() => {
@@ -266,6 +313,13 @@ function cerrarModal() {
 
 onMounted(() => {
   cargarDatos()
+  actualizarHorasDisponibles()
+})
+
+// AL CAMBIAR DE  dia se actualizan las horas x si cambia el horario
+watch(() => props.fecha, (n) => {
+  cita.date = n
+  actualizarHorasDisponibles()
 })
 </script>
 
@@ -391,5 +445,10 @@ input[readonly] {
 
 .guardar-btn:hover:not(:disabled) {
   background-color: #6bc5c5;
+}
+
+option.ocupada {
+  color: #c0392b;
+  font-weight: 600;
 }
 </style>

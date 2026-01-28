@@ -42,9 +42,9 @@
                       top: cita.top + 'px',
                       height: cita.height + 'px'
                     }">
-                    <p>{{ formatHora(cita.inicio) }}</p>
-                    <p>-</p>
-                    <p>{{ formatHora(cita.fin) }}</p>
+                    <p>{{ formatHora(cita.inicio) }} - {{ formatHora(cita.fin) }}</p>
+                    <div>{{ cita.comentario }}</div>
+                    
                   </div>
                 </div>
               </div>
@@ -153,7 +153,7 @@ const obtenerCitas = async () => {
     citas.value = appointments.map(c => ({
       id: c.id,
       silla: c.seat,
-      comentario: c.comments || 'Sin comentario',
+      comentario: c.comments || '',
       inicio: horaToDecimal(c.start_time),
       fin: horaToDecimal(c.end_time)
     }))
@@ -365,7 +365,7 @@ onMounted(() => {
   position: absolute;
   width: calc(100% - 8px);
   left: 4px;
-  background-color: #77cfad;
+  background-color: #9ddacc;
   color: #000;
   padding: 1rem;
   border-radius: 30px;
@@ -374,5 +374,7 @@ onMounted(() => {
   overflow: hidden;
   font-weight: 500;
   text-align: center;
+  border: 1px, solid;
+  border-color: #4e615461;
 }
 </style>

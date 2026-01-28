@@ -1,14 +1,18 @@
 <template>
-  <div v-if="mostrar" class="modal-backdrop">
-    <div class="modal">
-      <header class="modal-header">
-        <h3>Eliminar usuarios</h3>
+  <div v-if="mostrar" class="modal-dialog-overlay" @click.self="$emit('cancelar')">
+    <div class="modal" tabindex="-1">
+      <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Eliminar Usuarios</h5>
         <button class="btn-cerrar" @click="$emit('cancelar')" aria-label="Cerrar modal">&times;</button>
-      </header>
-      <p class="modal-mensaje">{{ mensaje }}</p>
-      <footer class="modal-footer">
+      </div>
+      <div class="modal-body">
+        <p class="modal-mensaje">{{ mensaje }}</p>
+      </div>
+      <div class="modal-footer">
         <button class="btn-eliminar" @click="$emit('confirmar')">Eliminar</button>
-      </footer>
+      </div>
+    </div>
     </div>
   </div>
 </template>
@@ -21,27 +25,29 @@ defineProps({
 </script>
 
 <style scoped>
-.modal-backdrop {
-  position: absolute;      /* relativo a .content2 */
+.modal-dialog-overlay {
+  position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.25);
   display: flex;
-  justify-content: center; /* centro horizontal */
-  align-items: center;     /* centro vertical */
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
   z-index: 1000;
+  padding: 0;
+  overflow-y: auto;
 }
 
 .modal {
-  background: white;
-  width: 320px;
-  padding: 1rem 1.5rem;
+  width: 100%;
+  max-width: 400px;
+  max-height: 25vh;    
   border-radius: 12px;
+  padding: 1rem 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  position: relative;
   font-family: Arial, sans-serif;
-  margin: 0 auto; 
+  overflow-y: auto;
 }
 
 .modal-header {
@@ -50,7 +56,7 @@ defineProps({
   align-items: center;
 }
 
-.modal-header h3 {
+.modal-header h5 {
   margin: 0;
   font-weight: 700;
   font-size: 1.1rem;
@@ -103,7 +109,4 @@ defineProps({
   user-select: none;
 }
 
-.btn-eliminar:hover {
-  background-color: #a10909;
-}
 </style>

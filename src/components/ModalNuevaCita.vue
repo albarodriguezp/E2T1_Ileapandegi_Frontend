@@ -110,12 +110,14 @@ import { reactive, ref, computed, onMounted, watch } from 'vue'
 const props = defineProps({
   fecha: String,
   sillones: Array,
-  citasExistentes: Array
+  citasExistentes: Array,
+  initialCita: Object
 })
 
 const emit = defineEmits(['guardar', 'cerrar'])
 
 const cita = reactive({
+  id: null,
   client_id: '',
   student_id: '',
   seat: '',
@@ -267,6 +269,27 @@ async function cargarDatos() {
     })
     servicios.value = await resServicios.json()
 
+    // si viene desde una cita para ditarm carga los datos que ya tiene
+    if (props.initialCita) {
+      const ic = props.initialCita
+      cita.id = ic.id || null
+      cita.client_id = ic.client_id || ic.client_id || ''
+      cita.student_id = ic.student_id || ic.student_id || ''
+      cita.seat = ic.seat || ic.silla || ''
+      cita.date = ic.date || props.fecha || cita.date
+      cita.start_time = ic.start_time || cita.start_time
+      cita.end_time = ic.end_time || cita.end_time
+      cita.comments = ic.comments || cita.comments
+
+      // servicios
+      if (ic.services && Array.isArray(ic.services)) {
+        serviciosSeleccionados.value = ic.services
+      }
+
+      calcularTotales()
+      actualizarHorasDisponibles()
+    }
+
   } catch (error) {
     console.error('Error al cargar datos:', error)
   }
@@ -287,8 +310,12 @@ async function guardarCita() {
   }
 
   try {
-    const res = await fetch('http://localhost:8000/api/appointments', {
-      method: 'POST',
+    const isEdit = !!cita.id
+    const url = isEdit ? `http://localhost:8000/api/appointments/${cita.id}` : 'http://localhost:8000/api/appointments'
+    const method = isEdit ? 'PUT' : 'POST'
+
+    const res = await fetch(url, {
+      method,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
@@ -319,6 +346,22 @@ onMounted(() => {
 // AL CAMBIAR DE  dia se actualizan las horas x si cambia el horario
 watch(() => props.fecha, (n) => {
   cita.date = n
+  actualizarHorasDisponibles()
+})
+
+// sincroniza si viene desde una citaa editar
+watch(() => props.initialCita, (ic) => {
+  if (!ic) return
+  cita.id = ic.id || null
+  cita.client_id = ic.client_id || ''
+  cita.student_id = ic.student_id || ''
+  cita.seat = ic.seat || ic.silla || ''
+  cita.date = ic.date || cita.date
+  cita.start_time = ic.start_time || cita.start_time
+  cita.end_time = ic.end_time || cita.end_time
+  cita.comments = ic.comments || cita.comments
+  if (ic.services && Array.isArray(ic.services)) serviciosSeleccionados.value = ic.services
+  calcularTotales()
   actualizarHorasDisponibles()
 })
 </script>

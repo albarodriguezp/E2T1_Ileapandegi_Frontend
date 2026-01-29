@@ -9,6 +9,7 @@ import PortfolioView from '../views/PortfolioView.vue'
 import CitasView from '../views/CitasView.vue'
 import PerfilView from '../views/PerfilView.vue'
 import DiaDetalle from '@/views/DiaDetalle.vue'
+import ParametrizacionView from '@/views/ParametrizacionView.vue'
 
 // =====================
 // RUTAS
@@ -56,10 +57,16 @@ const routes = [
     component: PerfilView,
     meta: { requiresAuth: true }
   },
-   {
+  {
     path: '/dia/:dia/:mes/:ano',
     name: 'DiaDetalle',
     component: DiaDetalle,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/parametrizacion',
+    name: 'parametrizacion',
+    component: ParametrizacionView,
     meta: { requiresAuth: true }
   }
 

@@ -130,23 +130,31 @@ function cerrarModal() {
 }
 .modal-backdrop {
   position: fixed;
-  top: 250px; left: 0;
-  width: 100vw; height: 40vh;
-  background-color: rgba(0,0,0,0.0);
-  display: flex; justify-content: center; align-items: center;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
   z-index: 1050;
 }
 
 .modal {
   background: white;
   border-radius: 8px;
-  padding: 12px 15px;
+  padding: 20px 25px;
   width: 360px;
+  overflow-y: auto;
   position: relative;
   box-shadow: 0 4px 12px rgb(0 0 0 / 0.15);
   display: flex;
-  flex-direction: column; 
-  gap: 15px;               
+  flex-direction: column;
+  gap: 15px;
+  height: auto;
+  max-height: none;
+  overflow: visible;
 }
 
 .cerrar-btn {

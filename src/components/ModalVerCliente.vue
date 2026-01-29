@@ -148,7 +148,7 @@ const guardar = () => {
   color: black;
   box-shadow: none;
   outline: none;
-  transition: none; /* elimina animaciones de transición */
+  transition: none;
 }
 .avatar {
   display: flex;

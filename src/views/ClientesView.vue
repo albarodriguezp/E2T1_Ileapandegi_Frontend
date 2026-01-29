@@ -42,7 +42,7 @@
             <td>{{ cliente.surnames }}</td>
             <td>{{ cliente.telephone }}</td>
             <td class="acciones-tabla">
-              <button @click="solicitarEliminarCliente(cliente)">
+              <button class="btn-icono" @click="solicitarEliminarCliente(cliente)">
                 <i class="bi bi-trash eliminar"></i>
               </button>
               <input type="checkbox" v-model="seleccionados" :value="cliente.id">
@@ -207,7 +207,13 @@ const actualizarCliente = async (clienteActualizado) => {
     const data = await res.json()
     // Actualizamos localmente la lista de clientes
     const index = clientes.value.findIndex(c => c.id === data.id)
-    if (index !== -1) clientes.value[index] = data
+    if (index !== -1) {
+      clientes.value[index] = {
+      ...clientes.value[index],
+      ...data,
+      observations: clienteActualizado.observations
+  }
+}
   } catch (err) {
     console.error(err)
     alert('Error al conectar con el servidor.')
@@ -359,7 +365,8 @@ onMounted(() => {
 
 .acciones-tabla {
   display: flex;
-  gap: 10px;
+  align-items: center;
+  gap: 14px;
 }
 
 .btn-eliminar {
@@ -444,7 +451,10 @@ onMounted(() => {
   background-color: #F7F7F7;
 }
 
-
+.acciones-tabla input[type="checkbox"] {
+  transform: scale(1.4);
+  cursor: pointer;
+}
 .tabla-clientes td.acciones {
   display: flex;
   gap: 10px;
@@ -454,10 +464,20 @@ onMounted(() => {
 .eliminiar-multiple {
   color: black;
   cursor: pointer;
+  font-size: 1.6rem;
 }
-
+.btn-icono {
+  background: none;
+  border: none;
+  padding: 1px; 
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .eliminar {
   color: red;
   cursor: pointer;
+  font-size: 1.6rem;  
 }
 </style>

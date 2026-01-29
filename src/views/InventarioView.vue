@@ -81,7 +81,6 @@ const perPage = 5
 
 const showModal = ref(false)
 const modalType = ref('') // add | edit | delete
-const modalTitle = ref('')
 const form = ref({})
 
 /* ===== API ===== */

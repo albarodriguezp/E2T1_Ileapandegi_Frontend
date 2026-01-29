@@ -20,23 +20,45 @@
       <li>
         <router-link to="/citas" active-class="active">CITAS</router-link>
       </li>
-       <li>
+      <li>
         <router-link to="/perfil" active-class="active">PERFIL</router-link>
+      </li>
+
+      <!-- Enlace solo para Admin -->
+      <li v-if="rol === 'A'">
+        <router-link to="/parametrizacion" active-class="active">PARAMETRIZACIÓN</router-link>
       </li>
     </ul>
   </nav>
 </template>
 
-
 <script setup>
+import { ref, onMounted } from 'vue'
 
+// Suponiendo que guardas el token y con eso obtienes info del usuario
+const rol = ref('')
+
+// Cargar rol del usuario al montar
+onMounted(async () => {
+  try {
+    const res = await fetch('http://localhost:8000/api/profile', {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    const data = await res.json()
+    rol.value = data.rol || '' // Asegurarse de que exista
+  } catch (error) {
+    console.error('Error al obtener rol del usuario:', error)
+  }
+})
 </script>
 
 <style scoped>
 /* Sidebar */
 .sidebar {
   width: 240px;
-  background-color: #222; 
+  background-color: #222;
   color: white;
   display: flex;
   flex-direction: column;
@@ -77,6 +99,6 @@
 
 .menu a:hover,
 .menu a.active {
-  background-color: #1f8aa0; 
+  background-color: #1f8aa0;
 }
 </style>

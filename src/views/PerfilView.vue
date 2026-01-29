@@ -70,6 +70,7 @@ const perfil = ref({
 const progreso = ref([])
 
 /* ===== Función para cargar datos del usuario ===== */
+/* ===== Función para cargar datos del usuario ===== */
 const cargarPerfil = async () => {
   try {
     // Traemos los datos del perfil
@@ -81,7 +82,6 @@ const cargarPerfil = async () => {
     const dataPerfil = await resPerfil.json()
     perfil.value.nombre = dataPerfil.name
     perfil.value.rol = dataPerfil.rol
-    // Si tu API devuelve email separados, por ejemplo: dataPerfil.email
     perfil.value.email = dataPerfil.email || ''
 
     // Traemos los datos de progreso
@@ -91,16 +91,23 @@ const cargarPerfil = async () => {
       }
     })
     const dataProgreso = await resProgreso.json()
+    console.log('DATA PROGRESO:', dataProgreso)
 
-    // Suponiendo que la API devuelve { servicios_completados: [ { id, nombre }, ... ] }
-    progreso.value = dataProgreso.servicios_completados.map(s => ({
+    // Suponiendo que la API devuelve algo como:
+    // { servicios: [ { id, nombre, completado, cantidad_completada }, ... ] }
+
+    const SERVICIOS_POR_COMPLETAR = 10
+
+    progreso.value = dataProgreso.servicios.map(s => ({
       nombre: s.nombre,
-      valor: 100 // Puedes poner 100% porque ya está completado
+      valor: Math.min((s.cantidad_completada / SERVICIOS_POR_COMPLETAR) * 100, 100)
     }))
+
   } catch (error) {
     console.error('Error al cargar perfil y progreso', error)
   }
 }
+
 
 /* ===== Cargar al montar el componente ===== */
 onMounted(() => {

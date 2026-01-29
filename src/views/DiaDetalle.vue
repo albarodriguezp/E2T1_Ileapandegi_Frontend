@@ -42,9 +42,19 @@
                       top: cita.top + 'px',
                       height: cita.height + 'px'
                     }">
-                    <div @click.stop="openVerCita(cita)" style="cursor:pointer;">
-                      <p>{{ formatHora(cita.inicio) }} - {{ formatHora(cita.fin) }}</p>
-                      <div>{{ cita.comentario }}</div>
+                    <div @click.stop="openVerCita(cita)" style="cursor:pointer; height: 100%; overflow-y: auto;">
+                      <p class="cita-hora">{{ formatHora(cita.inicio) }} - {{ formatHora(cita.fin) }}</p>
+                      
+                      <!-- Enseña servicios en el slot -->
+                      <div v-if="cita.servicios && cita.servicios.length > 0" class="cita-servicios">
+                        <div v-for="servicio in cita.servicios" :key="servicio.id" class="servicio-tag">
+                          {{ servicio.name }}
+                        </div>
+                      </div>
+                      
+                      <div v-if="cita.comentario" class="cita-comentario">
+                        {{ cita.comentario }}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -164,16 +174,27 @@ const obtenerCitas = async () => {
     const data = await res.json()
 
     const appointments = Array.isArray(data) ? data : []
-    citas.value = appointments.map(c => ({
-      id: c.id,
-      silla: c.seat,
-      comentario: c.comments || '',
-      inicio: horaToDecimal(c.start_time),
-      fin: horaToDecimal(c.end_time)
-    }))
+    citas.value = appointments.map(c => {
+      // coge los nombres del servicio
+      const servicios = (c.services || []).map(appointmentService => ({
+        id: appointmentService.service?.id || appointmentService.service_id,
+        name: appointmentService.service?.name || 'Servicio'
+      }))
+
+      return {
+        id: c.id,
+        silla: c.seat,
+        comentario: c.comments || '',
+        inicio: horaToDecimal(c.start_time),
+        fin: horaToDecimal(c.end_time),
+        servicios: servicios
+      }
+    })
+
 
   } catch (err) {
     error.value = err.message
+    console.error('Error:', err)
   } finally {
     cargando.value = false
   }
@@ -210,11 +231,9 @@ function handleNuevaCita(nuevaCita) {
   obtenerCitas()
 }
 
-function openVerCita(id) {
-  console.log('openVerCita called with:', id)
+function openVerCita(cita) {
   
-  const resolvedId = id && id.id !== undefined ? id.id : id
-  console.log('resolvedId=', resolvedId)
+  const resolvedId = cita && cita.id !== undefined ? cita.id : cita
   citaSeleccionadaId.value = resolvedId
   mostrarVerCita.value = true
 }
@@ -396,14 +415,51 @@ onMounted(() => {
   left: 4px;
   background-color: #9ddacc;
   color: #000;
-  padding: 1rem;
-  border-radius: 30px;
-  font-size: 12px;
+  padding: 0.5rem;
+  border-radius: 8px;
+  font-size: 11px;
   box-sizing: border-box;
   overflow: hidden;
   font-weight: 500;
+  border: 1px solid #4e615461;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.bloque-cita:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  z-index: 5;
+}
+
+.cita-hora {
+  margin: 0 0 4px 0;
+  font-weight: 700;
+  font-size: 11px;
   text-align: center;
-  border: 1px, solid;
-  border-color: #4e615461;
+}
+
+.cita-servicios {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 4px;
+}
+
+.servicio-tag {
+  background: rgba(255, 255, 255, 0.7);
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 600;
+  text-align: center;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.cita-comentario {
+  font-size: 9px;
+  font-style: italic;
+  color: #333;
+  margin-top: 4px;
+  text-align: center;
 }
 </style>

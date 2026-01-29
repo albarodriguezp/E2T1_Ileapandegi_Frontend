@@ -2,7 +2,7 @@
   <div class="modal-backdrop" @click.self="cerrarModal">
     <div class="modal">
       <button class="cerrar-btn" @click="cerrarModal">X</button>
-      <h2>Nueva Cita</h2>
+      <h2>{{ cita.id ? 'Editar Cita' : 'Nueva Cita' }}</h2>
 
       <div class="form-group">
         <label for="cliente">Cliente:</label>
@@ -98,7 +98,7 @@
       </div>
 
       <button class="guardar-btn" @click="validarYEnviar" :disabled="!formularioValido">
-        Guardar Cita
+        {{ cita.id ? 'Actualizar Cita' : 'Guardar Cita' }}
       </button>
     </div>
   </div>
@@ -140,7 +140,7 @@ const horasDisponibles = ref([])
 const horasValidas = computed(() => {
   if (!cita.seat) return []
 
-  const citasSillon = props.citasExistentes.filter(c => c.silla === cita.seat)
+  const citasSillon = props.citasExistentes.filter(c => c.silla === cita.seat && c.id !== cita.id)
 
   // mira que las horas esten en el horario del dia
   if (!horasDisponibles.value.length) actualizarHorasDisponibles()
@@ -269,25 +269,32 @@ async function cargarDatos() {
     })
     servicios.value = await resServicios.json()
 
+    // se cargan los servicios primero 
+    await new Promise(resolve => setTimeout(resolve, 50))
+
     // si viene desde una cita para ditarm carga los datos que ya tiene
     if (props.initialCita) {
       const ic = props.initialCita
       cita.id = ic.id || null
-      cita.client_id = ic.client_id || ic.client_id || ''
-      cita.student_id = ic.student_id || ic.student_id || ''
-      cita.seat = ic.seat || ic.silla || ''
+      cita.client_id = ic.client?.id || ic.client_id || ''
+      cita.student_id = ic.student?.id || ic.student_id || ''
+      cita.seat = ic.seat || ''
       cita.date = ic.date || props.fecha || cita.date
       cita.start_time = ic.start_time || cita.start_time
       cita.end_time = ic.end_time || cita.end_time
       cita.comments = ic.comments || cita.comments
 
-      // servicios
+      // Servicios
       if (ic.services && Array.isArray(ic.services)) {
-        serviciosSeleccionados.value = ic.services
+        if (ic.services.length > 0 && typeof ic.services[0] === 'object') {
+          serviciosSeleccionados.value = ic.services.map(s => s.service_id || s.service?.id || s.id)
+        } else {
+          serviciosSeleccionados.value = ic.services
+        }
       }
 
-      calcularTotales()
       actualizarHorasDisponibles()
+      calcularTotales()
     }
 
   } catch (error) {
@@ -348,21 +355,28 @@ watch(() => props.fecha, (n) => {
   cita.date = n
   actualizarHorasDisponibles()
 })
-
 // sincroniza si viene desde una citaa editar
 watch(() => props.initialCita, (ic) => {
-  if (!ic) return
+  if (!ic) return 
   cita.id = ic.id || null
-  cita.client_id = ic.client_id || ''
-  cita.student_id = ic.student_id || ''
-  cita.seat = ic.seat || ic.silla || ''
+  cita.client_id = ic.client?.id || ic.client_id || ''
+  cita.student_id = ic.student?.id || ic.student_id || ''
+  cita.seat = ic.seat || ''
   cita.date = ic.date || cita.date
   cita.start_time = ic.start_time || cita.start_time
   cita.end_time = ic.end_time || cita.end_time
   cita.comments = ic.comments || cita.comments
-  if (ic.services && Array.isArray(ic.services)) serviciosSeleccionados.value = ic.services
-  calcularTotales()
+  
+  if (ic.services && Array.isArray(ic.services)) {
+    if (ic.services.length > 0 && typeof ic.services[0] === 'object') {
+      serviciosSeleccionados.value = ic.services.map(s => s.service_id || s.service?.id || s.id)
+    } else {
+      serviciosSeleccionados.value = ic.services
+    }
+  }
+  
   actualizarHorasDisponibles()
+  calcularTotales()
 })
 </script>
 
@@ -377,7 +391,7 @@ watch(() => props.initialCita, (ic) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1050;
+  z-index: 999998;
 }
 
 .modal {
@@ -385,6 +399,7 @@ watch(() => props.initialCita, (ic) => {
   border-radius: 8px;
   padding: 20px 25px;
   width: 600px;
+  max-width: 95vw;
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
@@ -405,6 +420,17 @@ watch(() => props.initialCita, (ic) => {
   cursor: pointer;
 }
 
+.cerrar-btn:hover {
+  color: #c0392b;
+}
+
+h2 {
+  margin: 0 0 10px 0;
+  padding-right: 30px;
+  font-size: 24px;
+  color: #2c3e50;
+}
+
 .form-group {
   display: flex;
   flex-direction: column;
@@ -420,6 +446,7 @@ watch(() => props.initialCita, (ic) => {
 label {
   font-weight: 600;
   font-size: 14px;
+  color: #555;
 }
 
 input, select, textarea {
@@ -427,6 +454,7 @@ input, select, textarea {
   border-radius: 5px;
   border: 1px solid #ccc;
   font-size: 14px;
+  font-family: inherit;
 }
 
 input[readonly] {
@@ -479,6 +507,7 @@ input[readonly] {
   font-weight: 600;
   cursor: pointer;
   font-size: 16px;
+  transition: background-color 0.2s;
 }
 
 .guardar-btn:disabled {

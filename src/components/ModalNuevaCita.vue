@@ -196,6 +196,11 @@ function horaDecimalToString(decimal) {
   return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`
 }
 
+function normalizarHora(hora) {
+  if (!hora) return ''
+  return hora.slice(0, 5)
+}
+
 function calcularTotales() {
   const serviciosSel = servicios.value.filter(s => 
     serviciosSeleccionados.value.includes(s.id)
@@ -280,8 +285,8 @@ async function cargarDatos() {
       cita.student_id = ic.student?.id || ic.student_id || ''
       cita.seat = ic.seat || ''
       cita.date = ic.date || props.fecha || cita.date
-      cita.start_time = ic.start_time || cita.start_time
-      cita.end_time = ic.end_time || cita.end_time
+      cita.start_time = normalizarHora(ic.start_time) || cita.start_time
+      cita.end_time = normalizarHora(ic.end_time) || cita.end_time
       cita.comments = ic.comments || cita.comments
 
       // Servicios
@@ -363,8 +368,8 @@ watch(() => props.initialCita, (ic) => {
   cita.student_id = ic.student?.id || ic.student_id || ''
   cita.seat = ic.seat || ''
   cita.date = ic.date || cita.date
-  cita.start_time = ic.start_time || cita.start_time
-  cita.end_time = ic.end_time || cita.end_time
+  cita.start_time = normalizarHora(ic.start_time) || cita.start_time
+  cita.end_time = normalizarHora(ic.end_time) || cita.end_time
   cita.comments = ic.comments || cita.comments
   
   if (ic.services && Array.isArray(ic.services)) {

@@ -51,6 +51,11 @@
           </div>
         </div>
 
+        <div class="form-group precio-total-readonly">
+          <label>Precio Total:</label>
+          <input type="text" :value="precioTotal.toFixed(2) + '€'" readonly />
+        </div>
+
         <div class="form-group">
           <label>Comentarios:</label>
           <textarea :value="citaDetalle.comments || 'Sin comentarios'" readonly rows="3"></textarea>
@@ -69,7 +74,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 
 const props = defineProps({ 
   id: {
@@ -83,6 +88,14 @@ const emit = defineEmits(['cerrar', 'editar'])
 const citaDetalle = ref({})
 const cargando = ref(false)
 const error = ref(null)
+
+const precioTotal = computed(() => {
+  if (!citaDetalle.value || !citaDetalle.value.services) return 0
+  return citaDetalle.value.services.reduce((sum, s) => {
+    const price = s.service?.price ?? s.price ?? 0
+    return sum + (parseFloat(price) || 0)
+  }, 0)
+})
 
 async function cargarDetalle() {
   if (!props.id) {
@@ -324,5 +337,23 @@ input[readonly], textarea[readonly] {
 
 .cerrar-btn-secondary:hover {
   background-color: #7f8c8d;
+}
+
+/* Responsive tweaks */
+@media (max-width: 700px) {
+  .modal {
+    width: calc(100% - 32px) !important;
+    padding: 16px !important;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .acciones {
+    flex-direction: column-reverse;
+    gap: 8px;
+    align-items: stretch;
+  }
 }
 </style>

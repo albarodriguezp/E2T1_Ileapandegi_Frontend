@@ -27,14 +27,15 @@ defineProps({
 <style scoped>
 .modal-dialog-overlay {
   position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
-  padding: 0;
-  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050;
 }
 
 .modal {
@@ -43,11 +44,16 @@ defineProps({
   max-height: 25vh;    
   border-radius: 12px;
   padding: 1rem 1.5rem;
+  overflow-y: auto;
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 1rem;
   font-family: Arial, sans-serif;
   overflow-y: auto;
+  height: auto;
+  max-height: none;
+  overflow: visible;
 }
 
 .modal-header {

@@ -6,27 +6,27 @@
 
     <ul class="menu">
       <li>
-        <router-link to="/home" active-class="active">INICIO</router-link>
+        <router-link to="/home" active-class="active">{{ t('menu.home') }}</router-link>
       </li>
       <li>
-        <router-link to="/inventario" active-class="active">INVENTARIO</router-link>
+        <router-link to="/inventario" active-class="active">{{ t('menu.inventory') }}</router-link>
       </li>
       <li>
-        <router-link to="/clientes" active-class="active">CLIENTES</router-link>
+        <router-link to="/clientes" active-class="active">{{ t('menu.clients') }}</router-link>
       </li>
       <li>
-        <router-link to="/portfolio" active-class="active">PORTFOLIO</router-link>
+        <router-link to="/portfolio" active-class="active">{{ t('menu.portfolio') }}</router-link>
       </li>
       <li>
-        <router-link to="/citas" active-class="active">CITAS</router-link>
+        <router-link to="/citas" active-class="active">{{ t('menu.appointments') }}</router-link>
       </li>
       <li>
-        <router-link to="/perfil" active-class="active">PERFIL</router-link>
+        <router-link to="/perfil" active-class="active">{{ t('menu.profile') }}</router-link>
       </li>
 
       <!-- Enlace solo para Admin -->
       <li v-if="rol === 'A'">
-        <router-link to="/parametrizacion" active-class="active">PARAMETRIZACIÓN</router-link>
+        <router-link to="/parametrizacion" active-class="active">{{ t('menu.settings') }}</router-link>
       </li>
     </ul>
   </nav>
@@ -34,6 +34,9 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 // Suponiendo que guardas el token y con eso obtienes info del usuario
 const rol = ref('')

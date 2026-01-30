@@ -1,32 +1,42 @@
 <template>
   <div class="content">
     <div class="content2">
-      <h1>Clientes</h1>
+   
+       <IdiomaSelector />
+      <!-- Título -->
+      <h1>{{ $t('clients.title') }}</h1>
 
       <!-- Buscador -->
       <div class="buscador">
         <div class="icono-circulo">
           <i class="bi bi-search"></i>
         </div>
-        <BarraBusqueda v-model="busqueda" placeholder="Buscar por nombre, apellido o teléfono..." />
+        <BarraBusqueda 
+          v-model="busqueda" 
+          :placeholder="$t('clients.search')" 
+        />
       </div>
 
       <!-- Acciones -->
       <div class="acciones">
-        <button class="btn-eliminar" @click="eliminarMultiples">Eliminar</button>
-        <button class="btn-agregar" @click="abrirModalNuevoCliente">Nuevo cliente</button>
+        <button class="btn-eliminar" @click="eliminarMultiples">
+          {{ $t('clients.delete') }}
+        </button>
+        <button class="btn-agregar" @click="abrirModalNuevoCliente">
+          {{ $t('clients.new') }}
+        </button>
       </div>
 
       <!-- Tabla clientes -->
       <table class="tabla-clientes">
         <thead>
           <tr>
-            <th>ID cliente</th>
-            <th>Nombre</th>
-            <th>Apellidos</th>
-            <th>Teléfono</th>
+            <th>{{ $t('table.id') }}</th>
+            <th>{{ $t('table.name') }}</th>
+            <th>{{ $t('table.surnames') }}</th>
+            <th>{{ $t('table.phone') }}</th>
             <th>
-              Acciones
+              {{ $t('table.actions') }}
               <input type="checkbox" v-model="seleccionadosTodos" @change="seleccionarTodos">
             </th>
           </tr>
@@ -50,7 +60,9 @@
           </tr>
 
           <tr v-if="clientesFiltrados.length === 0">
-            <td colspan="5" style="text-align:center; color:gray;">No se encontraron clientes</td>
+            <td colspan="5" style="text-align:center; color:gray;">
+              {{ $t('clients.none') }}
+            </td>
           </tr>
         </tbody>
       </table>
@@ -74,14 +86,28 @@
   </div>
 </template>
 
-
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
+
 import BarraBusqueda from '@/components/BarraBusqueda.vue'
 import ModalNuevoCliente from '@/components/ModalNuevoCliente.vue'
 import ModalInformacion from '@/components/ModalInformativo.vue'
 import ModalConfirmacion from '@/components/ModalConfirmacion.vue'
 import ModalVerCliente from '@/components/ModalVerCliente.vue'
+import IdiomaSelector from '@/components/SelectorIdioma.vue'
+
+/* ===============================
+   i18n
+================================ */
+const { t, locale } = useI18n()
+
+// Idioma reactivo
+const idioma = ref(locale.value)
+const cambiarIdioma = () => {
+  locale.value = idioma.value
+  localStorage.setItem('lang', idioma.value)
+}
 
 /* ===============================
    ESTADOS
@@ -93,7 +119,6 @@ const error = ref(null)
 const seleccionados = ref([])
 const seleccionadosTodos = ref(false)
 
-/* Modales */
 const mostrarModalCliente = ref(false)
 const mostrarModalInformacion = ref(false)
 const mostrarModalConfirmacion = ref(false)
@@ -105,15 +130,14 @@ const clienteAEliminar = ref(null)
 const mensajeModal = ref('')
 const eliminarMultiple = ref(false)
 
-/* Buscador */
 const busqueda = ref('')
 
-// Búsqueda avanzada: varias palabras, cualquier campo
+/* ===============================
+   BÚSQUEDA AVANZADA
+================================ */
 const clientesFiltrados = computed(() => {
   if (!busqueda.value) return clientes.value
-
   const terminos = busqueda.value.toLowerCase().trim().split(/\s+/)
-
   return clientes.value.filter(cliente => {
     return terminos.every(term =>
       cliente.name.toLowerCase().includes(term) ||
@@ -123,9 +147,6 @@ const clientesFiltrados = computed(() => {
   })
 })
 
-/* ===============================
-   SINCRONIZAR SELECCIÓN CON FILTRO
-================================ */
 watch(clientesFiltrados, (nuevosClientes) => {
   seleccionados.value = seleccionados.value.filter(id =>
     nuevosClientes.some(c => c.id === id)
@@ -133,8 +154,9 @@ watch(clientesFiltrados, (nuevosClientes) => {
   seleccionadosTodos.value = nuevosClientes.length > 0 &&
                              nuevosClientes.every(c => seleccionados.value.includes(c.id))
 })
+
 /* ===============================
-   FUNCIONES MODALES
+   MODALES
 ================================ */
 const abrirModalNuevoCliente = () => mostrarModalCliente.value = true
 const cerrarModalCliente = () => mostrarModalCliente.value = false
@@ -143,122 +165,39 @@ const abrirModalVerCliente = (cliente) => {
   clienteSeleccionado.value = { ...cliente }
   mostrarModalVerCliente.value = true
 }
-
 const cerrarModalVerCliente = () => {
   clienteSeleccionado.value = null
   mostrarModalVerCliente.value = false
 }
+
 const cancelarModal = () => {
-  mostrarModalConfirmacion.value = false;
-  clienteAEliminar.value = null;
-  eliminarMultiple.value = false;
+  mostrarModalConfirmacion.value = false
+  clienteAEliminar.value = null
+  eliminarMultiple.value = false
 }
 
 /* ===============================
-   FUNCIONES ELIMINAR
+   ELIMINAR CLIENTES
 ================================ */
 const solicitarEliminarCliente = (cliente) => {
   clienteAEliminar.value = cliente
-  mensajeModal.value = `¿Deseas eliminar al cliente ${cliente.name}?`
+  mensajeModal.value = t('clients.delete_one', { name: cliente.name })
   eliminarMultiple.value = false
   mostrarModalConfirmacion.value = true
 }
 
 const eliminarMultiples = () => {
   if (seleccionados.value.length === 0) {
-    mensajeModal.value = "No hay clientes seleccionados"
+    mensajeModal.value = t('clients.none_selected')
     eliminarMultiple.value = false
     mostrarModalConfirmacion.value = true
     return
   }
-  mensajeModal.value = `¿Deseas eliminar ${seleccionados.value.length} clientes?`
+  mensajeModal.value = t('clients.delete_many', { count: seleccionados.value.length })
   eliminarMultiple.value = true
   mostrarModalConfirmacion.value = true
-  
-}
-/* ===============================
-   EDITAR CLIENETE
-================================ */
-
-// Función para actualizar cliente
-const actualizarCliente = async (clienteActualizado) => {
-  try {
-    const token = localStorage.getItem('token')
-    const res = await fetch(`http://localhost:8000/api/clients/${clienteActualizado.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        email: clienteActualizado.email,
-        telephone: clienteActualizado.telephone,
-        observations: clienteActualizado.observations
-      })
-    })
-
-    if (!res.ok) {
-      const errorData = await res.json()
-      console.error('Error al actualizar cliente:', errorData)
-      return
-    }
-
-    const data = await res.json()
-    // Actualizamos localmente la lista de clientes
-    const index = clientes.value.findIndex(c => c.id === data.id)
-    if (index !== -1) {
-      clientes.value[index] = {
-      ...clientes.value[index],
-      ...data,
-      observations: clienteActualizado.observations
-  }
-}
-  } catch (err) {
-    console.error(err)
-    alert('Error al conectar con el servidor.')
-  }
 }
 
-const confirmarEliminarConfirmado = async () => {
-  const token = localStorage.getItem('token')
-  try {
-    if (eliminarMultiple.value) {
-      // Eliminar múltiples clientes de la BD
-      await Promise.all(
-        seleccionados.value.map(id =>
-          fetch(`http://localhost:8000/api/clients/${id}`, { method: 'DELETE' ,headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-      }}
-            
-          ),
-          
-        )
-      )
-
-      seleccionados.value = []
-      seleccionadosTodos.value = false
-    } else if (clienteAEliminar.value) {
-      // Eliminar un solo cliente de la BD
-      const id = clienteAEliminar.value.id
-      const res = await fetch(`http://localhost:8000/api/clients/${id}`, { method: 'DELETE', headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-      }})
-      if (!res.ok) throw new Error('Error al eliminar cliente')
-      clienteAEliminar.value = null
-    }
-
-    // Refrescar la tabla
-    await obtenerClientes()
-  } catch (err) {
-    console.error(err)
-  } finally {
-    mostrarModalConfirmacion.value = false
-    eliminarMultiple.value = false
-  }
-}
 /* ===============================
    SELECCIONAR TODOS
 ================================ */
@@ -267,13 +206,12 @@ const seleccionarTodos = () => {
 }
 
 /* ===============================
-   OBTENER CLIENTES DE LA BD
+   OBTENER CLIENTES
 ================================ */
 const obtenerClientes = async () => {
   cargando.value = true
   error.value = null
-    const token = localStorage.getItem('token')
-
+  const token = localStorage.getItem('token')
   try {
     const res = await fetch('http://localhost:8000/api/clients', {
       headers: {
@@ -295,15 +233,13 @@ const obtenerClientes = async () => {
 ================================ */
 const guardarCliente = async (cliente) => {
   const token = localStorage.getItem('token')
-  
   const payload = {
-  name: cliente.name,
-  surnames: cliente.surnames,
-  telephone: cliente.telephone || null,
-  home_client: cliente.home_client ? 1 : 0,
-  email: cliente.email || null
-}
-
+    name: cliente.name,
+    surnames: cliente.surnames,
+    telephone: cliente.telephone || null,
+    home_client: cliente.home_client ? 1 : 0,
+    email: cliente.email || null
+  }
   try {
     const res = await fetch('http://localhost:8000/api/clients', {
       method: 'POST',
@@ -314,16 +250,60 @@ const guardarCliente = async (cliente) => {
       },
       body: JSON.stringify(payload)
     })
-
-    if (!res.ok) {
-      const errorData = await res.json()
-      console.error('Errores de validación:', errorData)
-      throw new Error('Error al guardar cliente')
-    }
-
+    if (!res.ok) throw new Error('Error al guardar cliente')
     await obtenerClientes()
   } catch (err) {
     console.error(err)
+  }
+}
+
+/* ===============================
+   ACTUALIZAR CLIENTE
+================================ */
+const actualizarCliente = async (clienteActualizado) => {
+  const token = localStorage.getItem('token')
+  try {
+    const res = await fetch(`http://localhost:8000/api/clients/${clienteActualizado.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(clienteActualizado)
+    })
+    if (!res.ok) throw new Error('Error al actualizar cliente')
+    const data = await res.json()
+    const index = clientes.value.findIndex(c => c.id === data.id)
+    if (index !== -1) clientes.value[index] = { ...clientes.value[index], ...data }
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+/* ===============================
+   CONFIRMAR ELIMINACIÓN
+================================ */
+const confirmarEliminarConfirmado = async () => {
+  const token = localStorage.getItem('token')
+  try {
+    if (eliminarMultiple.value) {
+      await Promise.all(
+        seleccionados.value.map(id =>
+          fetch(`http://localhost:8000/api/clients/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } })
+        )
+      )
+      seleccionados.value = []
+      seleccionadosTodos.value = false
+    } else if (clienteAEliminar.value) {
+      await fetch(`http://localhost:8000/api/clients/${clienteAEliminar.value.id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } })
+      clienteAEliminar.value = null
+    }
+    await obtenerClientes()
+  } catch (err) {
+    console.error(err)
+  } finally {
+    mostrarModalConfirmacion.value = false
+    eliminarMultiple.value = false
   }
 }
 

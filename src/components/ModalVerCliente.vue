@@ -11,48 +11,52 @@
 
         <div class="flex-grow-1">
           <div class="mb-3">
-            <label class="form-label small">Nombre:</label>
+            <label class="form-label small">{{ t('modal.name') }}:</label>
             <input v-model="form.name" type="text" class="form-control form-control-sm" disabled/>
           </div>
 
           <div class="mb-3">
-            <label class="form-label small">Apellidos:</label>
+            <label class="form-label small">{{ t('modal.surnames') }}:</label>
             <input v-model="form.surnames" type="text" class="form-control form-control-sm" disabled/>
           </div>
         </div>
       </div>
 
       <div class="mb-3">
-        <label class="form-label small">Email:</label>
+        <label class="form-label small">{{ t('modal.email') }}:</label>
         <input v-model="form.email" type="email" class="form-control form-control-sm" />
-         <p v-if="errores.email" class="text-danger small mt-1">{{ errores.email }}</p>
+        <p v-if="errores.email" class="text-danger small mt-1">{{ errores.email }}</p>
       </div>
 
       <div class="mb-3">
-        <label class="form-label small">Teléfono:</label>
+        <label class="form-label small">{{ t('modal.phone') }}:</label>
         <input v-model="form.telephone" type="text" class="form-control form-control-sm" />
         <p v-if="errores.telephone" class="text-danger small mt-1">{{ errores.telephone }}</p>
       </div>
 
       <div class="mb-3">
-        <label class="form-label small">Observaciones:</label>
-        <textarea v-model="form.observations" rows="3" class="form-control form-control-sm" placeholder="Sin observaciones..."></textarea>
+        <label class="form-label small">{{ t('modal.observations') }}:</label>
+        <textarea 
+          v-model="form.observations" 
+          rows="3" 
+          class="form-control form-control-sm" 
+          :placeholder="t('modal.no_observations')">
+        </textarea>
       </div>
 
-      <button class="btn btn-info w-100 mt-2" @click="guardar">Guardar</button>
+      <button class="btn btn-info w-100 mt-2" @click="guardar">{{ t('modal.save') }}</button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { reactive, watch, toRefs } from 'vue'
-import { ref } from 'vue'
+import { reactive, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
-  cliente: {
-    type: Object,
-    required: true
-  }
+  cliente: { type: Object, required: true }
 })
 
 const emit = defineEmits(['cerrar', 'guardar'])
@@ -65,26 +69,28 @@ const form = reactive({
   observations: ''
 })
 
+const errores = reactive({
+  email: '',
+  telephone: ''
+})
+
 function validarForm() {
   errores.email = ''
   errores.telephone = ''
-
   let valido = true
 
-  // Validar email si hay valor
   if (form.email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(form.email)) {
-      errores.email = 'Email no válido'
+      errores.email = t('modal.invalid_email')
       valido = false
     }
   }
 
-  // Validar teléfono si hay valor
   if (form.telephone) {
     const numeros = form.telephone.replace(/\D/g, '')
     if (!/^\d{9}$/.test(numeros)) {
-      errores.telephone = 'Teléfono debe tener 9 números'
+      errores.telephone = t('modal.invalid_phone')
       valido = false
     }
   }
@@ -92,12 +98,6 @@ function validarForm() {
   return valido
 }
 
-const errores = reactive({
-  email: '',
-  telephone: ''
-})
-
-// Cuando cambia el cliente, actualizamos el form
 watch(() => props.cliente, (newCliente) => {
   form.name = newCliente.name || ''
   form.surnames = newCliente.surnames || ''

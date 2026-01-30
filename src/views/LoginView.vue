@@ -99,7 +99,7 @@ const login = async () => {
     const data = await res.json()
 
     if (!res.ok) {
-      // 👉 Caso 401 (credenciales incorrectas, etc.)
+      // Caso 401 (credenciales incorrectas, etc.)
       if (res.status === 401) {
         modalMessage.value = data.message || 'Credenciales incorrectas'
         showModal.value = true
@@ -110,7 +110,7 @@ const login = async () => {
       return
     }
 
-    // 👉 Login correcto
+    // Login correcto
     localStorage.setItem('token', data.access_token)
     router.push({ name: 'inicio' })
 

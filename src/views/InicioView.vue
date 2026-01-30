@@ -22,12 +22,12 @@
 
           <div class="cita">
             <div class="headerCita d-flex justify-content-between">
-              <p>Lavado y secado</p>
-              <p>2024-06-15 10:00</p>
+              <p>10:00 - 12:00</p>
+              <p>2024-06-15</p>
             </div>
             <div class="bodyCita mt-2">
-              <p>Descripción: Lavado completo y secado con cepillo.</p>
-              <p>Estado: Pendiente</p>
+              <p>Lavado y secado</p>
+              <p>Alergia altinte</p>
             </div>
           </div>
       </div>

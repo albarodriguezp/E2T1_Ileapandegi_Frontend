@@ -46,23 +46,6 @@ const anosDisponibles = computed(() => {
 </script>
 
 <style scoped>
-.content {
-  background: #222;
-  padding: 0.7rem;
-  min-height: 100vh;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.content2 {
-  background: white;
-  border-radius: 20px;
-  padding: 1.5rem;
-  color: black;
-  min-height: 90vh;
-  box-sizing: border-box;
-}
-
 .header-mes {
   display: flex;
   justify-content: space-between;
@@ -109,14 +92,6 @@ h1 {
 
 
 @media (max-width: 768px) {
-  .content {
-    padding: 0.5rem;
-  }
-
-  .content2 {
-    padding: 1rem;
-  }
-
   .header-mes {
     flex-direction: column;
     align-items: flex-start;
@@ -141,15 +116,6 @@ h1 {
 }
 
 @media (max-width: 480px) {
-  .content {
-    padding: 0.5rem;
-  }
-
-  .content2 {
-    padding: 1rem;
-    border-radius: 15px;
-  }
-
   h1 {
     font-size: 1.25rem;
   }

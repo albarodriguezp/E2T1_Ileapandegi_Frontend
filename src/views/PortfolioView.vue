@@ -93,21 +93,6 @@ function abrirModal(trabajo) {
 </script>
 
 <style scoped>
-.content {
-  background: #222;
-  padding: 2rem;
-  min-height: 100vh;
-  width: 100%;
-}
-
-.content2 {
-  background: white;
-  border-radius: 20px;
-  padding: 2rem;
-  color: black;
-  min-height: 90vh;
-}
-
 h1 {
   margin-bottom: 2rem;
 }

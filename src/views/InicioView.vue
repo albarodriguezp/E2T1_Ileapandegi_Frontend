@@ -1,7 +1,36 @@
 <template>
   <div class="content">
     <div class="content2">
-      <h1>Hola {{  capitalizar(nombre) }}, estas son tus citas!</h1>
+      <h1>Hola {{ capitalizar(nombre) }}, estas son tus citas!</h1>
+
+      <div class="dashboard d-flex justify-content-center gap-5">
+        <div class="miniContenedor">
+          <p>Total citas: {{ totalCitas }}</p>
+          <p class="number">5</p>
+        </div>
+        <div class="miniContenedor">
+          <p>Citas de hoy: {{ totalCitas }}</p>
+          <p class="number">5</p>
+        </div>
+        <div class="miniContenedor">
+          <p>Completadas: {{ totalCitas }}</p>
+          <p class="number">5</p>
+        </div>
+      </div>
+      <div class="proximasCitas">
+          <p>Próximas citas:</p>
+
+          <div class="cita">
+            <div class="headerCita d-flex justify-content-between">
+              <p>Lavado y secado</p>
+              <p>2024-06-15 10:00</p>
+            </div>
+            <div class="bodyCita mt-2">
+              <p>Descripción: Lavado completo y secado con cepillo.</p>
+              <p>Estado: Pendiente</p>
+            </div>
+          </div>
+      </div>
     </div>
   </div>
 </template>
@@ -10,7 +39,7 @@
 
 
 const nombre = localStorage.getItem('name')
-  
+
 const obtenerCitasPorUsuario = async () => {
   cargando.value = true
   error.value = null
@@ -72,5 +101,43 @@ function capitalizar(texto) {
   padding: 2rem;
   color: black;
   height: 90vh;
+}
+
+.miniContenedor {
+  background: #d3f0ec;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  /*width: fit-content;*/
+}
+
+.miniContenedor p {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+.number {
+  font-size: 2rem !important;
+  color: #164e63;
+}
+
+.proximasCitas {
+  margin-top: 2rem;
+  background: #a8caca;
+  border-radius: 10px;
+  padding: 1.5rem;
+}
+
+.cita {
+  background: #ffffff;
+  padding: 1rem;
+  border-radius: 10px;
+  border-left: #394242 5px solid;
+}
+
+.headerCita p {
+  font-weight: bold;
 }
 </style>

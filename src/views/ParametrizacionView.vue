@@ -646,20 +646,6 @@ const turnosFiltrados = computed(() => {
 
 
 <style scoped>
-.content {
-  background: #222;
-  padding: 2rem;
-  min-height: 100vh;
-  width: 100%;
-}
-
-.content2 {
-  background: white;
-  border-radius: 20px;
-  padding: 2rem;
-  color: black;
-  overflow-y: auto;
-}
 
 /* ===== Usuarios en 2 columnas ===== */
 .usuarios-grid {

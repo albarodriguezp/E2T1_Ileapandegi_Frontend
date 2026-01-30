@@ -1,37 +1,11 @@
 <template>
   <div class="modal-overlay" @click.self="emit('close')">
-    <div class="modal add-modal">
-      <h2>Agregar Inventario</h2>
+    <div class="modal">
+      <h2>Editar categoría</h2>
+
       <form @submit.prevent="submit">
         <label>Nombre</label>
-        <input v-model="form.name" required />
-
-        <label>Lote</label>
-        <input v-model="form.batch" />
-
-        <label>Marca</label>
-        <input v-model="form.brand" />
-
-        <label>Stock</label>
-        <input type="number" v-model.number="form.stock" required />
-
-        <label>Stock mínimo</label>
-        <input type="number" v-model.number="form.min_stock" required />
-
-        <label>Categoría</label>
-        <select v-model="form.category_id" required>
-          <option disabled value="">Seleccione una categoría</option>
-          <option v-for="category in categories" :key="category.id" :value="category.id">
-            {{ category.name }}
-          </option>
-        </select>
-
-
-        <label>Fecha caducidad</label>
-        <input type="date" v-model="form.expiration_date" />
-
-        <label>Descripción</label>
-        <textarea v-model="form.description" />
+        <input v-model="local.name" required />
 
         <div class="actions">
           <button type="submit">Guardar</button>
@@ -43,39 +17,20 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, watch } from 'vue'
 
+const props = defineProps({ item: Object })
 const emit = defineEmits(['close', 'submit'])
 
-const form = reactive({
-  name: '',
-  batch: '',
-  brand: '',
-  stock: 0,
-  min_stock: 0,
-  category_id: '',
-  expiration_date: '',
-  description: ''
-})
+const local = reactive({})
 
-const categories = ref([])
+watch(
+  () => props.item,
+  v => Object.assign(local, v),
+  { immediate: true }
+)
 
-const token = localStorage.getItem('token')
-
-const fetchCategories = async () => {
-  const res = await fetch('http://localhost:8000/api/categorys', {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    }
-  })
-  categories.value = await res.json()
-}
-
-onMounted(fetchCategories)
-
-const submit = () => emit('submit', form)
-
+const submit = () => emit('submit', local)
 </script>
 
 <style scoped>

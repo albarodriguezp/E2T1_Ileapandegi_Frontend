@@ -1,82 +1,23 @@
 <template>
   <div class="modal-overlay" @click.self="emit('close')">
-    <div class="modal add-modal">
-      <h2>Agregar Inventario</h2>
-      <form @submit.prevent="submit">
-        <label>Nombre</label>
-        <input v-model="form.name" required />
+    <div class="modal">
+      <h2>Eliminar categoría</h2>
 
-        <label>Lote</label>
-        <input v-model="form.batch" />
+      <p>¿Seguro que deseas eliminar la categoría <b>{{ item.name }}</b>?</p>
 
-        <label>Marca</label>
-        <input v-model="form.brand" />
-
-        <label>Stock</label>
-        <input type="number" v-model.number="form.stock" required />
-
-        <label>Stock mínimo</label>
-        <input type="number" v-model.number="form.min_stock" required />
-
-        <label>Categoría</label>
-        <select v-model="form.category_id" required>
-          <option disabled value="">Seleccione una categoría</option>
-          <option v-for="category in categories" :key="category.id" :value="category.id">
-            {{ category.name }}
-          </option>
-        </select>
-
-
-        <label>Fecha caducidad</label>
-        <input type="date" v-model="form.expiration_date" />
-
-        <label>Descripción</label>
-        <textarea v-model="form.description" />
-
-        <div class="actions">
-          <button type="submit">Guardar</button>
-          <button type="button" @click="emit('close')">Cancelar</button>
-        </div>
-      </form>
+      <div class="actions">
+        <button class="danger" @click="emit('confirm')">Eliminar</button>
+        <button @click="emit('close')">Cancelar</button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { reactive, ref, onMounted } from 'vue'
-
-const emit = defineEmits(['close', 'submit'])
-
-const form = reactive({
-  name: '',
-  batch: '',
-  brand: '',
-  stock: 0,
-  min_stock: 0,
-  category_id: '',
-  expiration_date: '',
-  description: ''
-})
-
-const categories = ref([])
-
-const token = localStorage.getItem('token')
-
-const fetchCategories = async () => {
-  const res = await fetch('http://localhost:8000/api/categorys', {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    }
-  })
-  categories.value = await res.json()
-}
-
-onMounted(fetchCategories)
-
-const submit = () => emit('submit', form)
-
+defineProps({ item: Object })
+const emit = defineEmits(['close', 'confirm'])
 </script>
+
 
 <style scoped>
 /* ===== Overlay ===== */

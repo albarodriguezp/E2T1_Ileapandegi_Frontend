@@ -9,8 +9,8 @@
     <div class="language-selector">
       <select v-model="lang" class="form-select form-select-sm">
         <option value="es">ES</option>
-        <option value="en">EN</option>
         <option value="eu">EU</option>
+        <option value="en">EN</option>
       </select>
     </div>
 

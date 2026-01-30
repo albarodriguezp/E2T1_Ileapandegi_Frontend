@@ -336,27 +336,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.content {
-  background: #222;
-
-  padding: 2rem;
-  min-height: 100vh;
-  width: 100%;
-
-}
-
-.content2 {
-  background: white;
-  border-radius: 20px;
-  height: 100vh;
-  padding: 2rem;
-  color: black;
-  position: relative;
-  overflow: visible;
-  z-index: 1;
-
-}
-
 .acciones {
   margin-top: 1cm;
   display: flex;

@@ -136,46 +136,120 @@
           </button>
         </div>
 
-        <!-- Buscador -->
-        <input v-model="equipmentSearch" type="text" placeholder="Buscar por código, nombre o responsable..."
-          class="search-input" />
-
-        <table class="inventario-table">
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Marca</th>
-              <th>Etiqueta</th>
-              <th>Descripción</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <tr v-for="item in equipmentPaginatedData" :key="item.id">
-              <td>{{ item.name }}</td>
-              <td>{{ item.brand }}</td>
-              <td>{{ item.label }}</td>
-              <td>{{ item.description }}</td>
-              <td class="actions">
-                <button class="btn-edit" @click="openEquipmentModal('edit', item)">✏️</button>
-                <button class="btn-delete" @click="openEquipmentModal('delete', item)">🗑️</button>
-              </td>
-            </tr>
-
-
-
-            <tr v-if="filteredEquipments.length === 0">
-              <td colspan="6" class="empty">No hay resultados</td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="pagination">
-          <button @click="equipmentPrevPage" :disabled="equipmentCurrentPage === 1">«</button>
-          <span>Página {{ equipmentCurrentPage }} de {{ equipmentTotalPages }}</span>
-          <button @click="equipmentNextPage" :disabled="equipmentCurrentPage === equipmentTotalPages">»</button>
+        <!-- Selector sub-tabs para Equipamientos -->
+        <div class="equipment-subtabs">
+          <button :class="{ active: equipmentView === 'lista' }" @click="equipmentView = 'lista'">Lista
+            Completa</button>
+          <button :class="{ active: equipmentView === 'gestion' }" @click="equipmentView = 'gestion'">Gestión de
+            Equipamientos</button>
         </div>
+
+        <!-- Vista Gestión con dos columnas -->
+        <div v-if="equipmentView === 'gestion'" class="equipment-columns">
+          <!-- Equipamientos disponibles -->
+          <div class="column">
+            <h2>Disponibles</h2>
+            <table class="inventario-table">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Marca</th>
+                  <th>Etiqueta</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in availableEquipments" :key="item.id">
+                  <td>{{ item.name }}</td>
+                  <td>{{ item.brand }}</td>
+                  <td>{{ item.label }}</td>
+                  <td class="actions">
+                    <button class="btn-assign" @click="assignEquipment(item)">
+                      Asignar
+                    </button>
+                  </td>
+                </tr>
+                <tr v-if="availableEquipments.length === 0">
+                  <td colspan="4" class="empty">No hay equipamientos disponibles</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- Equipamientos ocupados -->
+          <div class="column">
+            <h2>Ocupados</h2>
+            <table class="inventario-table">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Marca</th>
+                  <th>Etiqueta</th>
+                  <th>Responsable</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in occupiedEquipments" :key="item.id">
+                  <td>{{ item.name }}</td>
+                  <td>{{ item.brand }}</td>
+                  <td>{{ item.label }}</td>
+                  <td>{{ item.assigned_to }}</td>
+
+                  <td class="actions">
+                    <button class="btn-assign" @click="finishEquipmentUsage(item)">
+                      Finalizar uso
+                    </button>
+                  </td>
+                </tr>
+                <tr v-if="occupiedEquipments.length === 0">
+                  <td colspan="5" class="empty">No hay equipamientos ocupados</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+
+        <!-- Vista Lista Completa (igual que antes) -->
+        <div v-if="equipmentView === 'lista'">
+          <input v-model="equipmentSearch" type="text" placeholder="Buscar por código, nombre o responsable..."
+            class="search-input" />
+
+          <table class="inventario-table">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Marca</th>
+                <th>Etiqueta</th>
+                <th>Descripción</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="item in equipmentPaginatedData" :key="item.id">
+                <td>{{ item.name }}</td>
+                <td>{{ item.brand }}</td>
+                <td>{{ item.label }}</td>
+                <td>{{ item.description }}</td>
+                <td class="actions">
+                  <button class="btn-edit" @click="openEquipmentModal('edit', item)">✏️</button>
+                  <button class="btn-delete" @click="openEquipmentModal('delete', item)">🗑️</button>
+                </td>
+              </tr>
+              <tr v-if="filteredEquipments.length === 0">
+                <td colspan="6" class="empty">No hay resultados</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="pagination">
+            <button @click="equipmentPrevPage" :disabled="equipmentCurrentPage === 1">«</button>
+            <span>Página {{ equipmentCurrentPage }} de {{ equipmentTotalPages }}</span>
+            <button @click="equipmentNextPage" :disabled="equipmentCurrentPage === equipmentTotalPages">»</button>
+          </div>
+        </div>
+
       </div>
+
 
     </div>
 
@@ -207,6 +281,8 @@
     <CategoryDeleteModal v-if="showCategoryModal && categoryModalType === 'delete'" :item="categoryForm"
       @close="closeCategoryModal" @confirm="deleteCategory" />
 
+    <AssignEquipmentModal v-if="showAssignModal" :item="assignItem" @close="showAssignModal = false"
+      @confirm="confirmAssign" />
 
   </div>
 </template>
@@ -326,6 +402,61 @@ watch(equipmentSearch, () => {
 import EquipmentAddModal from '../components/EquipmentAddModal.vue'
 import EquipmentEditModal from '../components/EquipmentEditModal.vue'
 import EquipmentDeleteModal from '../components/EquipmentDeleteModal.vue'
+
+
+const equipmentView = ref('lista') // o 'gestion', según la vista inicial que quieras
+
+// Equipamientos disponibles = equipments sin student_equipment activo
+const availableEquipments = computed(() =>
+  equipments.value.filter(e => !e.student_equipments || e.student_equipments.length === 0)
+)
+
+// Equipamientos ocupados = student_equipments activos con info del equipment y alumno
+const occupiedEquipments = computed(() => {
+  return equipments.value
+    .filter(e => e.student_equipments && e.student_equipments.length > 0)
+    .map(e => {
+      const se = e.student_equipments[0] // asumimos 1 por equipo
+      return {
+        id: e.id,
+        name: e.name,
+        brand: e.brand,
+        label: e.label,
+        assigned_to: se.student_name, // o el campo que tengas
+        student_equipment_id: se.id // para eliminar después
+      }
+    })
+})
+
+
+
+
+
+const assignEquipment = (item) => {
+  openAssignModal(item)
+}
+
+const confirmAssign = async (studentData) => {
+  // studentData: { student_name, start_date, etc. } viene de la modal
+  const payload = {
+    equipment_id: assignItem.value.id,
+    ...studentData
+  }
+
+  await fetch('http://localhost:8000/api/student_equipments', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  })
+
+  await fetchEquipments() // refresca lista completa
+  showAssignModal.value = false
+}
+
+
 
 
 
@@ -510,6 +641,29 @@ const deleteCategory = async () => {
   closeCategoryModal()
 }
 
+import AssignEquipmentModal from '../components/AssignEquipmentModal.vue'
+
+const showAssignModal = ref(false)
+const assignItem = ref({})
+
+const openAssignModal = (item) => {
+  assignItem.value = { ...item }
+  showAssignModal.value = true
+}
+
+const finishEquipmentUsage = async (occupiedItem) => {
+  // occupiedItem.student_equipment_id es el ID del registro a eliminar
+  await fetch(`http://localhost:8000/api/student_equipments/${occupiedItem.student_equipment_id}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  })
+
+  await fetchEquipments()
+}
+
+
 </script>
 
 
@@ -689,5 +843,47 @@ const deleteCategory = async () => {
 .tabs button.active {
   background: #164e63;
   color: white;
+}
+
+.equipment-subtabs {
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.equipment-subtabs button {
+  padding: 0.4rem 1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: #e0e0e0;
+  font-weight: 600;
+}
+
+.equipment-subtabs button.active {
+  background: #164e63;
+  color: white;
+}
+
+.equipment-columns {
+  display: flex;
+  gap: 1rem;
+}
+
+.column {
+  flex: 1;
+  overflow-x: auto;
+}
+
+.column h2 {
+  margin-bottom: 0.5rem;
+}
+
+.btn-assign {
+  background: #f57c00;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
 }
 </style>

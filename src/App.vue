@@ -1,5 +1,6 @@
 <script setup>
 import Menu from './components/AppMenu.vue'
+import Menu from './components/AppMenu.vue'
 import Login from './views/LoginView.vue'
 import { useRoute } from 'vue-router'
 
@@ -11,6 +12,7 @@ const route = useRoute()
    <div v-if="route.name === 'login'">
     <Login />
    </div>
+
 
   <!-- RESTO DE LA APP -->
   <div v-else class="app-layout">

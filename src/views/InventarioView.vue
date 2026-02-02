@@ -775,12 +775,6 @@ const finishEquipmentUsage = async (occupiedItem) => {
 }
 
 /* ===== Responsive ===== */
-@media (max-width: 1024px) {
-  .content2 {
-    padding: 1.5rem;
-    height: 95vh;
-  }
-}
 
 @media (max-width: 768px) {
   .header {
@@ -804,15 +798,6 @@ const finishEquipmentUsage = async (occupiedItem) => {
 }
 
 @media (max-width: 480px) {
-  .content {
-    padding: 0.5rem;
-  }
-
-  .content2 {
-    padding: 1rem;
-    border-radius: 12px;
-  }
-
   .inventario-table th,
   .inventario-table td {
     font-size: 0.75rem;

@@ -118,22 +118,6 @@ onMounted(() => {
 
 <style scoped>
 /* ===== Layout ===== */
-.content {
-  background: #222;
-  padding: 2rem;
-  min-height: 100vh;
-  width: 100%;
-}
-
-.content2 {
-  background: white;
-  border-radius: 20px;
-  padding: 2rem;
-  color: black;
-  height: 90vh;
-  overflow-y: auto;
-}
-
 h1 {
   margin-bottom: 2rem;
 }

@@ -258,23 +258,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.content {
-  background: #222;
-  padding: 0.7rem;
-  min-height: 100vh;
-  width: 100vw;
-  border-radius: 20px;
-  box-sizing: border-box;
-}
-
-.content2 {
-  background: white;
-  min-height: 100vh;
-  border-radius: 20px;
-  padding: 2rem;
-  color: black;
-}
-
 .header {
   display: flex;
   justify-content: space-between;

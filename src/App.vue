@@ -1,6 +1,5 @@
 <script setup>
 import Menu from './components/AppMenu.vue'
-import Menu from './components/AppMenu.vue'
 import Login from './views/LoginView.vue'
 import { useRoute } from 'vue-router'
 

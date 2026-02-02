@@ -26,19 +26,4 @@ const route = useRoute()
   min-height: 100vh;
   justify-content: center;
 }
-
-.content {
-  background: #222;
-  padding: 2rem;
-  min-height: 100vh;
-  width: 100%;
-}
-
-.content2 {
-  background: white;
-  border-radius: 20px;
-  padding: 2rem;
-  color: black;
-  overflow-y: auto;
-}
 </style>

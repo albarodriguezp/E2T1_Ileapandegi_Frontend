@@ -1,8 +1,6 @@
 <template>
   <div class="content">
     <div class="content2">
-   
-       <IdiomaSelector />
       <!-- Título -->
       <h1>{{ $t('clients.title') }}</h1>
 
@@ -95,7 +93,6 @@ import ModalNuevoCliente from '@/components/ModalNuevoCliente.vue'
 import ModalInformacion from '@/components/ModalInformativo.vue'
 import ModalConfirmacion from '@/components/ModalConfirmacion.vue'
 import ModalVerCliente from '@/components/ModalVerCliente.vue'
-import IdiomaSelector from '@/components/SelectorIdioma.vue'
 
 /* ===============================
    i18n

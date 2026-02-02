@@ -29,12 +29,16 @@
         <router-link to="/parametrizacion" active-class="active">{{ t('menu.settings') }}</router-link>
       </li>
     </ul>
+    <div class="idioma">
+      <IdiomaSelector />
+    </div>
   </nav>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import IdiomaSelector from '@/components/SelectorIdioma.vue'
 
 const { t } = useI18n()
 
@@ -103,5 +107,9 @@ onMounted(async () => {
 .menu a:hover,
 .menu a.active {
   background-color: #1f8aa0;
+}
+
+.idioma {
+  margin-top: auto; /* lo empuja al fondo del sidebar */
 }
 </style>

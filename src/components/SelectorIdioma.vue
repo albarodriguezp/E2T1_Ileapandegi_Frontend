@@ -21,7 +21,7 @@ function cambiarIdioma() {
 
 <style scoped>
 .selector-idioma {
-  position: absolute; /* Ajusta según tu contenedor */
+  margin-top: auto;
   top: 1rem;
   right: 1.5rem;
 }

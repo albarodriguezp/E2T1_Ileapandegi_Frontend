@@ -1,4 +1,11 @@
 {
+   "profile": {
+    "title": "Mi perfil",
+    "name": "Nombre",
+    "email": "Email",
+    "role": "Rol",
+    "progress": "Mi progreso"
+  },
   "clients": {
     "title": "Clientes",
     "search": "Buscar por nombre, apellido o teléfono...",
@@ -73,6 +80,4 @@
     "errorNoServer": "No se pudo conectar con el servidor",
     "close": "Cerrar"
   }
-  
-  
 }

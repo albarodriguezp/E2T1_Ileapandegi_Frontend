@@ -461,4 +461,5 @@ onMounted(() => {
   cursor: pointer;
   font-size: 1.6rem;  
 }
+
 </style>

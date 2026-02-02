@@ -80,6 +80,8 @@ const cargarPerfil = async () => {
       }
     })
     const dataPerfil = await resPerfil.json()
+    localStorage.setItem('name', dataPerfil.name)
+    localStorage.setItem('user_id', dataPerfil.id)
     perfil.value.nombre = dataPerfil.name
     perfil.value.rol = dataPerfil.rol
     perfil.value.email = dataPerfil.email || ''

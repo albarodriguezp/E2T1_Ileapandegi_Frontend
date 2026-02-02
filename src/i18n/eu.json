@@ -1,4 +1,11 @@
 {
+ "profile": {
+    "title": "Nire profila",
+    "name": "Izena",
+    "email": "Posta elektronikoa",
+    "role": "Rol",
+    "progress": "Nire aurrerapena"
+  },
   "clients": {
     "title": "Bezeroak",
     "search": "Izena, abizena edo telefonoa bilatu...",
@@ -20,9 +27,9 @@
     "home": "HASIERA",
     "inventory": "INBENTARIOA",
     "clients": "BEZEROAK",
-    "portfolio": "PORTFOLIO",
+    "portfolio": "PORTFOLIOA",
     "appointments": "HITZORDUAK",
-    "profile": "PROFIL",
+    "profile": "PROFILA",
     "settings": "PARAMETRIZAZIOA"
   },
    "modal": {

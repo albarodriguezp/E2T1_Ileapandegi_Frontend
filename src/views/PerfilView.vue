@@ -3,7 +3,7 @@
     <div class="content2">
 
       <!-- Título -->
-      <h1>Mi perfil</h1>
+      <h1>{{ $t('profile.title') }}</h1>
 
       <!-- ===== Información personal ===== -->
       <div class="perfil-card">
@@ -16,17 +16,17 @@
 
         <div class="perfil-right">
           <div class="form-group">
-            <label>Nombre</label>
+            <label>{{ $t('profile.name') }}</label>
             <input v-model="perfil.nombre" disabled />
           </div>
 
           <div class="form-group">
-            <label>Email</label>
+            <label>{{ $t('profile.email') }}</label>
             <input v-model="perfil.email" disabled />
           </div>
 
           <div class="form-group">
-            <label>Rol</label>
+            <label>{{ $t('profile.role') }}</label>
             <input v-model="perfil.rol" disabled />
           </div>
         </div>
@@ -35,7 +35,7 @@
 
       <!-- ===== Progreso ===== -->
       <div class="progreso">
-        <h2>Mi progreso</h2>
+        <h2>{{ $t('profile.progress') }}</h2>
 
         <div class="progress-item" v-for="item in progreso" :key="item.nombre">
           <div class="progress-header">

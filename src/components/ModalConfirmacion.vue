@@ -2,22 +2,26 @@
   <div v-if="mostrar" class="modal-dialog-overlay" @click.self="$emit('cancelar')">
     <div class="modal" tabindex="-1">
       <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Eliminar Usuarios</h5>
-        <button class="btn-cerrar" @click="$emit('cancelar')" aria-label="Cerrar modal">&times;</button>
+        <div class="modal-header">
+          <h5 class="modal-title">{{ t('deleteUser.title') }}</h5>
+          <button class="btn-cerrar" @click="$emit('cancelar')" aria-label="Cerrar modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-mensaje">{{ mensaje }}</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-eliminar" @click="$emit('confirmar')">{{ t('deleteUser.delete') }}</button>
+        </div>
       </div>
-      <div class="modal-body">
-        <p class="modal-mensaje">{{ mensaje }}</p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-eliminar" @click="$emit('confirmar')">Eliminar</button>
-      </div>
-    </div>
     </div>
   </div>
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 defineProps({
   mensaje: String,
   mostrar: Boolean

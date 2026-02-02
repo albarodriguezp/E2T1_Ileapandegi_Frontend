@@ -2,53 +2,57 @@
   <div class="modal-backdrop" @click.self="cerrarModal">
     <div class="modal">
       <button class="cerrar-btn" @click="cerrarModal">X</button>
-      <h2>Nuevo Cliente</h2>
+      <h2>{{ t('newClient.title') }}</h2>
 
       <div class="form-group">
-        <label for="nombre">Nombre:</label>
+        <label for="nombre">{{ t('newClient.name') }}:</label>
         <input id="nombre" v-model="cliente.name" type="text" />
         <p v-if="errores.name" class="error-msg">{{ errores.name }}</p>
       </div>
 
       <div class="form-group">
-        <label for="apellidos">Apellidos:</label>
+        <label for="apellidos">{{ t('newClient.surnames') }}:</label>
         <input id="apellidos" v-model="cliente.surnames" type="text" />
         <p v-if="errores.surnames" class="error-msg">{{ errores.surnames }}</p>
       </div>
 
       <div class="form-group">
-        <label for="telefono">Teléfono:</label>
+        <label for="telefono">{{ t('newClient.phone') }}:</label>
         <input id="telefono" v-model="cliente.telephone" type="tel" />
         <p v-if="errores.telephone" class="error-msg">{{ errores.telephone }}</p>
       </div>
 
       <div class="form-group">
-        <label for="email">Email:</label>
+        <label for="email">{{ t('newClient.email') }}:</label>
         <input id="email" v-model="cliente.email" type="email" />
         <p v-if="errores.email" class="error-msg">{{ errores.email }}</p>
       </div>
 
       <div class="form-group">
-        <label>Home client:</label>
+        <label>{{ t('newClient.homeClient') }}:</label>
         <div class="radio-group">
           <label>
             <input type="radio" v-model="cliente.home_client" :value="true" />
-            Sí
+            {{ t('newClient.yes') }}
           </label>
           <label>
             <input type="radio" v-model="cliente.home_client" :value="false" />
-            No
+            {{ t('newClient.no') }}
           </label>
         </div>
         <p v-if="errores.home_client" class="error-msg">{{ errores.home_client }}</p>
       </div>
-      <button class="guardar-btn" @click="validarYGuardar">Guardar</button>
+
+      <button class="guardar-btn" @click="validarYGuardar">{{ t('newClient.save') }}</button>
     </div>
   </div>
 </template>
 
 <script setup>
 import { reactive } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 const emit = defineEmits(['guardar', 'cerrar'])
 
 const cliente = reactive({
@@ -59,7 +63,6 @@ const cliente = reactive({
   email: ''
 })
 
-// Objeto reactivo para errores por campo
 const errores = reactive({
   name: '',
   surnames: '',
@@ -68,9 +71,7 @@ const errores = reactive({
   home_client: ''
 })
 
-// Función de validación
 function validarCliente(cliente) {
-  // Limpiar errores previos
   errores.name = ''
   errores.surnames = ''
   errores.telephone = ''
@@ -78,35 +79,33 @@ function validarCliente(cliente) {
   errores.home_client = ''
 
   const letrasRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/
-  if (!cliente.name) errores.name = 'El nombre es obligatorio'
-  else if (!letrasRegex.test(cliente.name)) errores.name = 'Solo se permiten letras'
+  if (!cliente.name) errores.name = t('newClient.errors.nameRequired')
+  else if (!letrasRegex.test(cliente.name)) errores.name = t('newClient.errors.onlyLetters')
 
-  if (!cliente.surnames) errores.surnames = 'Los apellidos son obligatorios'
-  else if (!letrasRegex.test(cliente.surnames)) errores.surnames = 'Solo se permiten letras'
+  if (!cliente.surnames) errores.surnames = t('newClient.errors.surnamesRequired')
+  else if (!letrasRegex.test(cliente.surnames)) errores.surnames = t('newClient.errors.onlyLetters')
 
   if (cliente.telephone) {
     const telRegex = /^[0-9+\-\s]+$/
-    if (!telRegex.test(cliente.telephone)) errores.telephone = 'Teléfono no válido'
+    if (!telRegex.test(cliente.telephone)) errores.telephone = t('newClient.errors.invalidPhone')
     const numeros = cliente.telephone.replace(/\D/g, '')
-
     if (!/^\d{9}$/.test(numeros)) {
-      errores.telephone = 'El teléfono debe tener 9 números'
+      errores.telephone = t('newClient.errors.phone9Digits')
     }
   }
+
   if (cliente.email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(cliente.email)) errores.email = 'Email no válido'
+    if (!emailRegex.test(cliente.email)) errores.email = t('newClient.errors.invalidEmail')
   }
-  if (cliente.home_client === null) errores.home_client = 'Selecciona Sí o No'
 
-  // Retorna true si no hay errores
+  if (cliente.home_client === null) errores.home_client = t('newClient.errors.selectYesNo')
+
   return !errores.name && !errores.surnames && !errores.telephone && !errores.email && !errores.home_client
 }
 
-// Validar y emitir si todo está correcto
 function validarYGuardar() {
-  const valido = validarCliente(cliente)
-  if (!valido) return
+  if (!validarCliente(cliente)) return
   emit('guardar', { ...cliente })
   cerrarModal()
 }

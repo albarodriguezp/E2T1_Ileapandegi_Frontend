@@ -2,88 +2,72 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
 
   <div class="login-page">
-    <!-- Fondo borroso -->
     <div class="bg-blur"></div>
 
     <!-- Selector de idioma -->
-    <div class="language-selector">
-      <select v-model="lang" class="form-select form-select-sm">
-        <option value="es">ES</option>
-        <option value="eu">EU</option>
-        <option value="en">EN</option>
-      </select>
-    </div>
+    <SelectorIdioma />
 
     <!-- Card -->
     <div class="card login-card shadow">
-      <h3>{{ t.loginTitle }}</h3>
+      <h3>{{ t('login.loginTitle') }}</h3>
 
       <form @submit.prevent="login">
         <div class="mb-3">
-          <label class="form-label">{{ t.user }}</label>
-          <input type="text" class="form-control" v-model="usuario" :placeholder="t.userPlaceholder" required />
+          <label class="form-label">{{ t('login.user') }}</label>
+          <input type="text" class="form-control" v-model="usuario" :placeholder="t('login.userPlaceholder')" required />
         </div>
 
         <div class="mb-3 password-wrapper">
-          <label class="form-label">{{ t.password }}</label>
+          <label class="form-label">{{ t('login.password') }}</label>
           <div class="password-field">
             <input :type="showPassword ? 'text' : 'password'" class="form-control" v-model="password"
-              :placeholder="t.passwordPlaceholder" required />
+              :placeholder="t('login.passwordPlaceholder')" required />
             <span class="toggle-password" @click="showPassword = !showPassword">
               <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
             </span>
           </div>
         </div>
 
-        <button class="btn btn-primary">{{ t.button }}</button>
+        <button class="btn btn-primary">{{ t('login.button') }}</button>
       </form>
     </div>
   </div>
 
+  <!-- Modal de error -->
   <div v-if="showModal" class="modal-backdrop-custom">
-  <div class="modal-card">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ t('login.errorAuthTitle') }}</h5>
+        <span class="modal-close" @click="showModal = false">&times;</span>
+      </div>
 
-    <!-- Header -->
-    <div class="modal-header">
-      <h2>Error de autenticación</h2>
-      <span class="modal-close" @click="showModal = false">×</span>
+      <div class="modal-body">
+        <p>{{ modalMessage }}</p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-danger" @click="showModal = false">
+          {{ t('login.close') }}
+        </button>
+      </div>
     </div>
-
-    <!-- Body -->
-    <div class="modal-body">
-      <p>{{ modalMessage }}</p>
-    </div>
-
-    <!-- Footer -->
-    <div class="modal-footer">
-      <button class="btn btn-danger" @click="showModal = false">
-        Cerrar
-      </button>
-    </div>
-
   </div>
-</div>
-
-
 </template>
 
-
 <script setup>
-import { ref, computed } from 'vue'
-import { messages } from '@/utils/translations.js' // importando el archivo
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import SelectorIdioma from '@/components/SelectorIdioma.vue'
 
 const router = useRouter()
-const lang = ref(navigator.language.slice(0, 2) in messages ? navigator.language.slice(0, 2) : 'es')
+const { t, locale } = useI18n()
+
 const usuario = ref('')
 const password = ref('')
 const showPassword = ref(false)
 const showModal = ref(false)
 const modalMessage = ref('')
-
-
-// Computed para acceder fácilmente a los textos
-const t = computed(() => messages[lang.value])
 
 const login = async () => {
   try {
@@ -99,30 +83,23 @@ const login = async () => {
     const data = await res.json()
 
     if (!res.ok) {
-      // 👉 Caso 401 (credenciales incorrectas, etc.)
       if (res.status === 401) {
-        modalMessage.value = data.message || 'Credenciales incorrectas'
-        showModal.value = true
+        modalMessage.value = data.message || t('login.errorCredentials')
       } else {
-        modalMessage.value = 'Error inesperado'
-        showModal.value = true
+        modalMessage.value = t('login.errorUnexpected')
       }
+      showModal.value = true
       return
     }
 
-    // 👉 Login correcto
     localStorage.setItem('token', data.access_token)
     router.push({ name: 'inicio' })
-
   } catch (err) {
-    modalMessage.value = 'No se pudo conectar con el servidor'
+    modalMessage.value = t('login.errorNoServer')
     showModal.value = true
     console.error(err)
   }
 }
-
-
-
 </script>
 
 <style lang="scss" scoped>

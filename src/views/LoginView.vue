@@ -5,7 +5,9 @@
     <div class="bg-blur"></div>
 
     <!-- Selector de idioma -->
-    <SelectorIdioma />
+    <div class="language-selector">
+      <IdiomaSelector />
+    </div>
 
     <!-- Card -->
     <div class="card login-card shadow">
@@ -58,7 +60,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import SelectorIdioma from '@/components/SelectorIdioma.vue'
+import IdiomaSelector from '@/components/SelectorIdioma.vue'   
 
 const router = useRouter()
 const { t, locale } = useI18n()

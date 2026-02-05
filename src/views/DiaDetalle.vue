@@ -2,9 +2,6 @@
   <div class="content">
     <div class="content2">
       <div class="header">
-        <button class="btn-volver" @click="router.push('/citas')">
-          ← Volver a Citas
-        </button>
         <div class="navegacion-fecha">
           <button class="btn-nav" @click="cambiarDia(-1)">←</button>
           <h1>Citas {{ diaReactivo }}/{{ mesReactivo + 1 }}/{{ anoReactivo }}</h1>
@@ -74,7 +71,6 @@
       :id="citaSeleccionadaId"
       @cerrar="mostrarVerCita = false"
       @editar="handleEditarCita"
-      @eliminar="handleSolicitarEliminar"
     />
 
     <!-- Modal Nueva Cita -->
@@ -87,15 +83,6 @@
       @guardar="handleNuevaCita"
       @cerrar="() => { mostrarModal = false; citaParaEditar = null }"
     />
-
-    <!-- Modal Confirmación Eliminar -->
-    <ModalConfirmParam
-      v-if="mostrarConfirmEliminar"
-      title="Eliminar Cita"
-      message="¿Estás seguro de que quieres eliminar esta cita? Esta acción no se puede deshacer."
-      @confirm="confirmarEliminar"
-      @close="cancelarEliminar"
-    />
   </div>
 </template>
 
@@ -104,7 +91,6 @@ import { computed, ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ModalNuevaCita from '../components/ModalNuevaCita.vue'
 import ModalVerCita from '../components/ModalVerCita.vue'
-import ModalConfirmParam from '../components/ModalConfirmParam.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -124,10 +110,8 @@ const slotHeight = 40
 const anchoSillon = 150 
 const mostrarModal = ref(false)
 const mostrarVerCita = ref(false)
-const mostrarConfirmEliminar = ref(false)
 const citaSeleccionadaId = ref(null)
 const citaParaEditar = ref(null)
-const citaIdAEliminar = ref(null)
 
 // sillones desde front tmb FALTA CAMBIAR POR ESTUDIANTES DEL DÍA
 const sillonesDisponibles = ref([1, 2, 3, 4, 5])
@@ -260,44 +244,6 @@ function handleEditarCita(citaDetalle) {
   mostrarModal.value = true
 }
 
-function handleSolicitarEliminar(citaId) {
-  mostrarVerCita.value = false
-  citaIdAEliminar.value = citaId
-  mostrarConfirmEliminar.value = true
-}
-
-async function confirmarEliminar() {
-  const token = localStorage.getItem('token')
-  
-  try {
-    const res = await fetch(`http://localhost:8000/api/appointments/${citaIdAEliminar.value}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
-    })
-
-    if (!res.ok) {
-      throw new Error('Error al eliminar la cita')
-    }
-
-    // Cerrar modal de confirmación
-    mostrarConfirmEliminar.value = false
-    citaIdAEliminar.value = null
-    await obtenerCitas()
-  } catch (err) {
-    console.error('Error al eliminar:', err)
-    alert('Error al eliminar la cita: ' + err.message)
-    mostrarConfirmEliminar.value = false
-  }
-}
-
-function cancelarEliminar() {
-  mostrarConfirmEliminar.value = false
-  citaIdAEliminar.value = null
-}
-
 // Para cambiar cada vez que cambian los params de la ruta (al cambiar dia)
 watch(() => route.params, (newParams) => {
   diaReactivo.value = Number(newParams.dia)
@@ -339,22 +285,6 @@ onMounted(() => {
 .btn-nav:hover {
   background-color: #d0d0d0;
 }
-.btn-volver {
-  background-color: #3b9e89;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 16px;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 14px;
-  color: white;
-  transition: background-color 0.2s;
-}
-
-.btn-volver:hover {
-  background-color: #7f8c8d;
-}
-
 
 .btn-nueva-cita {
   background-color: #82d8d8;

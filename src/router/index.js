@@ -5,7 +5,6 @@ import LoginView from '../views/LoginView.vue'
 import InicioView from '../views/InicioView.vue'
 import InventarioView from '../views/InventarioView.vue'
 import ClientesView from '../views/ClientesView.vue'
-import PortfolioView from '../views/PortfolioView.vue'
 import CitasView from '../views/CitasView.vue'
 import PerfilView from '../views/PerfilView.vue'
 import DiaDetalle from '@/views/DiaDetalle.vue'
@@ -37,12 +36,6 @@ const routes = [
     path: '/clientes',
     name: 'clientes',
     component: ClientesView,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/portfolio',
-    name: 'portfolio',
-    component: PortfolioView,
     meta: { requiresAuth: true }
   },
   {

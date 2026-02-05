@@ -15,9 +15,6 @@
         <router-link to="/clientes" active-class="active">{{ t('menu.clients') }}</router-link>
       </li>
       <li>
-        <router-link to="/portfolio" active-class="active">{{ t('menu.portfolio') }}</router-link>
-      </li>
-      <li>
         <router-link to="/citas" active-class="active">{{ t('menu.appointments') }}</router-link>
       </li>
       <li>

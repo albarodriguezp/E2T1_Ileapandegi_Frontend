@@ -62,6 +62,7 @@
         </div>
 
         <div class="acciones">
+          <button class="eliminar-btn" @click="eliminar">Eliminar</button>
           <button class="editar-btn" @click="editar">Editar</button>
           <button class="cerrar-btn-secondary" @click="cerrar">Cerrar</button>
         </div>
@@ -83,7 +84,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['cerrar', 'editar'])
+const emit = defineEmits(['cerrar', 'editar', 'eliminar'])
 
 const citaDetalle = ref({})
 const cargando = ref(false)
@@ -140,6 +141,10 @@ function cerrar() {
 
 function editar() {
   emit('editar', citaDetalle.value)
+}
+
+function eliminar() {
+  emit('eliminar', props.id)
 }
 
 onMounted(() => {
@@ -338,7 +343,22 @@ input[readonly], textarea[readonly] {
   background-color: #7f8c8d;
 }
 
-/* Responsive tweaks */
+.eliminar-btn {
+  background-color: #e74c3c;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 16px;
+  color: white;
+  transition: background-color 0.2s;
+}
+
+.eliminar-btn:hover {
+  background-color: #c0392b;
+}
+
 @media (max-width: 700px) {
   .modal {
     width: calc(100% - 32px) !important;

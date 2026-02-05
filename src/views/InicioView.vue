@@ -52,6 +52,7 @@
       :id="citaSeleccionadaId"
       @cerrar="mostrarVerCita = false"
       @editar="handleEditarCita"
+      @eliminar="handleSolicitarEliminar"
     />
 
     <!-- Modal Editar Cita -->
@@ -64,6 +65,15 @@
       @guardar="handleGuardarCita"
       @cerrar="cerrarModalEditar"
     />
+
+    <!-- Modal Confirmación Eliminar -->
+    <ModalConfirmParam
+      v-if="mostrarConfirmEliminar"
+      title="Eliminar Cita"
+      message="¿Estás seguro de que quieres eliminar esta cita? Esta acción no se puede deshacer."
+      @confirm="confirmarEliminar"
+      @close="cancelarEliminar"
+    />
   </div>
 </template>
 
@@ -71,6 +81,7 @@
 import { ref, computed, onMounted } from 'vue'
 import ModalVerCita from '@/components/ModalVerCita.vue'
 import ModalNuevaCita from '@/components/ModalNuevaCita.vue'
+import ModalConfirmParam from '@/components/ModalConfirmParam.vue'
 
 const nombre = localStorage.getItem('name')
 const citas = ref([])
@@ -78,8 +89,10 @@ const cargando = ref(false)
 const error = ref(null)
 const mostrarVerCita = ref(false)
 const mostrarModalEditar = ref(false)
+const mostrarConfirmEliminar = ref(false)
 const citaSeleccionadaId = ref(null)
 const citaParaEditar = ref(null)
+const citaIdAEliminar = ref(null)
 
 const citasDelUsuario = computed(() => citas.value)
 
@@ -220,6 +233,44 @@ function handleGuardarCita() {
 function cerrarModalEditar() {
   mostrarModalEditar.value = false
   citaParaEditar.value = null
+}
+
+function handleSolicitarEliminar(citaId) {
+  mostrarVerCita.value = false
+  citaIdAEliminar.value = citaId
+  mostrarConfirmEliminar.value = true
+}
+
+async function confirmarEliminar() {
+  const token = localStorage.getItem('token')
+  
+  try {
+    const res = await fetch(`http://localhost:8000/api/appointments/${citaIdAEliminar.value}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    })
+
+    if (!res.ok) {
+      throw new Error('Error al eliminar la cita')
+    }
+
+    // Cerrar modal de confirmación
+    mostrarConfirmEliminar.value = false
+    citaIdAEliminar.value = null
+    await obtenerCitasPorUsuario()
+  } catch (err) {
+    console.error('Error al eliminar:', err)
+    alert('Error al eliminar la cita: ' + err.message)
+    mostrarConfirmEliminar.value = false
+  }
+}
+
+function cancelarEliminar() {
+  mostrarConfirmEliminar.value = false
+  citaIdAEliminar.value = null
 }
 
 onMounted(() => {

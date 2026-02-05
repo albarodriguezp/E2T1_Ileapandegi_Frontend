@@ -2,6 +2,9 @@
   <div class="content">
     <div class="content2">
       <div class="header">
+        <button class="btn-volver" @click="router.push('/citas')">
+          ← Volver a Citas
+        </button>
         <div class="navegacion-fecha">
           <button class="btn-nav" @click="cambiarDia(-1)">←</button>
           <h1>Citas {{ diaReactivo }}/{{ mesReactivo + 1 }}/{{ anoReactivo }}</h1>
@@ -336,6 +339,22 @@ onMounted(() => {
 .btn-nav:hover {
   background-color: #d0d0d0;
 }
+.btn-volver {
+  background-color: #3b9e89;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  color: white;
+  transition: background-color 0.2s;
+}
+
+.btn-volver:hover {
+  background-color: #7f8c8d;
+}
+
 
 .btn-nueva-cita {
   background-color: #82d8d8;

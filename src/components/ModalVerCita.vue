@@ -359,7 +359,6 @@ input[readonly], textarea[readonly] {
   background-color: #c0392b;
 }
 
-
 @media (max-width: 700px) {
   .modal {
     width: calc(100% - 32px) !important;

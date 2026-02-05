@@ -51,6 +51,18 @@
       v-if="mostrarVerCita"
       :id="citaSeleccionadaId"
       @cerrar="mostrarVerCita = false"
+      @editar="handleEditarCita"
+    />
+
+    <!-- Modal Editar Cita -->
+    <ModalNuevaCita
+      v-if="mostrarModalEditar"
+      :fecha="fechaEditar"
+      :sillones="sillonesDisponibles"
+      :citas-existentes="citasExistentes"
+      :initial-cita="citaParaEditar"
+      @guardar="handleGuardarCita"
+      @cerrar="cerrarModalEditar"
     />
   </div>
 </template>
@@ -58,13 +70,16 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import ModalVerCita from '@/components/ModalVerCita.vue'
+import ModalNuevaCita from '@/components/ModalNuevaCita.vue'
 
 const nombre = localStorage.getItem('name')
 const citas = ref([])
 const cargando = ref(false)
 const error = ref(null)
 const mostrarVerCita = ref(false)
+const mostrarModalEditar = ref(false)
 const citaSeleccionadaId = ref(null)
+const citaParaEditar = ref(null)
 
 const citasDelUsuario = computed(() => citas.value)
 
@@ -89,9 +104,39 @@ const proximasCitas = computed(() => {
     .sort((a, b) => new Date(`${a.date}T${a.start_time}`) - new Date(`${b.date}T${b.start_time}`))
 })
 
+const sillonesDisponibles = computed(() => {
+  const sillones = citas.value
+    .map(c => c.seat)
+    .filter(s => s !== null && s !== undefined)
+
+  if (!sillones.length) return [1, 2, 3, 4, 5]
+  return [...new Set(sillones)].sort((a, b) => a - b)
+})
+
+const citasExistentes = computed(() => {
+  return citas.value
+    .filter(c => c.seat && c.start_time && c.end_time)
+    .map(c => ({
+      id: c.id,
+      silla: c.seat,
+      inicio: horaToDecimal(c.start_time),
+      fin: horaToDecimal(c.end_time)
+    }))
+})
+
+const fechaEditar = computed(() => {
+  if (citaParaEditar.value?.date) return citaParaEditar.value.date
+  return new Date().toISOString().split('T')[0]
+})
+
 function formatDate(dateStr) {
   const date = new Date(dateStr)
   return date.toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' })
+}
+
+function horaToDecimal(time) {
+  const [h, m] = time.split(':').map(Number)
+  return h + m / 60
 }
 
 const obtenerCitasPorUsuario = async () => {
@@ -133,6 +178,7 @@ const obtenerCitasPorUsuario = async () => {
     citas.value = Array.isArray(data) ? data.map(c => ({
       id: c.id,
       date: c.date,
+      seat: c.seat,
       start_time: c.start_time,
       end_time: c.end_time,
       status: c.status,
@@ -158,6 +204,22 @@ function capitalizar(texto) {
 function abrirVerCita(citaId) {
   citaSeleccionadaId.value = citaId
   mostrarVerCita.value = true
+}
+
+function handleEditarCita(citaDetalle) {
+  mostrarVerCita.value = false
+  citaParaEditar.value = citaDetalle
+  mostrarModalEditar.value = true
+}
+
+function handleGuardarCita() {
+  obtenerCitasPorUsuario()
+  cerrarModalEditar()
+}
+
+function cerrarModalEditar() {
+  mostrarModalEditar.value = false
+  citaParaEditar.value = null
 }
 
 onMounted(() => {

@@ -110,7 +110,6 @@ async function cargarDetalle() {
 
   try {
     const url = `http://localhost:8000/api/appointments/${props.id}`
-    console.log('📡 URL:', url)
 
     const res = await fetch(url, {
       headers: { 

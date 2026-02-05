@@ -8,19 +8,44 @@
       <p v-if="!item.is_occupied">
         Asignando: <strong>{{ item.name }}</strong>
       </p>
+
       <p v-else>
-        Finalizando uso del equipamiento: <strong>{{ item.name }}</strong><br>
-        Responsable actual: <strong>{{ item.assigned_to }}</strong>
+        Finalizando uso del equipamiento:
+        <strong>{{ item.name }}</strong><br />
+        Responsable actual:
+        <strong>{{ item.assigned_to }}</strong>
       </p>
 
-      <!-- Input solo si se va a asignar -->
+      <!-- Selector de alumno con búsqueda -->
       <div v-if="!item.is_occupied" class="form-group">
-        <label for="user">Nombre del responsable</label>
-        <input type="text" id="user" v-model="user" placeholder="Ingrese nombre del alumno" />
+        <label>Alumno responsable</label>
+
+        <input
+          type="text"
+          v-model="search"
+          placeholder="Buscar alumno..."
+        />
+
+        <ul v-if="search && filteredStudents.length" class="dropdown">
+          <li
+            v-for="student in filteredStudents"
+            :key="student"
+            @click="selectStudent(student)"
+          >
+            {{ student }}
+          </li>
+        </ul>
+
+        <p v-if="search && !filteredStudents.length" class="no-results">
+          No se encontraron alumnos
+        </p>
       </div>
 
       <div class="modal-actions">
-        <button class="btn-cancel" @click="$emit('close')">Cancelar</button>
+        <button class="btn-cancel" @click="$emit('close')">
+          Cancelar
+        </button>
+
         <button class="btn-confirm" @click="confirmAction">
           {{ item.is_occupied ? 'Finalizar uso' : 'Asignar' }}
         </button>
@@ -30,33 +55,52 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 
 const props = defineProps({
   item: {
     type: Object,
     required: true
+  },
+  students: {
+    type: Array,
+    required: true
+    // Ejemplo:
+    // ['Juan Pérez', 'María López', 'Pedro González']
   }
 })
 
 const emits = defineEmits(['close', 'confirm'])
 
-const user = ref('')
+const search = ref('')
+const selectedStudent = ref(null)
 
-// Reset user cuando cambia el item
+// Reset cuando cambia el item
 watch(() => props.item, () => {
-  user.value = ''
+  search.value = ''
+  selectedStudent.value = null
 })
 
+const filteredStudents = computed(() =>
+  props.students.filter(student =>
+    student.toLowerCase().includes(search.value.toLowerCase())
+  )
+)
+
+const selectStudent = (student) => {
+  selectedStudent.value = student
+  search.value = student
+}
+
 const confirmAction = () => {
-  if (!props.item.is_occupied && !user.value.trim()) {
-    alert('Debe ingresar el nombre del responsable')
+  if (!props.item.is_occupied && !selectedStudent.value) {
+    alert('Debe seleccionar un alumno')
     return
   }
 
   emits('confirm', {
     ...props.item,
-    assigned_to: props.item.is_occupied ? null : user.value.trim(),
+    assigned_to: props.item.is_occupied ? null : selectedStudent.value,
     is_occupied: !props.item.is_occupied
   })
 }
@@ -67,9 +111,7 @@ const confirmAction = () => {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  /* top:0; right:0; bottom:0; left:0 */
   background: rgba(0, 0, 0, 0.5);
-  /* fondo semi-transparente */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -79,7 +121,6 @@ const confirmAction = () => {
 /* ===== Modal ===== */
 .modal {
   background: #ffffff;
-  /* Color único para todas las modales */
   padding: 2rem;
   border-radius: 12px;
   width: 400px;
@@ -88,14 +129,10 @@ const confirmAction = () => {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  position: relative;
-  text-align: left;
-  height: auto;
 }
 
-/* ===== Form Inputs ===== */
-.modal input,
-.modal textarea {
+/* ===== Inputs ===== */
+.modal input {
   width: 100%;
   padding: 0.5rem;
   border-radius: 6px;
@@ -103,61 +140,76 @@ const confirmAction = () => {
   font-size: 0.9rem;
 }
 
-.modal input:focus,
-.modal textarea:focus {
+.modal input:focus {
   border-color: #1976d2;
   box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+  outline: none;
 }
 
 /* ===== Labels ===== */
 .modal label {
   font-weight: 600;
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.3rem;
   display: block;
 }
 
-/* ===== Actions Buttons ===== */
-.modal .actions {
+/* ===== Dropdown ===== */
+.dropdown {
+  list-style: none;
+  padding: 0;
+  margin: 0.3rem 0 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  max-height: 150px;
+  overflow-y: auto;
+  background: white;
+}
+
+.dropdown li {
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.dropdown li:hover {
+  background: #f0f0f0;
+}
+
+.no-results {
+  font-size: 0.8rem;
+  color: #777;
+  margin-top: 0.3rem;
+}
+
+/* ===== Actions ===== */
+.modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 0.5rem;
   margin-top: 1rem;
 }
 
-.modal button {
+.btn-cancel {
+  background: #e0e0e0;
   padding: 0.6rem 1rem;
   border-radius: 6px;
   border: none;
   cursor: pointer;
-  font-weight: 600;
-  transition: background 0.2s;
 }
 
-.modal button[type="submit"] {
+.btn-confirm {
   background: #1976d2;
   color: white;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
 }
 
-.modal button[type="submit"]:hover {
+.btn-confirm:hover {
   background: #115293;
 }
 
-.modal button[type="button"] {
-  background: #e0e0e0;
-  color: #333;
-}
-
-.modal button[type="button"]:hover {
-  background: #bdbdbd;
-}
-
-/* Textarea */
-.modal textarea {
-  resize: vertical;
-  min-height: 60px;
-}
-
-/* Responsivo */
+/* ===== Responsive ===== */
 @media (max-width: 450px) {
   .modal {
     width: 90%;
@@ -165,4 +217,3 @@ const confirmAction = () => {
   }
 }
 </style>
-

@@ -60,10 +60,10 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import IdiomaSelector from '@/components/SelectorIdioma.vue'   
+import IdiomaSelector from '@/components/SelectorIdioma.vue'
 
 const router = useRouter()
-const { t, locale } = useI18n()
+const { t } = useI18n()
 
 const usuario = ref('')
 const password = ref('')

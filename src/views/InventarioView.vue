@@ -127,128 +127,125 @@
 
 
       <!-- ===== EQUIPAMIENTOS ===== -->
-      <div v-if="activeTab === 'equipamientos'">
+      <!-- ===== EQUIPAMIENTOS ===== -->
+<div v-if="activeTab === 'equipamientos'">
 
-        <div class="header">
-          <h1>Equipamientos</h1>
-          <button class="btn-add" @click="openEquipmentModal('add')">
-            + Agregar equipamiento
-          </button>
-        </div>
+  <div class="header">
+    <h1>Equipamientos</h1>
+    <button class="btn-add" @click="openEquipmentModal('add')">
+      + Agregar equipamiento
+    </button>
+  </div>
 
-        <!-- Selector sub-tabs para Equipamientos -->
-        <div class="equipment-subtabs">
-          <button :class="{ active: equipmentView === 'lista' }" @click="equipmentView = 'lista'">Lista
-            Completa</button>
-          <button :class="{ active: equipmentView === 'gestion' }" @click="equipmentView = 'gestion'">Gestión de
-            Equipamientos</button>
-        </div>
+  <!-- Selector sub-tabs para Equipamientos -->
+  <div class="equipment-subtabs">
+    <button :class="{ active: equipmentView === 'lista' }" @click="equipmentView = 'lista'">Lista Completa</button>
+    <button :class="{ active: equipmentView === 'gestion' }" @click="equipmentView = 'gestion'">Gestión de Equipamientos</button>
+  </div>
 
-        <!-- Vista Gestión con dos columnas -->
-        <div v-if="equipmentView === 'gestion'" class="equipment-columns">
-          <!-- Equipamientos disponibles -->
-          <div class="column">
-            <h2>Disponibles</h2>
-            <table class="inventario-table">
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Marca</th>
-                  <th>Etiqueta</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="item in availableEquipments" :key="item.id">
-                  <td>{{ item.name }}</td>
-                  <td>{{ item.brand }}</td>
-                  <td>{{ item.label }}</td>
-                  <td class="actions">
-                    <button class="btn-assign" @click="assignEquipment(item)">
-                      Asignar
-                    </button>
-                  </td>
-                </tr>
-                <tr v-if="availableEquipments.length === 0">
-                  <td colspan="4" class="empty">No hay equipamientos disponibles</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <!-- Equipamientos ocupados -->
-          <div class="column">
-            <h2>Ocupados</h2>
-            <table class="inventario-table">
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Marca</th>
-                  <th>Etiqueta</th>
-                  <th>Responsable</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="item in occupiedEquipments" :key="item.id">
-                  <td>{{ item.name }}</td>
-                  <td>{{ item.brand }}</td>
-                  <td>{{ item.label }}</td>
-                  <td>{{ item.assigned_to }}</td>
+  <!-- Vista Gestión con dos columnas -->
+  <div v-if="equipmentView === 'gestion'" class="equipment-columns">
+    <!-- Equipamientos disponibles -->
+    <div class="column">
+      <h2>Disponibles</h2>
+      <table class="inventario-table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Marca</th>
+            <th>Etiqueta</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in availableEquipments" :key="item.id">
+            <td>{{ item.name }}</td>
+            <td>{{ item.brand }}</td>
+            <td>{{ item.label }}</td>
+            <td class="actions">
+              <button class="btn-assign" @click="assignEquipment(item)">
+                Asignar
+              </button>
+            </td>
+          </tr>
+          <tr v-if="availableEquipments.length === 0">
+            <td colspan="4" class="empty">No hay equipamientos disponibles</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-                  <td class="actions">
-                    <button class="btn-assign" @click="finishEquipmentUsage(item)">
-                      Finalizar uso
-                    </button>
-                  </td>
-                </tr>
-                <tr v-if="occupiedEquipments.length === 0">
-                  <td colspan="5" class="empty">No hay equipamientos ocupados</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+    <!-- Equipamientos ocupados -->
+    <div class="column">
+      <h2>Ocupados</h2>
+      <table class="inventario-table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Marca</th>
+            <th>Etiqueta</th>
+            <th>Responsable</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in occupiedEquipments" :key="item.student_equipment_id">
+            <td>{{ item.name }}</td>
+            <td>{{ item.brand }}</td>
+            <td>{{ item.label }}</td>
+            <td>{{ item.responsible }}</td>
+            <td class="actions">
+              <button class="btn-assign" @click="finishEquipmentUsage(item.student_equipment_id)">
+                Finalizar uso
+              </button>
+            </td>
+          </tr>
+          <tr v-if="occupiedEquipments.length === 0">
+            <td colspan="5" class="empty">No hay equipamientos ocupados</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 
+  <!-- Vista Lista Completa -->
+  <div v-if="equipmentView === 'lista'">
+    <input v-model="equipmentSearch" type="text" placeholder="Buscar por código, nombre o responsable..." class="search-input" />
 
-        <!-- Vista Lista Completa (igual que antes) -->
-        <div v-if="equipmentView === 'lista'">
-          <input v-model="equipmentSearch" type="text" placeholder="Buscar por código, nombre o responsable..."
-            class="search-input" />
+    <table class="inventario-table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Marca</th>
+          <th>Etiqueta</th>
+          <th>Descripción</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="item in equipmentPaginatedData" :key="item.id">
+          <td>{{ item.name }}</td>
+          <td>{{ item.brand }}</td>
+          <td>{{ item.label }}</td>
+          <td>{{ item.description }}</td>
+          <td class="actions">
+            <button class="btn-edit" @click="openEquipmentModal('edit', item)">✏️</button>
+            <button class="btn-delete" @click="openEquipmentModal('delete', item)">🗑️</button>
+          </td>
+        </tr>
+        <tr v-if="filteredEquipments.length === 0">
+          <td colspan="5" class="empty">No hay resultados</td>
+        </tr>
+      </tbody>
+    </table>
 
-          <table class="inventario-table">
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Marca</th>
-                <th>Etiqueta</th>
-                <th>Descripción</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="item in equipmentPaginatedData" :key="item.id">
-                <td>{{ item.name }}</td>
-                <td>{{ item.brand }}</td>
-                <td>{{ item.label }}</td>
-                <td>{{ item.description }}</td>
-                <td class="actions">
-                  <button class="btn-edit" @click="openEquipmentModal('edit', item)">✏️</button>
-                  <button class="btn-delete" @click="openEquipmentModal('delete', item)">🗑️</button>
-                </td>
-              </tr>
-              <tr v-if="filteredEquipments.length === 0">
-                <td colspan="6" class="empty">No hay resultados</td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="pagination">
-            <button @click="equipmentPrevPage" :disabled="equipmentCurrentPage === 1">«</button>
-            <span>Página {{ equipmentCurrentPage }} de {{ equipmentTotalPages }}</span>
-            <button @click="equipmentNextPage" :disabled="equipmentCurrentPage === equipmentTotalPages">»</button>
-          </div>
-        </div>
-
-      </div>
+    <div class="pagination">
+      <button @click="equipmentPrevPage" :disabled="equipmentCurrentPage === 1">«</button>
+      <span>Página {{ equipmentCurrentPage }} de {{ equipmentTotalPages }}</span>
+      <button @click="equipmentNextPage" :disabled="equipmentCurrentPage === equipmentTotalPages">»</button>
+    </div>
+  </div>
+</div>
 
 
     </div>
@@ -329,7 +326,6 @@ const fetchEquipments = async () => {
     }
   })
   equipments.value = await res.json()
-  console.log(equipments.value)
 }
 
 const filteredEquipments = computed(() =>
@@ -367,7 +363,6 @@ const submitEquipment = async (data) => {
     body: JSON.stringify(data)
   })
 
-  console.log(data);
   await fetchEquipments()
   closeEquipmentModal()
 }
@@ -408,27 +403,58 @@ const equipmentView = ref('lista') // o 'gestion', según la vista inicial que q
 
 // Equipamientos disponibles = equipments sin student_equipment activo
 const availableEquipments = computed(() =>
-  equipments.value.filter(e => !e.student_equipments || e.student_equipments.length === 0)
+  equipments.value.filter(e =>
+    !studentEquipments.value.some(se => se.equipment_id === e.id)
+  )
 )
 
-// Equipamientos ocupados = student_equipments activos con info del equipment y alumno
-const occupiedEquipments = computed(() => {
-  return equipments.value
-    .filter(e => e.student_equipments && e.student_equipments.length > 0)
-    .map(e => {
-      const se = e.student_equipments[0] // asumimos 1 por equipo
-      return {
-        id: e.id,
-        name: e.name,
-        brand: e.brand,
-        label: e.label,
-        assigned_to: se.student_name, // o el campo que tengas
-        student_equipment_id: se.id // para eliminar después
-      }
-    })
+const occupiedEquipments = computed(() =>
+  studentEquipments.value.map(se => ({
+    student_equipment_id: se.id,
+    equipment_id: se.equipment.id,
+    name: se.equipment.name,
+    brand: se.equipment.brand,
+    label: se.equipment.label,
+    responsible: `${se.student.name} ${se.student.surnames}`,
+    start_datetime: se.start_datetime
+  }))
+)
+
+
+const finishEquipmentUsage = async (occupiedItemId) => {
+  console.log("Se finalizaaa" + occupiedItemId);
+  await fetch(`http://localhost:8000/api/student_equipments/${occupiedItemId}/finish`, {
+    method: 'PUT',
+    headers: { 'Authorization': `Bearer ${token}` }
+  })
+
+  await fetchAllEquipments()
+}
+watch(activeTab, (tab) => {
+  if (tab === 'equipamientos') {
+    fetchAllEquipments()
+  }
 })
 
+const studentEquipments = ref([])
 
+const fetchStudentEquipmentsActive = async () => {
+  const res = await fetch('http://localhost:8000/api/student_equipments-active', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  })
+  studentEquipments.value = await res.json()
+}
+
+
+const fetchAllEquipments = async () => {
+  await Promise.all([
+    fetchEquipments(),
+    fetchStudentEquipmentsActive()
+  ])
+}
 
 
 
@@ -436,25 +462,24 @@ const assignEquipment = (item) => {
   openAssignModal(item)
 }
 
-const confirmAssign = async (studentData) => {
-  // studentData: { student_name, start_date, etc. } viene de la modal
-  const payload = {
-    equipment_id: assignItem.value.id,
-    ...studentData
-  }
-
+const confirmAssign = async ({ student_id, start_datetime }) => {
   await fetch('http://localhost:8000/api/student_equipments', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(payload)
+    body: JSON.stringify({
+      student_id,
+      equipment_id: assignItem.value.id,
+      start_datetime
+    })
   })
 
-  await fetchEquipments() // refresca lista completa
+  await fetchAllEquipments()
   showAssignModal.value = false
 }
+
 
 
 
@@ -600,7 +625,6 @@ watch(materialView, v => {
 })
 
 const openCategoryModal = (type, item = {}) => {
-  console.log("hola")
   categoryModalType.value = type
   categoryForm.value = { ...item }
   showCategoryModal.value = true
@@ -650,19 +674,6 @@ const openAssignModal = (item) => {
   assignItem.value = { ...item }
   showAssignModal.value = true
 }
-
-const finishEquipmentUsage = async (occupiedItem) => {
-  // occupiedItem.student_equipment_id es el ID del registro a eliminar
-  await fetch(`http://localhost:8000/api/student_equipments/${occupiedItem.student_equipment_id}`, {
-    method: 'DELETE',
-    headers: {
-      'Authorization': `Bearer ${token}`
-    }
-  })
-
-  await fetchEquipments()
-}
-
 
 </script>
 

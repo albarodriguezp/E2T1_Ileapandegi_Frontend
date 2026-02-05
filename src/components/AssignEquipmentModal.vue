@@ -20,21 +20,15 @@
       <div v-if="!item.is_occupied" class="form-group">
         <label>Alumno responsable</label>
 
-        <input
-          type="text"
-          v-model="search"
-          placeholder="Buscar alumno..."
-        />
+        <input type="text" v-model="search" placeholder="Buscar alumno..." />
 
-        <ul v-if="search && filteredStudents.length" class="dropdown">
-          <li
-            v-for="student in filteredStudents"
-            :key="student"
-            @click="selectStudent(student)"
-          >
-            {{ student }}
+        <ul v-if="filteredStudents.length" class="dropdown">
+          <li v-for="student in filteredStudents" :key="student.id" @click="selectStudent(student)">
+            {{ student.name }}
           </li>
         </ul>
+
+
 
         <p v-if="search && !filteredStudents.length" class="no-results">
           No se encontraron alumnos
@@ -52,21 +46,38 @@
       </div>
     </div>
   </div>
+
+  <!-- MODAL CONFIRMAR FINALIZACIÓN -->
+<div v-if="showConfirmFinish" class="modal-overlay">
+  <div class="modal confirm-modal">
+    <h3>¿Finalizar uso?</h3>
+
+    <p>
+      ¿Estás seguro de que deseas finalizar el uso del equipamiento
+      <strong>{{ item.name }}</strong>?
+    </p>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" @click="cancelFinish">
+        Cancelar
+      </button>
+
+      <button class="btn-danger" @click="confirmFinish">
+        Sí, finalizar
+      </button>
+    </div>
+  </div>
+</div>
+
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, onMounted } from 'vue'
 
 const props = defineProps({
   item: {
     type: Object,
     required: true
-  },
-  students: {
-    type: Array,
-    required: true
-    // Ejemplo:
-    // ['Juan Pérez', 'María López', 'Pedro González']
   }
 })
 
@@ -74,37 +85,95 @@ const emits = defineEmits(['close', 'confirm'])
 
 const search = ref('')
 const selectedStudent = ref(null)
+const students = ref([])
+const showConfirmFinish = ref(false)
+
+const token = localStorage.getItem('token')
 
 // Reset cuando cambia el item
 watch(() => props.item, () => {
   search.value = ''
   selectedStudent.value = null
+  showConfirmFinish.value = false
 })
 
+// Traer alumnos
+onMounted(async () => {
+  try {
+    const res = await fetch('http://localhost:8000/api/students', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/json'
+      }
+    })
+
+    const response = await res.json()
+
+    if (response.success && Array.isArray(response.data)) {
+      students.value = response.data.map(s => ({
+        id: s.id,
+        name: s.name
+      }))
+    }
+  } catch (err) {
+    console.error(err)
+  }
+})
+
+// Búsqueda
 const filteredStudents = computed(() =>
-  props.students.filter(student =>
-    student.toLowerCase().includes(search.value.toLowerCase())
+  students.value.filter(s =>
+    s.name.toLowerCase().includes(search.value.toLowerCase())
   )
 )
 
 const selectStudent = (student) => {
   selectedStudent.value = student
-  search.value = student
+  search.value = student.name
 }
 
+// BOTÓN PRINCIPAL
 const confirmAction = () => {
-  if (!props.item.is_occupied && !selectedStudent.value) {
-    alert('Debe seleccionar un alumno')
+  // ASIGNAR
+  if (!props.item.is_occupied) {
+    if (!selectedStudent.value) {
+      alert('Debe seleccionar un alumno')
+      return
+    }
+
+    emits('confirm', {
+      ...props.item,
+      student_id: selectedStudent.value.id,
+      assigned_to: selectedStudent.value.name
+    })
+
+    emits('close')
     return
   }
 
+  // FINALIZAR → SOLO abrir modal
+  showConfirmFinish.value = true
+}
+
+// CONFIRMAR FINALIZACIÓN
+const confirmFinish = () => {
   emits('confirm', {
     ...props.item,
-    assigned_to: props.item.is_occupied ? null : selectedStudent.value,
-    is_occupied: !props.item.is_occupied
+    student_id: null,
+    assigned_to: null
   })
+
+  showConfirmFinish.value = false
+  emits('close')
+}
+
+// CANCELAR FINALIZACIÓN
+const cancelFinish = () => {
+  showConfirmFinish.value = false
 }
 </script>
+
+
 
 <style scoped>
 /* ===== Overlay ===== */
@@ -216,4 +285,22 @@ const confirmAction = () => {
     padding: 1.5rem;
   }
 }
+
+.btn-danger {
+  background: #d32f2f;
+  color: white;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-danger:hover {
+  background: #b71c1c;
+}
+
+.confirm-modal {
+  max-width: 350px;
+}
+
 </style>

@@ -22,8 +22,8 @@
             <div class="cabecera-sillones">
               <div class="columna-horas-header"></div>
               <div class="contenedor-headers-sillones">
-                <div v-for="silla in sillones" :key="silla" class="silla">
-                  Silla {{ silla }}
+                <div v-for="est in estudiantes" :key="est.student_id" class="silla">
+                  {{ est.name }}
                 </div>
               </div>
             </div>
@@ -38,23 +38,21 @@
               <div class="contenedor-sillones">
                 <div v-for="silla in sillones" :key="silla" class="columna-sillon">
                   <div v-for="hora in horasTurno" :key="hora" class="slot-fondo"></div>
-                  
-                  <div v-for="cita in citasDeSillon(silla)" :key="cita.id"
-                    class="bloque-cita"
-                    :style="{
-                      top: cita.top + 'px',
-                      height: cita.height + 'px'
-                    }">
+
+                  <div v-for="cita in citasDeSillon(silla)" :key="cita.id" class="bloque-cita" :style="{
+                    top: cita.top + 'px',
+                    height: cita.height + 'px'
+                  }">
                     <div @click.stop="openVerCita(cita)" style="cursor:pointer; height: 100%; overflow-y: auto;">
                       <p class="cita-hora">{{ formatHora(cita.inicio) }} - {{ formatHora(cita.fin) }}</p>
-                      
+
                       <!-- Enseña servicios en el slot -->
                       <div v-if="cita.servicios && cita.servicios.length > 0" class="cita-servicios">
                         <div v-for="servicio in cita.servicios" :key="servicio.id" class="servicio-tag">
                           {{ servicio.name }}
                         </div>
                       </div>
-                      
+
                       <div v-if="cita.comentario" class="cita-comentario">
                         {{ cita.comentario }}
                       </div>
@@ -69,33 +67,18 @@
     </div>
 
     <!-- Modal Ver Cita -->
-    <ModalVerCita
-      v-if="mostrarVerCita"
-      :id="citaSeleccionadaId"
-      @cerrar="mostrarVerCita = false"
-      @editar="handleEditarCita"
-      @eliminar="handleSolicitarEliminar"
-    />
+    <ModalVerCita v-if="mostrarVerCita" :id="citaSeleccionadaId" @cerrar="mostrarVerCita = false"
+      @editar="handleEditarCita" @eliminar="handleSolicitarEliminar" />
 
     <!-- Modal Nueva Cita -->
-    <ModalNuevaCita
-      v-if="mostrarModal"
-      :fecha="fechaStr"
-      :sillones="sillones"
-      :citas-existentes="citasPosicion"
-      :initial-cita="citaParaEditar"
-      @guardar="handleNuevaCita"
-      @cerrar="() => { mostrarModal = false; citaParaEditar = null }"
-    />
+    <ModalNuevaCita v-if="mostrarModal" :fecha="fechaStr" :sillones="sillones" :citas-existentes="citasPosicion"
+      :initial-cita="citaParaEditar" @guardar="handleNuevaCita"
+      @cerrar="() => { mostrarModal = false; citaParaEditar = null }" />
 
     <!-- Modal Confirmación Eliminar -->
-    <ModalConfirmParam
-      v-if="mostrarConfirmEliminar"
-      title="Eliminar Cita"
+    <ModalConfirmParam v-if="mostrarConfirmEliminar" title="Eliminar Cita"
       message="¿Estás seguro de que quieres eliminar esta cita? Esta acción no se puede deshacer."
-      @confirm="confirmarEliminar"
-      @close="cancelarEliminar"
-    />
+      @confirm="confirmarEliminar" @close="cancelarEliminar" />
   </div>
 </template>
 
@@ -116,18 +99,35 @@ const anoReactivo = ref(Number(route.params.ano))
 const fechaSeleccionada = computed(() => new Date(anoReactivo.value, mesReactivo.value, diaReactivo.value))
 const esMiercoles = computed(() => fechaSeleccionada.value.getDay() === 3)
 
-const fechaStr = computed(() => 
-  `${anoReactivo.value}-${(mesReactivo.value+1).toString().padStart(2,'0')}-${diaReactivo.value.toString().padStart(2,'0')}`
+const fechaStr = computed(() =>
+  `${anoReactivo.value}-${(mesReactivo.value + 1).toString().padStart(2, '0')}-${diaReactivo.value.toString().padStart(2, '0')}`
 )
 
 const slotHeight = 40
-const anchoSillon = 150 
+const anchoSillon = 150
 const mostrarModal = ref(false)
 const mostrarVerCita = ref(false)
 const mostrarConfirmEliminar = ref(false)
 const citaSeleccionadaId = ref(null)
 const citaParaEditar = ref(null)
 const citaIdAEliminar = ref(null)
+
+const estudiantes = ref([])
+
+const obtenerEstudiantes = async () => {
+  const token = localStorage.getItem('token')
+
+  const res = await fetch(
+    `http://localhost:8000/api/students/available?date=${fechaStr.value}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  )
+
+  estudiantes.value = await res.json()
+}
 
 // sillones desde front tmb FALTA CAMBIAR POR ESTUDIANTES DEL DÍA
 const sillonesDisponibles = ref([1, 2, 3, 4, 5])
@@ -137,11 +137,8 @@ const cargando = ref(false)
 const error = ref(null)
 
 const sillones = computed(() => {
-  if (!Array.isArray(citas.value)) return sillonesDisponibles.value
-  
-  const sillonesConCitas = citas.value.map(c => c.silla)
-  const todosSillones = [...new Set([...sillonesDisponibles.value, ...sillonesConCitas])]
-  return todosSillones.sort((a, b) => a - b)
+  return estudiantes.value.map(e => e.seat)
+
 })
 
 const horaInicio = computed(() => esMiercoles.value ? 9 : 10)
@@ -158,7 +155,7 @@ const horasTurno = computed(() => {
 function formatHora(hora) {
   const h = Math.floor(hora)
   const m = Math.round((hora - h) * 60)
-  return `${h}:${m.toString().padStart(2,'0')}`
+  return `${h}:${m.toString().padStart(2, '0')}`
 }
 
 function horaToDecimal(time) {
@@ -199,7 +196,7 @@ const obtenerCitas = async () => {
 
       return {
         id: c.id,
-        silla: c.seat,
+        student_id: c.student_id,
         comentario: c.comments || '',
         inicio: horaToDecimal(c.start_time),
         fin: horaToDecimal(c.end_time),
@@ -225,14 +222,19 @@ const citasPosicion = computed(() => {
   }))
 })
 
-function citasDeSillon(silla) {
-  return citasPosicion.value.filter(c => c.silla === silla)
+function citasDeSillon(seat) {
+  const student = estudiantes.value.find(e => e.seat === seat)
+  if (!student) return []
+
+  return citasPosicion.value.filter(
+    c => c.student_id === student.student_id
+  )
 }
 
 function cambiarDia(incremento) {
   const nuevaFecha = new Date(anoReactivo.value, mesReactivo.value, diaReactivo.value)
   nuevaFecha.setDate(nuevaFecha.getDate() + incremento)
-  
+
   router.push({
     name: route.name,
     params: {
@@ -248,7 +250,7 @@ function handleNuevaCita(nuevaCita) {
 }
 
 function openVerCita(cita) {
-  
+
   const resolvedId = cita && cita.id !== undefined ? cita.id : cita
   citaSeleccionadaId.value = resolvedId
   mostrarVerCita.value = true
@@ -268,7 +270,7 @@ function handleSolicitarEliminar(citaId) {
 
 async function confirmarEliminar() {
   const token = localStorage.getItem('token')
-  
+
   try {
     const res = await fetch(`http://localhost:8000/api/appointments/${citaIdAEliminar.value}`, {
       method: 'DELETE',
@@ -299,12 +301,19 @@ function cancelarEliminar() {
 }
 
 // Para cambiar cada vez que cambian los params de la ruta (al cambiar dia)
-watch(() => route.params, (newParams) => {
-  diaReactivo.value = Number(newParams.dia)
-  mesReactivo.value = Number(newParams.mes)
-  anoReactivo.value = Number(newParams.ano)
-  obtenerCitas()
-}, { immediate: true })
+watch(
+  () => route.params,
+  async (newParams) => {
+    diaReactivo.value = Number(newParams.dia)
+    mesReactivo.value = Number(newParams.mes)
+    anoReactivo.value = Number(newParams.ano)
+
+    await obtenerEstudiantes()
+    await obtenerCitas()
+  },
+  { immediate: true }
+)
+
 
 onMounted(() => {
   obtenerCitas()
@@ -339,6 +348,7 @@ onMounted(() => {
 .btn-nav:hover {
   background-color: #d0d0d0;
 }
+
 .btn-volver {
   background-color: #3b9e89;
   border: none;
@@ -375,7 +385,7 @@ onMounted(() => {
   max-width: 100%;
 }
 
-.contenido-centrado{
+.contenido-centrado {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -480,7 +490,7 @@ onMounted(() => {
 
 .bloque-cita:hover {
   transform: scale(1.02);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   z-index: 5;
 }
 

@@ -426,7 +426,7 @@ const occupiedEquipments = computed(() =>
 
 const finishEquipmentUsage = async (occupiedItemId) => {
   console.log("Se finalizaaa" + occupiedItemId);
-  await fetch(`http://localhost:8000/api/student_equipments/${occupiedItemId}/finish`, {
+  await fetch(`http://localhost:8000/api/student-equipments/${occupiedItemId}/finish`, {
     method: 'PUT',
     headers: { 'Authorization': `Bearer ${token}` }
   })
@@ -442,7 +442,7 @@ watch(activeTab, (tab) => {
 const studentEquipments = ref([])
 
 const fetchStudentEquipmentsActive = async () => {
-  const res = await fetch('http://localhost:8000/api/student_equipments-active', {
+  const res = await fetch('http://localhost:8000/api/student-equipments/active', {
     headers: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json'
@@ -470,10 +470,10 @@ const confirmAssignEquipment = async (payload) => {
 
   if (!payload.student_id) {
     // Finalizar uso
-    await fetch(`http://localhost:8000/api/student_equipments/${payload.id}/finish`, { method: 'PUT', headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } })
+    await fetch(`http://localhost:8000/api/student-equipments/${payload.id}/finish`, { method: 'PUT', headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } })
   } else {
     // Asignar equipamiento
-    await fetch('http://localhost:8000/api/student_equipments', {
+    await fetch('http://localhost:8000/api/student-equipments', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -609,7 +609,7 @@ const showCategoryModal = ref(false)
 const categoryModalType = ref('')
 const categoryForm = ref({})
 
-const categoryApiUrl = 'http://localhost:8000/api/categorys'
+const categoryApiUrl = 'http://localhost:8000/api/categories'
 
 const fetchCategories = async () => {
   const res = await fetch(categoryApiUrl, {

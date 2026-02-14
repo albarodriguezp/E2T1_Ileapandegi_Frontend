@@ -2,6 +2,7 @@
 @import './buttons.scss';
 @import './modals.scss';
 @import './forms.scss';
+@import './tables.scss';
 
 #app {
   width: 100%;

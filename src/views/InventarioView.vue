@@ -69,8 +69,12 @@
                 <td>{{ formatDate(item.expiration_date) }}</td>
                 <td class="description">{{ item.description }}</td>
                 <td class="actions">
-                  <button class="btn-edit" @click="openModal('edit', item)">✏️</button>
-                  <button class="btn-delete" @click="openModal('delete', item)">🗑️</button>
+                  <button class="btn-tabla-edit" @click="openModal('edit', item)">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button class="btn-tabla-delete" @click="openModal('delete', item)">
+                    <i class="bi bi-trash"></i>
+                  </button>
                 </td>
               </tr>
 
@@ -110,8 +114,12 @@
                 <td>{{ cat.id }}</td>
                 <td>{{ cat.name }}</td>
                 <td class="actions">
-                  <button class="btn-edit" @click="openCategoryModal('edit', cat)">✏️</button>
-                  <button class="btn-delete" @click="openCategoryModal('delete', cat)">🗑️</button>
+                  <button class="btn-tabla-edit" @click="openCategoryModal('edit', cat)">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button class="btn-tabla-delete" @click="openCategoryModal('delete', cat)">
+                    <i class="bi bi-trash"></i>
+                  </button>
                 </td>
               </tr>
 
@@ -126,7 +134,6 @@
 
 
 
-      <!-- ===== EQUIPAMIENTOS ===== -->
       <!-- ===== EQUIPAMIENTOS ===== -->
       <div v-if="activeTab === 'equipamientos'">
 
@@ -165,8 +172,8 @@
                   <td>{{ item.brand }}</td>
                   <td>{{ item.label }}</td>
                   <td class="actions">
-                    <button class="btn-assign" @click="assignEquipment(item)">
-                      Asignar
+                    <button class="btn-tabla-assign" @click="assignEquipment(item)">
+                      <i class="bi bi-person-plus"></i>
                     </button>
                   </td>
                 </tr>
@@ -197,8 +204,8 @@
                   <td>{{ item.label }}</td>
                   <td>{{ item.responsible }}</td>
                   <td class="actions">
-                    <button class="btn-assign" @click="finishEquipmentUsage(item.student_equipment_id)">
-                      Finalizar uso
+                    <button class="btn-tabla-assign" @click="finishEquipmentUsage(item.student_equipment_id)" title="Finalizar uso">
+                      <i class="bi bi-check-circle"></i>
                     </button>
                   </td>
                 </tr>
@@ -232,8 +239,12 @@
                 <td>{{ item.label }}</td>
                 <td>{{ item.description }}</td>
                 <td class="actions">
-                  <button class="btn-edit" @click="openEquipmentModal('edit', item)">✏️</button>
-                  <button class="btn-delete" @click="openEquipmentModal('delete', item)">🗑️</button>
+                  <button class="btn-tabla-edit" @click="openEquipmentModal('edit', item)">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button class="btn-tabla-delete" @click="openEquipmentModal('delete', item)">
+                    <i class="bi bi-trash"></i>
+                  </button>
                 </td>
               </tr>
               <tr v-if="filteredEquipments.length === 0">
@@ -403,9 +414,9 @@ import EquipmentEditModal from '../components/EquipmentEditModal.vue'
 import EquipmentDeleteModal from '../components/EquipmentDeleteModal.vue'
 
 
-const equipmentView = ref('lista') // o 'gestion', según la vista inicial que quieras
+const equipmentView = ref('lista') 
 
-// Equipamientos disponibles = equipments sin student_equipment activo
+// Equipamientos disponibles
 const availableEquipments = computed(() =>
   equipments.value.filter(e =>
     !studentEquipments.value.some(se => se.equipment_id === e.id)
@@ -515,14 +526,14 @@ const formatDate = (date) => date ? new Date(date).toLocaleDateString('es-ES') :
 /* ===== MODAL ===== */
 const openModal = (type, item = {}) => {
   modalType.value = type
-  form.value = { ...item } // clonar el objeto para no mutar el original
+  form.value = { ...item } 
   showModal.value = true
 }
 
 
 const closeModal = () => {
   showModal.value = false
-  modalType.value = ''   // esto es lo que realmente desmonta el modal
+  modalType.value = ''   
 }
 
 /* ===== CRUD ===== */
@@ -656,82 +667,6 @@ const openAssignModal = (item) => {
   padding: 0.6rem 1rem;
   border-radius: 8px;
   border: 1px solid #ccc;
-}
-
-/* Table */
-.inventario-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.inventario-table thead {
-  background: #164e63;
-  color: white;
-}
-
-.inventario-table th,
-.inventario-table td {
-  padding: 0.8rem;
-  font-size: 0.9rem;
-}
-
-.inventario-table tbody tr:nth-child(odd) {
-  background: #c7dadd;
-}
-
-.lowStock {
-  color: #c62828;
-  font-weight: 700;
-}
-
-.actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.btn-edit {
-  background: #1976d2;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 0.3rem 0.6rem;
-}
-
-.btn-delete {
-  background: #d32f2f;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 0.3rem 0.6rem;
-}
-
-/* Pagination */
-.pagination {
-  margin-top: 1rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-}
-
-.pagination button {
-  padding: 0.4rem 0.8rem;
-  border-radius: 6px;
-  border: none;
-  background: #164e63;
-  color: white;
-  cursor: pointer;
-}
-
-.pagination button:disabled {
-  background: #aaa;
-  cursor: not-allowed;
-}
-
-.empty {
-  text-align: center;
-  padding: 1rem;
-  font-style: italic;
 }
 
 /* ===== Responsive ===== */

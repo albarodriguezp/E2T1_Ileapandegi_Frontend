@@ -50,7 +50,7 @@
           <div class="col">
             <h2>Gestión de Usuarios</h2>
 
-            <!-- 🔍 Buscador -->
+            <!-- Buscador -->
             <div class="form-group">
               <input v-model="buscarUsuario" placeholder="Buscar por username o email..." />
             </div>
@@ -193,7 +193,7 @@
 <div class="col">
   <h2>Gestión de Turnos</h2>
 
-  <!-- 🔍 Filtros -->
+  <!--  Filtros -->
   <div class="form-group">
     <input
       v-model="buscarTurno"
@@ -621,7 +621,7 @@ const eliminarTurno = () => {
 }
 
 const buscarTurno = ref('')
-const filtroMes = ref('') // formato YYYY-MM
+const filtroMes = ref('') 
 
 const turnosFiltrados = computed(() => {
   return turnos.value.filter(t => {
@@ -634,7 +634,7 @@ const turnosFiltrados = computed(() => {
 
     // Filtro por mes
     if (filtroMes.value) {
-      const turnoMes = t.fecha.slice(0, 7) // YYYY-MM
+      const turnoMes = t.fecha.slice(0, 7) 
       coincide = coincide && turnoMes === filtroMes.value
     }
 
@@ -708,7 +708,7 @@ h1 {
   transition: background-color 0.3s;
 }
 
-/* Botón principal (mismo que submit) */
+/* Botón principal  */
 .btn-primary {
   padding: 0.6rem 1.2rem;
   background-color: #164e63;
@@ -723,7 +723,7 @@ h1 {
   background-color: #0f3b4d;
 }
 
-/* Botón peligro (eliminar) */
+/* Botón eliminar */
 .btn-danger {
   padding: 0.6rem 1.2rem;
   background-color: #d32f2f;
@@ -738,7 +738,7 @@ h1 {
   background-color: #b71c1c;
 }
 
-/* Ajuste visual dentro de la fila */
+
 .actions {
   display: flex;
   gap: 0.5rem;
@@ -801,7 +801,6 @@ button[type="submit"]:hover {
 .password-wrapper input {
   width: 100%;
   padding: 0.6rem 2.5rem 0.6rem 0.6rem;
-  /* espacio para el ojo a la derecha */
   border-radius: 6px;
   border: 1px solid #ccc;
   box-sizing: border-box;

@@ -106,6 +106,7 @@
 
 <script setup>
 import { reactive, ref, computed, onMounted, watch } from 'vue'
+import { getClients, getStudents, getServices, createAppointment, updateAppointment } from '@/services/api'
 
 const props = defineProps({
   fecha: String,
@@ -251,28 +252,16 @@ const formularioValido = computed(() => {
 })
 
 async function cargarDatos() {
-  const token = localStorage.getItem('token')
-  
   try {
     // Cargar clientes
-    const resClientes = await fetch('http://localhost:8000/api/clients', {
-      headers: { 'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}` }
-    })
-    clientes.value = await resClientes.json()
+    clientes.value = await getClients()
 
     // Cargar estudiantes
-    const resEstudiantes = await fetch('http://localhost:8000/api/students', {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
-    const estudiantesJson = await resEstudiantes.json()
-    estudiantes.value = estudiantesJson.data
+    const estudiantesJson = await getStudents()
+    estudiantes.value = estudiantesJson?.data || []
 
     // Cargar servicios de pelu
-    const resServicios = await fetch('http://localhost:8000/api/services', {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
-    servicios.value = await resServicios.json()
+    servicios.value = await getServices()
 
     // se cargan los servicios primero 
     await new Promise(resolve => setTimeout(resolve, 50))
@@ -308,8 +297,6 @@ async function cargarDatos() {
 }
 
 async function guardarCita() {
-  const token = localStorage.getItem('token')
-  
   const payload = {
     client_id: cita.client_id,
     student_id: cita.student_id || null,
@@ -323,21 +310,9 @@ async function guardarCita() {
 
   try {
     const isEdit = !!cita.id
-    const url = isEdit ? `http://localhost:8000/api/appointments/${cita.id}` : 'http://localhost:8000/api/appointments'
-    const method = isEdit ? 'PUT' : 'POST'
-
-    const res = await fetch(url, {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(payload)
-    })
-
-    if (!res.ok) throw new Error('Error al guardar cita')
-
-    const data = await res.json()
+    const data = isEdit
+      ? await updateAppointment(cita.id, payload)
+      : await createAppointment(payload)
     emit('guardar', data)
     cerrarModal()
   } catch (error) {

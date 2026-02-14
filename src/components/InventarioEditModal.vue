@@ -43,6 +43,7 @@
 </template>
 
 <script setup>import { reactive, watch, ref, onMounted } from 'vue'
+import { getCategories } from '@/services/api'
 
 const props = defineProps({ item: Object })
 const emit = defineEmits(['close', 'submit'])
@@ -50,23 +51,14 @@ const emit = defineEmits(['close', 'submit'])
 const local = reactive({})
 const categories = ref([])
 
-const token = localStorage.getItem('token')
-
 const fetchCategories = async () => {
-  const res = await fetch('http://localhost:8000/api/categorys', {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    }
-  })
-  categories.value = await res.json()
+  categories.value = await getCategories()
 }
 
 watch(
   () => props.item,
   val => {
     Object.assign(local, val)
-    // ⚠️ Si viene category como objeto, asegurar category_id
     if (val?.category?.id) {
       local.category_id = val.category.id
     }
@@ -85,9 +77,7 @@ const submit = () => emit('submit', local)
 .modal-overlay {
   position: fixed;
   inset: 0;
-  /* top:0; right:0; bottom:0; left:0 */
   background: rgba(0, 0, 0, 0.5);
-  /* fondo semi-transparente */
   display: flex;
   align-items: center;
   justify-content: center;

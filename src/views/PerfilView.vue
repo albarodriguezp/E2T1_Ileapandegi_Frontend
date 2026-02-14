@@ -58,6 +58,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { getProfile, getProfileProgress } from '@/services/api'
 
 /* ===== Datos perfil ===== */
 const perfil = ref({
@@ -70,16 +71,10 @@ const perfil = ref({
 const progreso = ref([])
 
 /* ===== Función para cargar datos del usuario ===== */
-/* ===== Función para cargar datos del usuario ===== */
 const cargarPerfil = async () => {
   try {
     // Traemos los datos del perfil
-    const resPerfil = await fetch('http://localhost:8000/api/profile', {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
-    })
-    const dataPerfil = await resPerfil.json()
+    const dataPerfil = await getProfile()
     localStorage.setItem('name', dataPerfil.name)
     localStorage.setItem('user_id', dataPerfil.id)
     perfil.value.nombre = dataPerfil.name
@@ -87,16 +82,9 @@ const cargarPerfil = async () => {
     perfil.value.email = dataPerfil.email || ''
 
     // Traemos los datos de progreso
-    const resProgreso = await fetch('http://localhost:8000/api/profile/progress', {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
-    })
-    const dataProgreso = await resProgreso.json()
+    const dataProgreso = await getProfileProgress()
     console.log('DATA PROGRESO:', dataProgreso)
 
-    // Suponiendo que la API devuelve algo como:
-    // { servicios: [ { id, nombre, completado, cantidad_completada }, ... ] }
 
     const SERVICIOS_POR_COMPLETAR = 10
 

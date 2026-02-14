@@ -93,6 +93,7 @@ import ModalNuevoCliente from '@/components/ModalNuevoCliente.vue'
 import ModalInformacion from '@/components/ModalInformativo.vue'
 import ModalConfirmacion from '@/components/ModalConfirmacion.vue'
 import ModalVerCliente from '@/components/ModalVerCliente.vue'
+import { getClients, createClient, updateClient, deleteClient } from '@/services/api'
 
 /* ===============================
    i18n
@@ -208,16 +209,8 @@ const seleccionarTodos = () => {
 const obtenerClientes = async () => {
   cargando.value = true
   error.value = null
-  const token = localStorage.getItem('token')
   try {
-    const res = await fetch('http://localhost:8000/api/clients', {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
-    })
-    if (!res.ok) throw new Error('Error al obtener clientes')
-    clientes.value = await res.json()
+    clientes.value = await getClients()
   } catch (err) {
     error.value = err.message
   } finally {
@@ -229,7 +222,6 @@ const obtenerClientes = async () => {
    GUARDAR CLIENTE
 ================================ */
 const guardarCliente = async (cliente) => {
-  const token = localStorage.getItem('token')
   const payload = {
     name: cliente.name,
     surnames: cliente.surnames,
@@ -238,16 +230,7 @@ const guardarCliente = async (cliente) => {
     email: cliente.email || null
   }
   try {
-    const res = await fetch('http://localhost:8000/api/clients', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(payload)
-    })
-    if (!res.ok) throw new Error('Error al guardar cliente')
+    await createClient(payload)
     await obtenerClientes()
   } catch (err) {
     console.error(err)
@@ -258,18 +241,8 @@ const guardarCliente = async (cliente) => {
    ACTUALIZAR CLIENTE
 ================================ */
 const actualizarCliente = async (clienteActualizado) => {
-  const token = localStorage.getItem('token')
   try {
-    const res = await fetch(`http://localhost:8000/api/clients/${clienteActualizado.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(clienteActualizado)
-    })
-    if (!res.ok) throw new Error('Error al actualizar cliente')
-    const data = await res.json()
+    const data = await updateClient(clienteActualizado.id, clienteActualizado)
     const index = clientes.value.findIndex(c => c.id === data.id)
     if (index !== -1) clientes.value[index] = { ...clientes.value[index], ...data }
   } catch (err) {
@@ -281,18 +254,17 @@ const actualizarCliente = async (clienteActualizado) => {
    CONFIRMAR ELIMINACIÓN
 ================================ */
 const confirmarEliminarConfirmado = async () => {
-  const token = localStorage.getItem('token')
   try {
     if (eliminarMultiple.value) {
       await Promise.all(
         seleccionados.value.map(id =>
-          fetch(`http://localhost:8000/api/clients/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } })
+          deleteClient(id)
         )
       )
       seleccionados.value = []
       seleccionadosTodos.value = false
     } else if (clienteAEliminar.value) {
-      await fetch(`http://localhost:8000/api/clients/${clienteAEliminar.value.id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } })
+      await deleteClient(clienteAEliminar.value.id)
       clienteAEliminar.value = null
     }
     await obtenerClientes()

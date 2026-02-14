@@ -76,6 +76,7 @@
 
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue'
+import { getAppointment } from '@/services/api'
 
 const props = defineProps({ 
   id: {
@@ -107,24 +108,8 @@ async function cargarDetalle() {
   cargando.value = true
   error.value = null
 
-  const token = localStorage.getItem('token')
-
   try {
-    const url = `http://localhost:8000/api/appointments/${props.id}`
-
-    const res = await fetch(url, {
-      headers: { 
-        'Content-Type': 'application/json', 
-        'Authorization': `Bearer ${token}` 
-      }
-    })
-
-
-    if (!res.ok) {
-      throw new Error(`Error ${res.status}: ${res.statusText}`)
-    }
-
-    const data = await res.json()
+    const data = await getAppointment(props.id)
     citaDetalle.value = data
 
   } catch (e) {

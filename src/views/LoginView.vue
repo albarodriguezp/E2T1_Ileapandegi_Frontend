@@ -61,6 +61,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import IdiomaSelector from '@/components/SelectorIdioma.vue'
+import { login as loginRequest } from '@/services/api'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -73,23 +74,14 @@ const modalMessage = ref('')
 
 const login = async () => {
   try {
-    const res = await fetch('http://localhost:8000/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: usuario.value,
-        password: password.value
-      })
-    })
+    const result = await loginRequest(usuario.value, password.value)
 
-    const data = await res.json()
-
-    if (!res.ok) {
+    if (!result.ok) {
 
       // Caso 401 (credenciales incorrectas, etc.)
 
-      if (res.status === 401) {
-        modalMessage.value = data.message || t('login.errorCredentials')
+      if (result.status === 401) {
+        modalMessage.value = result.data?.message || t('login.errorCredentials')
       } else {
         modalMessage.value = t('login.errorUnexpected')
       }
@@ -98,7 +90,7 @@ const login = async () => {
     }
 
     // Login correcto
-    localStorage.setItem('token', data.access_token)
+    localStorage.setItem('token', result.data?.access_token)
     router.push({ name: 'inicio' })
   } catch (err) {
     modalMessage.value = t('login.errorNoServer')

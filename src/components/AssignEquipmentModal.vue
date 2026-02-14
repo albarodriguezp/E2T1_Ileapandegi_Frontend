@@ -73,6 +73,7 @@
 
 <script setup>
 import { ref, watch, computed, onMounted } from 'vue'
+import { getStudents } from '@/services/api'
 
 const props = defineProps({
   item: {
@@ -88,8 +89,6 @@ const selectedStudent = ref(null)
 const students = ref([])
 const showConfirmFinish = ref(false)
 
-const token = localStorage.getItem('token')
-
 // Reset cuando cambia el item
 watch(() => props.item, () => {
   search.value = ''
@@ -100,15 +99,7 @@ watch(() => props.item, () => {
 // Traer alumnos
 onMounted(async () => {
   try {
-    const res = await fetch('http://localhost:8000/api/students', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/json'
-      }
-    })
-
-    const response = await res.json()
-
+    const response = await getStudents()
     if (response.success && Array.isArray(response.data)) {
       students.value = response.data.map(s => ({
         id: s.id,

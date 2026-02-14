@@ -44,6 +44,7 @@
 
 <script setup>
 import { reactive, ref, onMounted } from 'vue'
+import { getCategories } from '@/services/api'
 
 const emit = defineEmits(['close', 'submit'])
 
@@ -60,16 +61,8 @@ const form = reactive({
 
 const categories = ref([])
 
-const token = localStorage.getItem('token')
-
 const fetchCategories = async () => {
-  const res = await fetch('http://localhost:8000/api/categorys', {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    }
-  })
-  categories.value = await res.json()
+  categories.value = await getCategories()
 }
 
 onMounted(fetchCategories)
@@ -83,9 +76,7 @@ const submit = () => emit('submit', form)
 .modal-overlay {
   position: fixed;
   inset: 0;
-  /* top:0; right:0; bottom:0; left:0 */
   background: rgba(0, 0, 0, 0.5);
-  /* fondo semi-transparente */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -95,7 +86,6 @@ const submit = () => emit('submit', form)
 /* ===== Modal ===== */
 .modal {
   background: #ffffff;
-  /* Color único para todas las modales */
   padding: 2rem;
   border-radius: 12px;
   width: 400px;

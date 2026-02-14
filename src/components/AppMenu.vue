@@ -36,22 +36,17 @@
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import IdiomaSelector from '@/components/SelectorIdioma.vue'
+import { getProfile } from '@/services/api'
 
 const { t } = useI18n()
 
-// Suponiendo que guardas el token y con eso obtienes info del usuario
 const rol = ref('')
 
-// Cargar rol del usuario al montar
+// Cargar rol del usuario 
 onMounted(async () => {
   try {
-    const res = await fetch('http://localhost:8000/api/profile', {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
-    })
-    const data = await res.json()
-    rol.value = data.rol || '' // Asegurarse de que exista
+    const data = await getProfile()
+    rol.value = data.rol || '' 
   } catch (error) {
     console.error('Error al obtener rol del usuario:', error)
   }
@@ -107,6 +102,6 @@ onMounted(async () => {
 }
 
 .idioma {
-  margin-top: auto; /* lo empuja al fondo del sidebar */
+  margin-top: auto; 
 }
 </style>

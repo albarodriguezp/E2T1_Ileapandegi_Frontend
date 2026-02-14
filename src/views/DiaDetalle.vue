@@ -105,6 +105,7 @@ import { useRoute, useRouter } from 'vue-router'
 import ModalNuevaCita from '../components/ModalNuevaCita.vue'
 import ModalVerCita from '../components/ModalVerCita.vue'
 import ModalConfirmParam from '../components/ModalConfirmParam.vue'
+import { getAppointmentsByDate, deleteAppointment } from '@/services/api'
 
 const route = useRoute()
 const router = useRouter()
@@ -170,24 +171,8 @@ const obtenerCitas = async () => {
   cargando.value = true
   error.value = null
 
-  const token = localStorage.getItem('token')
-
   try {
-    const res = await fetch(
-      `http://localhost:8000/api/appointments/by-date?date=${fechaStr.value}`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      }
-    )
-
-    if (!res.ok) {
-      throw new Error('Error al obtener citas')
-    }
-
-    const data = await res.json()
+    const data = await getAppointmentsByDate(fechaStr.value)
 
     const appointments = Array.isArray(data) ? data : []
     citas.value = appointments.map(c => {
@@ -267,20 +252,8 @@ function handleSolicitarEliminar(citaId) {
 }
 
 async function confirmarEliminar() {
-  const token = localStorage.getItem('token')
-  
   try {
-    const res = await fetch(`http://localhost:8000/api/appointments/${citaIdAEliminar.value}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
-    })
-
-    if (!res.ok) {
-      throw new Error('Error al eliminar la cita')
-    }
+    await deleteAppointment(citaIdAEliminar.value)
 
     // Cerrar modal de confirmación
     mostrarConfirmEliminar.value = false

@@ -270,7 +270,7 @@
       @close="closeEquipmentModal" @submit="submitEquipment" />
 
     <EquipmentDeleteModal v-if="showEquipmentModal && equipmentModalType === 'delete'" :item="equipmentForm"
-      @close="closeEquipmentModal" @confirm="deleteEquipment" />
+      @close="closeEquipmentModal" @confirm="handleDeleteEquipment" />
 
     <CategoryAddModal v-if="showCategoryModal && categoryModalType === 'add'" @close="closeCategoryModal"
       @submit="submitCategory" />
@@ -279,7 +279,7 @@
       @close="closeCategoryModal" @submit="submitCategory" />
 
     <CategoryDeleteModal v-if="showCategoryModal && categoryModalType === 'delete'" :item="categoryForm"
-      @close="closeCategoryModal" @confirm="deleteCategory" />
+      @close="closeCategoryModal" @confirm="handleDeleteCategory" />
 
     <AssignEquipmentModal v-if="showAssignModal" :item="assignItem" @close="showAssignModal = false"
       @confirm="confirmAssignEquipment" />
@@ -292,6 +292,23 @@ import { ref, computed, onMounted, watch } from 'vue'
 import InventarioAddModal from '../components/InventarioAddModal.vue'
 import InventarioEditModal from '../components/InventarioEditModal.vue'
 import InventarioDeleteModal from '../components/InventarioDeleteModal.vue'
+import {
+  getConsumables,
+  createConsumable,
+  updateConsumable,
+  deleteConsumable,
+  getEquipments,
+  createEquipment,
+  updateEquipment,
+  deleteEquipment,
+  getStudentEquipmentsActive,
+  finishStudentEquipment,
+  assignStudentEquipment,
+  getCategories,
+  createCategory,
+  updateCategory,
+  deleteCategory
+} from '@/services/api'
 /* ===== Variables ===== */
 const inventario = ref([])
 const search = ref('')
@@ -305,8 +322,6 @@ const form = ref({})
 
 
 /* ===== API ===== */
-const token = localStorage.getItem('token')
-const apiUrl = 'http://localhost:8000/api/consumables'
 
 /* ===== Tabs ===== */
 const activeTab = ref('material')
@@ -319,16 +334,9 @@ const equipmentForm = ref({})
 const equipmentModalType = ref('')
 const showEquipmentModal = ref(false)
 
-const equipmentApiUrl = 'http://localhost:8000/api/equipments'
 
 const fetchEquipments = async () => {
-  const res = await fetch(equipmentApiUrl, {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    }
-  })
-  equipments.value = await res.json()
+  equipments.value = await getEquipments()
 }
 
 const filteredEquipments = computed(() =>
@@ -353,18 +361,11 @@ const closeEquipmentModal = () => {
 
 
 const submitEquipment = async (data) => {
-  const method = equipmentModalType.value === 'add' ? 'POST' : 'PUT'
-  const url = equipmentModalType.value === 'add'
-    ? equipmentApiUrl
-    : `${equipmentApiUrl}/${data.id}`
-  await fetch(url, {
-    method,
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data)
-  })
+  if (equipmentModalType.value === 'add') {
+    await createEquipment(data)
+  } else {
+    await updateEquipment(data.id, data)
+  }
 
   await fetchEquipments()
   closeEquipmentModal()
@@ -426,10 +427,7 @@ const occupiedEquipments = computed(() =>
 
 const finishEquipmentUsage = async (occupiedItemId) => {
   console.log("Se finalizaaa" + occupiedItemId);
-  await fetch(`http://localhost:8000/api/student_equipments/${occupiedItemId}/finish`, {
-    method: 'PUT',
-    headers: { 'Authorization': `Bearer ${token}` }
-  })
+  await finishStudentEquipment(occupiedItemId)
 
   await fetchAllEquipments()
 }
@@ -442,13 +440,7 @@ watch(activeTab, (tab) => {
 const studentEquipments = ref([])
 
 const fetchStudentEquipmentsActive = async () => {
-  const res = await fetch('http://localhost:8000/api/student_equipments-active', {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    }
-  })
-  studentEquipments.value = await res.json()
+  studentEquipments.value = await getStudentEquipmentsActive()
 }
 
 
@@ -466,52 +458,30 @@ const assignEquipment = (item) => {
 }
 
 const confirmAssignEquipment = async (payload) => {
-  const token = localStorage.getItem('token')
-
   if (!payload.student_id) {
     // Finalizar uso
-    await fetch(`http://localhost:8000/api/student_equipments/${payload.id}/finish`, { method: 'PUT', headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } })
+    await finishStudentEquipment(payload.id)
   } else {
     // Asignar equipamiento
-    await fetch('http://localhost:8000/api/student_equipments', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-        student_id: payload.student_id,
-        equipment_id: payload.id,
-        start_datetime: new Date().toISOString().slice(0, 19).replace('T', ' ')
-      })
-
+    await assignStudentEquipment({
+      student_id: payload.student_id,
+      equipment_id: payload.id,
+      start_datetime: new Date().toISOString().slice(0, 19).replace('T', ' ')
     })
   }
   await fetchAllEquipments()
 }
 
 
-const deleteEquipment = async () => {
-  await fetch(`${equipmentApiUrl}/${equipmentForm.value.id}`, {
-    method: 'DELETE',
-    headers: {
-      'Authorization': `Bearer ${token}`
-    }
-  })
+const handleDeleteEquipment = async () => {
+  await deleteEquipment(equipmentForm.value.id)
 
   await fetchEquipments()
   closeEquipmentModal()
 }
 
 const fetchInventario = async () => {
-  const res = await fetch(apiUrl, {
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    }
-  })
-  inventario.value = await res.json()
+  inventario.value = await getConsumables()
 }
 
 /* ===== Buscar ===== */
@@ -564,14 +534,11 @@ const submitForm = async (data) => {
     ? apiUrl
     : `${apiUrl}/${form.value.id}`
 
-  await fetch(url, {
-    method,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify(form.value)
-  })
+  if (modalType.value === 'add') {
+    await createConsumable(form.value)
+  } else {
+    await updateConsumable(form.value.id, form.value)
+  }
 
   await fetchInventario()
   closeModal()
@@ -580,12 +547,7 @@ const submitForm = async (data) => {
 
 const deleteItem = async () => {
   try {
-    const res = await fetch(`${apiUrl}/${form.value.id}`, {
-      method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
-
-    if (!res.ok) throw new Error('Error al eliminar')
+    await deleteConsumable(form.value.id)
     await fetchInventario()
     closeModal()
   } catch (error) {
@@ -609,16 +571,9 @@ const showCategoryModal = ref(false)
 const categoryModalType = ref('')
 const categoryForm = ref({})
 
-const categoryApiUrl = 'http://localhost:8000/api/categorys'
 
 const fetchCategories = async () => {
-  const res = await fetch(categoryApiUrl, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    }
-  })
-  categories.value = await res.json()
+  categories.value = await getCategories()
 }
 
 const filteredCategories = computed(() =>
@@ -642,31 +597,18 @@ const closeCategoryModal = () => {
   categoryModalType.value = ''
 }
 const submitCategory = async (data) => {
-  const method = categoryModalType.value === 'add' ? 'POST' : 'PUT'
-  const url = categoryModalType.value === 'add'
-    ? categoryApiUrl
-    : `${categoryApiUrl}/${data.id}`
-
-  await fetch(url, {
-    method,
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ name: data.name })
-  })
+  if (categoryModalType.value === 'add') {
+    await createCategory({ name: data.name })
+  } else {
+    await updateCategory(data.id, { name: data.name })
+  }
 
   await fetchCategories()
   closeCategoryModal()
 }
 
-const deleteCategory = async () => {
-  await fetch(`${categoryApiUrl}/${categoryForm.value.id}`, {
-    method: 'DELETE',
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  })
+const handleDeleteCategory = async () => {
+  await deleteCategory(categoryForm.value.id)
 
   await fetchCategories()
   closeCategoryModal()

@@ -1,18 +1,11 @@
-const API_URL = 'http://localhost:8000/api'
-
-export const getToken = () => localStorage.getItem('token')
+import { apiRequest, getToken } from '@/services/api'
 
 export const checkAuth = async () => {
   const token = getToken()
   if (!token) return false
 
   try {
-    const res = await fetch(`${API_URL}/user`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/json' // 🔴 CLAVE
-      }
-    })
+    const res = await apiRequest('/user')
 
     return res.ok
   } catch (error) {
@@ -25,13 +18,7 @@ export const logout = async () => {
   const token = getToken()
 
   if (token) {
-    await fetch(`${API_URL}/logout`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/json' // 🔴 CLAVE
-      }
-    })
+    await apiRequest('/logout', { method: 'POST' })
   }
 
   localStorage.removeItem('token')

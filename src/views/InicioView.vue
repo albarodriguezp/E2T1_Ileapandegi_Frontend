@@ -82,6 +82,7 @@ import { ref, computed, onMounted } from 'vue'
 import ModalVerCita from '@/components/ModalVerCita.vue'
 import ModalNuevaCita from '@/components/ModalNuevaCita.vue'
 import ModalConfirmParam from '@/components/ModalConfirmParam.vue'
+import { getAppointmentsByUser, getAppointments, deleteAppointment } from '@/services/api'
 
 const nombre = localStorage.getItem('name')
 const citas = ref([])
@@ -156,37 +157,15 @@ const obtenerCitasPorUsuario = async () => {
   cargando.value = true
   error.value = null
 
-  const token = localStorage.getItem('token')
   const idUsuario = localStorage.getItem('user_id')
 
   try {
-    let res = await fetch(
-      `http://localhost:8000/api/appointments?user_id=${idUsuario}`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      }
-    )
-
-    if (!res.ok) {
-      res = await fetch(
-        'http://localhost:8000/api/appointments',
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        }
-      )
+    let data = []
+    try {
+      data = await getAppointmentsByUser(idUsuario)
+    } catch {
+      data = await getAppointments()
     }
-
-    if (!res.ok) {
-      throw new Error(`Error al obtener citas`)
-    }
-
-    const data = await res.json()
 
     citas.value = Array.isArray(data) ? data.map(c => ({
       id: c.id,
@@ -242,20 +221,8 @@ function handleSolicitarEliminar(citaId) {
 }
 
 async function confirmarEliminar() {
-  const token = localStorage.getItem('token')
-  
   try {
-    const res = await fetch(`http://localhost:8000/api/appointments/${citaIdAEliminar.value}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
-    })
-
-    if (!res.ok) {
-      throw new Error('Error al eliminar la cita')
-    }
+    await deleteAppointment(citaIdAEliminar.value)
 
     // Cerrar modal de confirmación
     mostrarConfirmEliminar.value = false

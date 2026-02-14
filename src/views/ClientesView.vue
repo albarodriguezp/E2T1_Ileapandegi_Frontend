@@ -298,24 +298,6 @@ onMounted(() => {
   gap: 14px;
 }
 
-.btn-eliminar {
-  background-color: #EBB3B3;
-  color: black;
-  border-radius: 10px;
-  border-color: #EBB3B3;
-  font-weight: bold;
-  padding: 10px 20px;
-}
-
-.btn-agregar {
-  background-color: #9CE0DB;
-  color: black;
-  border-radius: 10px;
-  border-color: #9CE0DB;
-  font-weight: bold;
-  padding: 10px 20px;
-}
-
 .buscador {
   margin-top: 1cm;
   margin-bottom: 20px;

@@ -296,55 +296,6 @@ input[readonly], textarea[readonly] {
   border-top: 2px solid #ddd;
 }
 
-.editar-btn {
-  background-color: #82d8d8;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 16px;
-  color: white;
-  transition: background-color 0.2s;
-}
-
-.editar-btn:hover {
-  background-color: #6bc5c5;
-}
-
-.cerrar-btn-secondary {
-  background-color: #95a5a6;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 16px;
-  color: white;
-  transition: background-color 0.2s;
-}
-
-.cerrar-btn-secondary:hover {
-  background-color: #7f8c8d;
-}
-
-.eliminar-btn {
-  background-color: #e74c3c;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 16px;
-  color: white;
-  transition: background-color 0.2s;
-}
-
-.eliminar-btn:hover {
-  background-color: #c0392b;
-}
-
-
 @media (max-width: 700px) {
   .modal {
     width: calc(100% - 32px) !important;

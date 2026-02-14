@@ -107,16 +107,4 @@ defineProps({
   justify-content: flex-end;
 }
 
-.btn-eliminar {
-  background-color: #c20b0b;
-  color: white;
-  border: none;
-  padding: 0.5rem 1.2rem;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  user-select: none;
-}
-
 </style>

@@ -478,27 +478,6 @@ input[readonly] {
   border-top: 2px solid #ddd;
 }
 
-.guardar-btn {
-  margin-top: 10px;
-  background-color: #82d8d8;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.2s;
-}
-
-.guardar-btn:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
-.guardar-btn:hover:not(:disabled) {
-  background-color: #6bc5c5;
-}
-
 option.ocupada {
   color: #c0392b;
   font-weight: 600;

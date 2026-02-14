@@ -82,9 +82,9 @@ import { ref, computed, onMounted } from 'vue'
 import ModalVerCita from '@/components/ModalVerCita.vue'
 import ModalNuevaCita from '@/components/ModalNuevaCita.vue'
 import ModalConfirmParam from '@/components/ModalConfirmParam.vue'
-import { getAppointmentsByUser, getAppointments, deleteAppointment } from '@/services/api'
+import { getAppointmentsByUser, getAppointments, deleteAppointment, getProfile } from '@/services/api'
 
-const nombre = localStorage.getItem('name')
+let nombre = ref(localStorage.getItem('name') || '')
 const citas = ref([])
 const cargando = ref(false)
 const error = ref(null)
@@ -240,7 +240,19 @@ function cancelarEliminar() {
   citaIdAEliminar.value = null
 }
 
-onMounted(() => {
+// Cargar datos del perfil 
+onMounted(async () => {
+  
+  try {
+    const dataPerfil = await getProfile()
+    localStorage.setItem('name', dataPerfil.name)
+    localStorage.setItem('user_id', dataPerfil.id)
+    nombre.value = dataPerfil.name
+  } catch (err) {
+    console.error('Error al cargar perfil:', err)
+  }
+  
+
   obtenerCitasPorUsuario()
 })
 </script>

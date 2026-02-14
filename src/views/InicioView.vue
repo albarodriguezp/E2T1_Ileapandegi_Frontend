@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     <div class="content2">
-      <h1>Hola {{ capitalizar(nombre) }}, estas son tus citas!</h1>
+      <h1>Hola {{ capitalizar(nombre) }}, estas son las citas programadas!</h1>
 
       <div class="dashboard d-flex justify-content-center gap-5">
         <div class="miniContenedor">

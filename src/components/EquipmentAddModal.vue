@@ -1,19 +1,19 @@
 <template>
   <div class="modal-overlay">
     <div class="modal">
-      <h2>Agregar equipamiento</h2>
+      <h2>{{ t('inventory.addEquipment') }}</h2>
 
-      <input v-model="form.name" placeholder="Nombre" />
-      <input v-model="form.brand" placeholder="Marca" />
-      <input v-model="form.label" placeholder="Etiqueta" />
-      <input v-model="form.description" placeholder="Descripción" />
+      <input v-model="form.name" :placeholder="t('table.name')" />
+      <input v-model="form.brand" :placeholder="t('inventory.brand')" />
+      <input v-model="form.label" :placeholder="t('inventory.label')" />
+      <input v-model="form.description" :placeholder="t('inventory.description')" />
 
       <div class="actions">
         <button class="btn-add" @click="$emit('submit', form)">
-          Guardar
+          {{ t('modal.save') }}
         </button>
         <button class="btn-delete" @click="$emit('close')">
-          Cancelar
+          {{ t('modal.cancel') }}
         </button>
       </div>
     </div>
@@ -22,6 +22,9 @@
 
 <script setup>
 import { reactive } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const form = reactive({
   name: '',

@@ -2,16 +2,16 @@
   <div class="content">
     <div class="content2">
 
-      <h1>Gestión de Inventario</h1>
+      <h1>{{ t('inventory.title') }}</h1>
 
       <!-- Tabs -->
       <div class="tabs">
         <button :class="{ active: activeTab === 'material' }" @click="activeTab = 'material'">
-          Material
+          {{ t('inventory.material') }}
         </button>
 
         <button :class="{ active: activeTab === 'equipamientos' }" @click="activeTab = 'equipamientos'">
-          Equipamientos
+          {{ t('inventory.equipment') }}
         </button>
       </div>
 
@@ -19,22 +19,22 @@
         <!-- Header -->
         <div class="header">
           <h1>
-            {{ materialView === 'items' ? 'Material' : 'Categorías de Material' }}
+            {{ materialView === 'items' ? t('inventory.material') : t('inventory.materialCategories') }}
           </h1>
 
           <div style="display:flex; gap:0.5rem">
             <button v-if="materialView === 'items'" class="btn-add" @click="openModal('add')">
-              + Agregar material
+              {{ t('inventory.addMaterial') }}
             </button>
 
             <button v-if="materialView === 'items'" class="btn-add" style="background:#455a64"
               @click="materialView = 'categories'">
-              📂 Gestionar categorías
+              📂 {{ t('inventory.manageCategories') }}
             </button>
 
             <button v-if="materialView === 'categories'" class="btn-add" style="background:#455a64"
               @click="materialView = 'items'">
-              ← Volver a materiales
+              {{ t('inventory.backToMaterials') }}
             </button>
           </div>
         </div>
@@ -42,20 +42,20 @@
         <div v-if="materialView === 'items'">
 
           <!-- Buscador -->
-          <input v-model="search" type="text" placeholder="Buscar por nombre, lote o marca..." class="search-input" />
+          <input v-model="search" type="text" :placeholder="t('inventory.searchMaterial')" class="search-input" />
 
           <!-- Tabla -->
           <table class="inventario-table">
             <thead>
               <tr>
-                <th>Lote</th>
-                <th>Nombre</th>
-                <th>Cantidad</th>
-                <th>Categoría</th>
-                <th>Marca</th>
-                <th>Fecha cad</th>
-                <th>Descripción</th>
-                <th>Acciones</th>
+                <th>{{ t('inventory.batch') }}</th>
+                <th>{{ t('inventory.name') }}</th>
+                <th>{{ t('inventory.quantity') }}</th>
+                <th>{{ t('inventory.category') }}</th>
+                <th>{{ t('inventory.brand') }}</th>
+                <th>{{ t('inventory.expirationDate') }}</th>
+                <th>{{ t('inventory.description') }}</th>
+                <th>{{ t('table.actions') }}</th>
               </tr>
             </thead>
 
@@ -79,7 +79,7 @@
               </tr>
 
               <tr v-if="paginatedData.length === 0">
-                <td colspan="8" class="empty">No hay resultados</td>
+                <td colspan="8" class="empty">{{ t('inventory.noResults') }}</td>
               </tr>
             </tbody>
           </table>
@@ -87,7 +87,7 @@
           <!-- Paginación -->
           <div class="pagination">
             <button @click="prevPage" :disabled="currentPage === 1">«</button>
-            <span>Página {{ currentPage }} de {{ totalPages }}</span>
+            <span>{{ t('inventory.page') }} {{ currentPage }} {{ t('inventory.of') }} {{ totalPages }}</span>
             <button @click="nextPage" :disabled="currentPage === totalPages">»</button>
           </div>
 
@@ -95,17 +95,17 @@
 
         <div v-if="materialView === 'categories'">
           <button class="btn-add" @click="openCategoryModal('add')">
-            + Agregar categoría
+            {{ t('inventory.addCategory') }}
           </button>
 
-          <input v-model="categorySearch" type="text" placeholder="Buscar categoría..." class="search-input" />
+          <input v-model="categorySearch" type="text" :placeholder="t('inventory.searchCategory')" class="search-input" />
 
           <table class="inventario-table">
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Acciones</th>
+                <th>{{ t('table.id') }}</th>
+                <th>{{ t('table.name') }}</th>
+                <th>{{ t('table.actions') }}</th>
               </tr>
             </thead>
 
@@ -124,7 +124,7 @@
               </tr>
 
               <tr v-if="filteredCategories.length === 0">
-                <td colspan="3" class="empty">No hay categorías</td>
+                <td colspan="3" class="empty">{{ t('inventory.noCategories') }}</td>
               </tr>
             </tbody>
           </table>
@@ -138,32 +138,30 @@
       <div v-if="activeTab === 'equipamientos'">
 
         <div class="header">
-          <h1>Equipamientos</h1>
+          <h1>{{ t('inventory.equipment') }}</h1>
           <button class="btn-add" @click="openEquipmentModal('add')">
-            + Agregar equipamiento
+            {{ t('inventory.addEquipment') }}
           </button>
         </div>
 
         <!-- Selector sub-tabs para Equipamientos -->
         <div class="equipment-subtabs">
-          <button :class="{ active: equipmentView === 'lista' }" @click="equipmentView = 'lista'">Lista
-            Completa</button>
-          <button :class="{ active: equipmentView === 'gestion' }" @click="equipmentView = 'gestion'">Gestión de
-            Equipamientos</button>
+          <button :class="{ active: equipmentView === 'lista' }" @click="equipmentView = 'lista'">{{ t('inventory.completeList') }}</button>
+          <button :class="{ active: equipmentView === 'gestion' }" @click="equipmentView = 'gestion'">{{ t('inventory.equipmentManagement') }}</button>
         </div>
 
         <!-- Vista Gestión con dos columnas -->
         <div v-if="equipmentView === 'gestion'" class="equipment-columns">
           <!-- Equipamientos disponibles -->
           <div class="column">
-            <h2>Disponibles</h2>
+            <h2>{{ t('inventory.available') }}</h2>
             <table class="inventario-table">
               <thead>
                 <tr>
-                  <th>Nombre</th>
-                  <th>Marca</th>
-                  <th>Etiqueta</th>
-                  <th>Acciones</th>
+                  <th>{{ t('table.name') }}</th>
+                  <th>{{ t('inventory.brand') }}</th>
+                  <th>{{ t('inventory.label') }}</th>
+                  <th>{{ t('table.actions') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -178,7 +176,7 @@
                   </td>
                 </tr>
                 <tr v-if="availableEquipments.length === 0">
-                  <td colspan="4" class="empty">No hay equipamientos disponibles</td>
+                  <td colspan="4" class="empty">{{ t('inventory.noAvailableEquipments') }}</td>
                 </tr>
               </tbody>
             </table>
@@ -186,15 +184,15 @@
 
           <!-- Equipamientos ocupados -->
           <div class="column">
-            <h2>Ocupados</h2>
+            <h2>{{ t('inventory.occupied') }}</h2>
             <table class="inventario-table">
               <thead>
                 <tr>
-                  <th>Nombre</th>
-                  <th>Marca</th>
-                  <th>Etiqueta</th>
-                  <th>Responsable</th>
-                  <th>Acciones</th>
+                  <th>{{ t('table.name') }}</th>
+                  <th>{{ t('inventory.brand') }}</th>
+                  <th>{{ t('inventory.label') }}</th>
+                  <th>{{ t('appointments.responsible') }}</th>
+                  <th>{{ t('table.actions') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -204,13 +202,13 @@
                   <td>{{ item.label }}</td>
                   <td>{{ item.responsible }}</td>
                   <td class="actions">
-                    <button class="btn-tabla-assign" @click="finishEquipmentUsage(item.student_equipment_id)" title="Finalizar uso">
+                    <button class="btn-tabla-assign" @click="finishEquipmentUsage(item.student_equipment_id)" :title="t('inventory.finishUsage')">
                       <i class="bi bi-check-circle"></i>
                     </button>
                   </td>
                 </tr>
                 <tr v-if="occupiedEquipments.length === 0">
-                  <td colspan="5" class="empty">No hay equipamientos ocupados</td>
+                  <td colspan="5" class="empty">{{ t('inventory.noOccupiedEquipments') }}</td>
                 </tr>
               </tbody>
             </table>
@@ -219,17 +217,17 @@
 
         <!-- Vista Lista Completa -->
         <div v-if="equipmentView === 'lista'">
-          <input v-model="equipmentSearch" type="text" placeholder="Buscar por código, nombre o responsable..."
+          <input v-model="equipmentSearch" type="text" :placeholder="t('inventory.searchEquipment')"
             class="search-input" />
 
           <table class="inventario-table">
             <thead>
               <tr>
-                <th>Nombre</th>
-                <th>Marca</th>
-                <th>Etiqueta</th>
-                <th>Descripción</th>
-                <th>Acciones</th>
+                <th>{{ t('table.name') }}</th>
+                <th>{{ t('inventory.brand') }}</th>
+                <th>{{ t('inventory.label') }}</th>
+                <th>{{ t('inventory.description') }}</th>
+                <th>{{ t('table.actions') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -248,14 +246,14 @@
                 </td>
               </tr>
               <tr v-if="filteredEquipments.length === 0">
-                <td colspan="5" class="empty">No hay resultados</td>
+                <td colspan="5" class="empty">{{ t('inventory.noResults') }}</td>
               </tr>
             </tbody>
           </table>
 
           <div class="pagination">
             <button @click="equipmentPrevPage" :disabled="equipmentCurrentPage === 1">«</button>
-            <span>Página {{ equipmentCurrentPage }} de {{ equipmentTotalPages }}</span>
+            <span>{{ t('inventory.page') }} {{ equipmentCurrentPage }} {{ t('inventory.of') }} {{ equipmentTotalPages }}</span>
             <button @click="equipmentNextPage" :disabled="equipmentCurrentPage === equipmentTotalPages">»</button>
           </div>
         </div>
@@ -300,6 +298,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import InventarioAddModal from '../components/InventarioAddModal.vue'
 import InventarioEditModal from '../components/InventarioEditModal.vue'
 import InventarioDeleteModal from '../components/InventarioDeleteModal.vue'
@@ -320,6 +319,9 @@ import {
   updateCategory,
   deleteCategory
 } from '@/services/api'
+
+const { t } = useI18n()
+
 /* ===== Variables ===== */
 const inventario = ref([])
 const search = ref('')

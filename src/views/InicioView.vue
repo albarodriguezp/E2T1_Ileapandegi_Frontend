@@ -1,33 +1,33 @@
 <template>
   <div class="content">
     <div class="content2">
-      <h1>Hola {{ capitalizar(nombre) }}, estas son las citas programadas!</h1>
+      <h1>{{ t('home.greeting', { name: capitalizar(nombre) }) }}</h1>
 
       <div class="dashboard d-flex justify-content-center gap-5">
         <div class="miniContenedor">
-          <p>Total citas:</p>
+          <p>{{ t('home.totalAppointments') }}</p>
           <p class="number">{{ citasDelUsuario.length }}</p>
         </div>
         <div class="miniContenedor">
-          <p>Citas de hoy:</p>
+          <p>{{ t('home.today') }}:</p>
           <p class="number">{{ citasDeHoy.length }}</p>
         </div>
         <div class="miniContenedor">
-          <p>Completadas:</p>
+          <p>{{ t('home.completed') }}:</p>
           <p class="number">{{ citasCompletadas.length }}</p>
         </div>
       </div>
       <div class="proximasCitas">
-          <p>Próximas citas:</p>
+          <p>{{ t('home.nextAppointments') }}:</p>
 
           <div v-if="cargando" class="loading">
-            Cargando citas...
+            {{ t('home.loading') }}
           </div>
           <div v-else-if="error" class="error">
             {{ error }}
           </div>
           <div v-else-if="proximasCitas.length === 0" class="sin-citas">
-            No hay citas próximas
+            {{ t('home.noNext') }}
           </div>
           <div v-for="cita in proximasCitas.slice(0, 5)" :key="cita.id" class="cita" @click="abrirVerCita(cita.id)">
             <div class="headerCita d-flex justify-content-between">
@@ -36,10 +36,10 @@
             </div>
             <div class="bodyCita mt-2">
               <p v-if="cita.servicios && cita.servicios.length > 0">
-                <strong>Servicios:</strong> {{ cita.servicios.map(s => s.name).join(', ') }}
+                <strong>{{ t('appointments.services') }}:</strong> {{ cita.servicios.map(s => s.name).join(', ') }}
               </p>
               <p v-if="cita.comments">
-                <strong>Notas:</strong> {{ cita.comments }}
+                <strong>{{ t('home.notes') }}:</strong> {{ cita.comments }}
               </p>
             </div>
           </div>
@@ -69,8 +69,8 @@
     <!-- Modal Confirmación Eliminar -->
     <ModalConfirmParam
       v-if="mostrarConfirmEliminar"
-      title="Eliminar Cita"
-      message="¿Estás seguro de que quieres eliminar esta cita? Esta acción no se puede deshacer."
+      :title="t('appointments.deleteConfirm')"
+      :message="t('appointments.deleteConfirmMsg')"
       @confirm="confirmarEliminar"
       @close="cancelarEliminar"
     />
@@ -79,10 +79,13 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import ModalVerCita from '@/components/ModalVerCita.vue'
 import ModalNuevaCita from '@/components/ModalNuevaCita.vue'
 import ModalConfirmParam from '@/components/ModalConfirmParam.vue'
 import { getAppointmentsByUser, getAppointments, deleteAppointment, getProfile } from '@/services/api'
+
+const { t } = useI18n()
 
 let nombre = ref(localStorage.getItem('name') || '')
 const citas = ref([])

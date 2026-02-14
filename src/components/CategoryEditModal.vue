@@ -1,15 +1,15 @@
 <template>
   <div class="modal-overlay" @click.self="emit('close')">
     <div class="modal">
-      <h2>Editar categoría</h2>
+      <h2>{{ t('inventory.edit') }} {{ t('inventory.materialCategories') }}</h2>
 
       <form @submit.prevent="submit">
-        <label>Nombre</label>
+        <label>{{ t('table.name') }}</label>
         <input v-model="local.name" required />
 
         <div class="actions">
-          <button type="submit">Guardar</button>
-          <button type="button" @click="emit('close')">Cancelar</button>
+          <button type="submit">{{ t('modal.save') }}</button>
+          <button type="button" @click="emit('close')">{{ t('modal.cancel') }}</button>
         </div>
       </form>
     </div>
@@ -18,7 +18,9 @@
 
 <script setup>
 import { reactive, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const props = defineProps({ item: Object })
 const emit = defineEmits(['close', 'submit'])
 

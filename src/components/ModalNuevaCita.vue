@@ -2,12 +2,12 @@
   <div class="modal-backdrop" @click.self="cerrarModal">
     <div class="modal">
       <button class="cerrar-btn" @click="cerrarModal">X</button>
-      <h2>{{ cita.id ? 'Editar Cita' : 'Nueva Cita' }}</h2>
+      <h2>{{ cita.id ? t('appointments.edit') : t('appointments.new') }}</h2>
 
       <div class="form-group">
-        <label for="cliente">Cliente:</label>
+        <label for="cliente">{{ t('appointments.client') }}:</label>
         <select id="cliente" v-model="cita.client_id">
-          <option value="">Selecciona un cliente</option>
+          <option value="">{{ t('appointments.selectClient') }}</option>
           <option v-for="cliente in clientes" :key="cliente.id" :value="cliente.id">
             {{ cliente.name }} {{ cliente.surnames }}
           </option>
@@ -15,9 +15,9 @@
       </div>
 
       <div class="form-group">
-        <label for="estudiante">Estudiante:</label>
+        <label for="estudiante">{{ t('appointments.student') }}:</label>
         <select id="estudiante" v-model="cita.student_id">
-          <option value="">Selecciona un estudiante</option>
+          <option value="">{{ t('appointments.selectStudent') }}</option>
           <option v-for="estudiante in estudiantes" :key="estudiante.id" :value="estudiante.id">
             {{ estudiante.name }} {{ estudiante.surnames }}
           </option>
@@ -25,9 +25,9 @@
       </div>
 
       <div class="form-group">
-        <label for="sillon">Sillón:</label>
+        <label for="sillon">{{ t('appointments.chair') }}:</label>
         <select id="sillon" v-model="cita.seat" @change="actualizarHorasDisponibles">
-          <option value="">Selecciona un sillón</option>
+          <option value="">{{ t('appointments.selectChair') }}</option>
           <option v-for="sillon in sillones" :key="sillon" :value="sillon">
             Silla {{ sillon }}
           </option>
@@ -35,7 +35,7 @@
       </div>
 
       <div class="form-group">
-        <label for="servicios">Servicios:</label>
+        <label for="servicios">{{ t('appointments.services') }}:</label>
         <div class="servicios-lista">
           <div v-for="servicio in servicios" :key="servicio.id" class="servicio-item">
             <input 
@@ -54,9 +54,9 @@
 
       <div class="form-row">
         <div class="form-group">
-          <label for="hora-inicio">Hora Inicio:</label>
+          <label for="hora-inicio">{{ t('appointments.startTime') }}:</label>
           <select id="hora-inicio" v-model="cita.start_time" @change="calcularHoraFin">
-            <option value="">Selecciona hora</option>
+            <option value="">{{ t('appointments.selectTime') }}</option>
             <option
               v-for="hora in horasDisponibles"
               :key="hora"
@@ -72,7 +72,7 @@
         </div>
 
         <div class="form-group">
-          <label for="duracion">Duración (min):</label>
+          <label for="duracion">{{ t('appointments.duration') }}:</label>
           <input 
             id="duracion" 
             v-model.number="duracionTotal" 
@@ -83,22 +83,22 @@
         </div>
 
         <div class="form-group">
-          <label for="hora-fin">Hora Fin:</label>
+          <label for="hora-fin">{{ t('appointments.endTime') }}:</label>
           <input id="hora-fin" v-model="cita.end_time" type="text" />
         </div>
       </div>
 
       <div class="form-group">
-        <label for="comentarios">Comentarios:</label>
+        <label for="comentarios">{{ t('appointments.comments') }}:</label>
         <textarea id="comentarios" v-model="cita.comments" rows="3"></textarea>
       </div>
 
       <div class="precio-total">
-        <strong>Precio Total: {{ precioTotal.toFixed(2) }}€</strong>
+        <strong>{{ t('appointments.totalPrice') }}: {{ precioTotal.toFixed(2) }}€</strong>
       </div>
 
       <button class="guardar-btn" @click="validarYEnviar" :disabled="!formularioValido">
-        {{ cita.id ? 'Actualizar Cita' : 'Guardar Cita' }}
+        {{ cita.id ? t('appointments.update') : t('appointments.save') }}
       </button>
     </div>
   </div>
@@ -106,7 +106,10 @@
 
 <script setup>
 import { reactive, ref, computed, onMounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { getClients, getStudents, getServices, createAppointment, updateAppointment } from '@/services/api'
+
+const { t } = useI18n()
 
 const props = defineProps({
   fecha: String,
@@ -229,13 +232,13 @@ function calcularHoraFin() {
 // VALIDACIONES
 function validarYEnviar() {
   if (!cita.start_time) {
-    alert('Selecciona una hora de inicio válida')
+    alert(t('appointments.selectTime'))
     return
   }
 
   
   if (!horasValidas.value.includes(cita.start_time)) {
-    alert('La hora seleccionada no es válida')
+    alert(t('appointments.invalidTime'))
     return
   }
 

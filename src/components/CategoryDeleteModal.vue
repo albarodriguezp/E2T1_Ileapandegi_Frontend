@@ -1,19 +1,22 @@
 <template>
   <div class="modal-overlay" @click.self="emit('close')">
     <div class="modal">
-      <h2>Eliminar categoría</h2>
+      <h2>{{ t('inventory.delete') }} {{ t('inventory.materialCategories') }}</h2>
 
-      <p>¿Seguro que deseas eliminar la categoría <b>{{ item.name }}</b>?</p>
+      <p>{{ t('modal.deleteConfirm', { name: item.name }) }}</p>
 
       <div class="actions">
-        <button class="danger" @click="emit('confirm')">Eliminar</button>
-        <button @click="emit('close')">Cancelar</button>
+        <button class="danger" @click="emit('confirm')">{{ t('inventory.delete') }}</button>
+        <button @click="emit('close')">{{ t('modal.cancel') }}</button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 defineProps({ item: Object })
 const emit = defineEmits(['close', 'confirm'])
 </script>

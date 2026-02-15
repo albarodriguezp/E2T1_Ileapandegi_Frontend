@@ -83,7 +83,6 @@ const cargarPerfil = async () => {
 
     // Traemos los datos de progreso
     const dataProgreso = await getProfileProgress()
-    console.log('DATA PROGRESO:', dataProgreso)
 
 
     const SERVICIOS_POR_COMPLETAR = 10

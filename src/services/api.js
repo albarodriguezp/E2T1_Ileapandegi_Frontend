@@ -169,3 +169,11 @@ export const finishStudentEquipment = async (id) => {
   const res = await apiRequest(`/student_equipments/${id}/finish`, { method: 'PUT' })
   if (!res.ok) throw new Error('Error al finalizar uso')
 }
+
+export const getMonthOccupancy = async (year, month) => {
+  return apiJson(
+    `/appointments/occupancy/month?year=${year}&month=${month + 1}`, 
+    {}, 
+    'Error al obtener ocupación del mes'
+  )
+}

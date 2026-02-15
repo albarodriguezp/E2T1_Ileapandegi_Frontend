@@ -102,11 +102,11 @@
 <script setup>
 import { computed, ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n'
 import ModalNuevaCita from '../components/ModalNuevaCita.vue'
 import ModalVerCita from '../components/ModalVerCita.vue'
 import ModalConfirmParam from '../components/ModalConfirmParam.vue'
 import { getAppointmentsByDate, deleteAppointment } from '@/services/api'
+import { useI18n } from 'vue-i18n'
 
 const route = useRoute()
 const router = useRouter()
@@ -132,19 +132,19 @@ const citaSeleccionadaId = ref(null)
 const citaParaEditar = ref(null)
 const citaIdAEliminar = ref(null)
 
-// sillones desde front tmb FALTA CAMBIAR POR ESTUDIANTES DEL DÍA
-const sillonesDisponibles = ref([1, 2, 3, 4, 5])
-
 const citas = ref([])
+const estudiantesDelDia = ref([])
 const cargando = ref(false)
 const error = ref(null)
 
+// Sillones por los estudiantes que hay
 const sillones = computed(() => {
-  if (!Array.isArray(citas.value)) return sillonesDisponibles.value
+  if (estudiantesDelDia.value.length === 0) {
+    // Si no hay estudiantes asignados el dia , 5 sillones x si acaso
+    return [1, 2, 3, 4, 5]
+  }
   
-  const sillonesConCitas = citas.value.map(c => c.silla)
-  const todosSillones = [...new Set([...sillonesDisponibles.value, ...sillonesConCitas])]
-  return todosSillones.sort((a, b) => a - b)
+  return Array.from({ length: estudiantesDelDia.value.length }, (_, i) => i + 1)
 })
 
 const horaInicio = computed(() => esMiercoles.value ? 9 : 10)
@@ -176,9 +176,11 @@ const obtenerCitas = async () => {
   try {
     const data = await getAppointmentsByDate(fechaStr.value)
 
-    const appointments = Array.isArray(data) ? data : []
+    const { appointments = [], students = [] } = data
+
+    estudiantesDelDia.value = students
+
     citas.value = appointments.map(c => {
-      // coge los nombres del servicio
       const servicios = (c.services || []).map(appointmentService => ({
         id: appointmentService.service?.id || appointmentService.service_id,
         name: appointmentService.service?.name || 'Servicio'
@@ -190,10 +192,10 @@ const obtenerCitas = async () => {
         comentario: c.comments || '',
         inicio: horaToDecimal(c.start_time),
         fin: horaToDecimal(c.end_time),
-        servicios: servicios
+        servicios: servicios,
+        estudiante: c.student?.name || ''
       }
     })
-
 
   } catch (err) {
     error.value = err.message
@@ -235,7 +237,6 @@ function handleNuevaCita(nuevaCita) {
 }
 
 function openVerCita(cita) {
-  
   const resolvedId = cita && cita.id !== undefined ? cita.id : cita
   citaSeleccionadaId.value = resolvedId
   mostrarVerCita.value = true
@@ -256,8 +257,6 @@ function handleSolicitarEliminar(citaId) {
 async function confirmarEliminar() {
   try {
     await deleteAppointment(citaIdAEliminar.value)
-
-    // Cerrar modal de confirmación
     mostrarConfirmEliminar.value = false
     citaIdAEliminar.value = null
     await obtenerCitas()
@@ -273,7 +272,6 @@ function cancelarEliminar() {
   citaIdAEliminar.value = null
 }
 
-// Para cambiar cada vez que cambian los params de la ruta (al cambiar dia)
 watch(() => route.params, (newParams) => {
   diaReactivo.value = Number(newParams.dia)
   mesReactivo.value = Number(newParams.mes)

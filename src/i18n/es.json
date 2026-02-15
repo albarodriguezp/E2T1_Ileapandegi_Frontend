@@ -187,7 +187,9 @@
     "deleteShiftConfirm": "Eliminar Turno",
     "deleteShiftMsg": "¿Deseas eliminar este turno?"
   },
-  
+  "citas": {
+    "title": "Citas"
+  },
   "appointmentDetails": {
     "page": "Página",
     "dayDetail": "Detalle del Día",

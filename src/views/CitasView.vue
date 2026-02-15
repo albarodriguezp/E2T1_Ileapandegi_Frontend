@@ -2,7 +2,7 @@
   <div class="content">
     <div class="content2">
       <div class="header-mes">
-        <h1>Citas</h1>
+        <h1>{{ t('citas.title') }}</h1>
         <div class="selectores">
           <select v-model="mesActual" class="selector">
             <option v-for="(nombre, index) in meses" :key="index" :value="index">
@@ -23,8 +23,10 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Mes from '@/components/Mes.vue'
 
+const { t } = useI18n()
 const hoy = new Date()
 const mesActual = ref(hoy.getMonth())
 const anoActual = ref(hoy.getFullYear())

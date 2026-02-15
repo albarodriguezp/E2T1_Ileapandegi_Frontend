@@ -161,6 +161,9 @@
     "today": "Gaur",
     "completed": "Osatutakoak"
   },
+   "citas": {
+    "title": "Hitzorduak"
+  },
  
   "parameters": {
     "title": "Parametrizazioa (Admin)",

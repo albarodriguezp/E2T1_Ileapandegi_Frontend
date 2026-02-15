@@ -141,51 +141,7 @@ function cerrarModal() {
 }
 
 .modal {
-  background: white;
-  border-radius: 8px;
-  padding: 20px 25px;
   width: 360px;
-  overflow-y: auto;
-  position: relative;
-  box-shadow: 0 4px 12px rgb(0 0 0 / 0.15);
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  height: auto;
-  max-height: none;
-  overflow: visible;
 }
 
-.cerrar-btn {
-  position: absolute;
-  top: 10px; right: 12px;
-  border: none;
-  background: transparent;
-  font-weight: bold;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-input {
-  padding: 6px 8px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-}
-
-.guardar-btn {
-  margin-top: 10px;
-  background-color: #82d8d8;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 20px;
-  font-weight: 600;
-  cursor: pointer;
-}
 </style>

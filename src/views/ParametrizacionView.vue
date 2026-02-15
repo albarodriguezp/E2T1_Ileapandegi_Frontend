@@ -1,13 +1,13 @@
 <template>
   <div class="content">
     <div class="content2">
-      <h1>Parametrización (Admin)</h1>
+      <h1>{{ t('parameters.title') }}</h1>
 
       <!-- ===== Tabs ===== -->
       <div class="tabs">
-        <button :class="{ active: activeTab === 'usuarios' }" @click="activeTab = 'usuarios'">Usuarios</button>
-        <button :class="{ active: activeTab === 'grupos' }" @click="activeTab = 'grupos'">Grupos</button>
-        <button :class="{ active: activeTab === 'turnos' }" @click="activeTab = 'turnos'">Turnos</button>
+        <button :class="{ active: activeTab === 'usuarios' }" @click="activeTab = 'usuarios'">{{ t('parameters.users') }}</button>
+        <button :class="{ active: activeTab === 'grupos' }" @click="activeTab = 'grupos'">{{ t('parameters.groups') }}</button>
+        <button :class="{ active: activeTab === 'turnos' }" @click="activeTab = 'turnos'">{{ t('parameters.shifts') }}</button>
       </div>
 
       <div class="tab-content">
@@ -16,43 +16,43 @@
 
           <!-- ===== Columna Crear ===== -->
           <div class="col">
-            <h2>Crear Usuario</h2>
+            <h2>{{ t('parameters.createUser') }}</h2>
 
             <form @submit.prevent="crearUsuario">
               <div class="form-group">
-                <label>Username</label>
+                <label>{{ t('parameters.username') }}</label>
                 <input v-model="usuario.username" required />
               </div>
 
               <div class="form-group">
-                <label>Email</label>
+                <label>{{ t('modal.email') }}</label>
                 <input v-model="usuario.email" type="email" required />
               </div>
 
               <div class="form-group">
-                <label>Password</label>
+                <label>{{ t('appointments.password') }}</label>
                 <input type="password" v-model="usuario.password" required />
               </div>
 
               <div class="form-group">
-                <label>Rol</label>
+                <label>{{ t('parameters.role') }}</label>
                 <select v-model="usuario.rol">
-                  <option value="A">Admin</option>
-                  <option value="U">Usuario</option>
+                  <option value="A">{{ t('parameters.admin') }}</option>
+                  <option value="U">{{ t('parameters.user') }}</option>
                 </select>
               </div>
 
-              <button type="submit">Crear Usuario</button>
+              <button type="submit">{{ t('parameters.createUser') }}</button>
             </form>
           </div>
 
           <!-- ===== Columna Gestión ===== -->
           <div class="col">
-            <h2>Gestión de Usuarios</h2>
+            <h2>{{ t('parameters.userManagement') }}</h2>
 
-            <!-- 🔍 Buscador -->
+            <!-- Buscador -->
             <div class="form-group">
-              <input v-model="buscarUsuario" placeholder="Buscar por username o email..." />
+              <input v-model="buscarUsuario" :placeholder="t('parameters.searchUser')" />
             </div>
 
             <div v-for="u in usuariosFiltrados" :key="u.id" class="user-row">
@@ -62,8 +62,8 @@
               </div>
 
               <div class="actions">
-                <button class="btn-primary" @click="openEditUsuario(u)">Editar</button>
-                <button class="btn-danger" @click="openDeleteUsuario(u)">Eliminar</button>
+                <button class="btn-primary" @click="openEditUsuario(u)">{{ t('inventory.edit') }}</button>
+                <button class="btn-danger" @click="openDeleteUsuario(u)">{{ t('inventory.delete') }}</button>
               </div>
             </div>
           </div>
@@ -77,27 +77,27 @@
 
           <!-- ===== Crear Grupo ===== -->
           <div class="col">
-            <h2>Crear Grupo</h2>
+            <h2>{{ t('parameters.createGroup') }}</h2>
 
             <form @submit.prevent="crearGrupo">
               <div class="form-group">
-                <label>Nombre del Grupo</label>
+                <label>{{ t('table.name') }}</label>
                 <input v-model="grupo.nombre" required />
               </div>
 
-              <button type="submit">Crear Grupo</button>
+              <button type="submit">{{ t('parameters.createGroup') }}</button>
             </form>
           </div>
 
           <!-- ===== Asignar Usuarios ===== -->
           <div class="col">
-            <h2>Asignar Usuarios a Grupo</h2>
+            <h2>{{ t('parameters.assignUsersToGroup') }}</h2>
 
             <form @submit.prevent="asignarUsuarios">
               <div class="form-group">
-                <label>Seleccionar Grupo</label>
+                <label>{{ t('parameters.selectGroup') }}</label>
                 <select v-model="grupoSeleccionado">
-                  <option disabled value="">Selecciona un grupo</option>
+                  <option disabled value="">{{ t('parameters.selectGroup') }}</option>
                   <option v-for="g in grupos" :key="g.id" :value="g.id">
                     {{ g.nombre }}
                   </option>
@@ -105,8 +105,8 @@
               </div>
 
               <div class="form-group">
-                <label>Buscar Usuarios</label>
-                <input v-model="buscarUsuarioGrupo" placeholder="Buscar usuario..." />
+                <label>{{ t('parameters.searchGroupUser') }}</label>
+                <input v-model="buscarUsuarioGrupo" :placeholder="t('parameters.searchGroupUser')" />
               </div>
 
               <div class="checkbox-list">
@@ -116,23 +116,23 @@
                 </div>
               </div>
 
-<button type="submit" class="btn-submit">Asignar Usuarios</button>
+<button type="submit" class="btn-submit">{{ t('parameters.assignUsersBtn') }}</button>
             </form>
           </div>
 
           <!-- ===== Gestión de Grupos ===== -->
           <div class="col">
-            <h2>Gestión de Grupos</h2>
+            <h2>{{ t('parameters.groupManagement') }}</h2>
 
             <div v-for="g in grupos" :key="g.id" class="group-row">
               <span>{{ g.nombre }}</span>
 
               <div class="actions">
                 <button class="btn-primary" @click="openEditGrupo(g)">
-                  Editar
+                  {{ t('inventory.edit') }}
                 </button>
                 <button class="btn-danger" @click="openDeleteGrupo(g)">
-                  Eliminar
+                  {{ t('inventory.delete') }}
                 </button>
               </div>
             </div>
@@ -146,12 +146,12 @@
 
   <!-- ===== Crear Turno ===== -->
   <div class="col">
-    <h2>Crear Turno</h2>
+    <h2>{{ t('parameters.createShift') }}</h2>
 
     <form @submit.prevent="crearTurno">
       <div class="form-group">
-        <label>Buscar Usuario</label>
-        <input v-model="buscarUsuarioTurno" placeholder="Buscar usuario..." />
+        <label>{{ t('parameters.searchUserShift') }}</label>
+        <input v-model="buscarUsuarioTurno" :placeholder="t('parameters.searchUserShift')" />
 
         <div class="checkbox-list">
           <div
@@ -173,36 +173,36 @@
       </div>
 
       <div class="form-group">
-        <label>Tipo de Turno</label>
+        <label>{{ t('parameters.shiftType') }}</label>
         <select v-model="turno.tipo">
-          <option value="A">Mesa</option>
-          <option value="M">Cortando Pelo</option>
+          <option value="A">{{ t('parameters.table') }}</option>
+          <option value="M">{{ t('parameters.haircut') }}</option>
         </select>
       </div>
 
       <div class="form-group">
-        <label>Fecha</label>
+        <label>{{ t('parameters.date') }}</label>
         <input type="date" v-model="turno.fecha" required />
       </div>
 
-      <button type="submit">Crear Turno</button>
+      <button type="submit">{{ t('parameters.createShift') }}</button>
     </form>
   </div>
 
   <!-- ===== Gestión de Turnos ===== -->
 <div class="col">
-  <h2>Gestión de Turnos</h2>
+  <h2>{{ t('parameters.shiftManagement') }}</h2>
 
-  <!-- 🔍 Filtros -->
+  <!--  Filtros -->
   <div class="form-group">
     <input
       v-model="buscarTurno"
-      placeholder="Buscar por usuario..."
+      :placeholder="t('parameters.searchUserShift')"
     />
   </div>
 
   <div class="form-group">
-    <label>Filtrar por Mes:</label>
+    <label>{{ t('parameters.filterByMonth') }}</label>
     <input
       type="month"
       v-model="filtroMes"
@@ -210,7 +210,7 @@
   </div>
 
   <div v-if="turnosFiltrados.length === 0" class="empty">
-    No hay turnos que coincidan
+    {{ t('parameters.noShifts') }}
   </div>
 
   <div
@@ -221,16 +221,16 @@
     <div class="turno-info">
       <strong>{{ t.usuario }}</strong>
       <small>
-        {{ t.tipo === 'A' ? 'Mesa' : 'Cortando Pelo' }} · {{ t.fecha }}
+        {{ t.tipo === 'A' ? t('parameters.table') : t('parameters.haircut') }} · {{ t.fecha }}
       </small>
     </div>
 
     <div class="actions">
       <button class="btn-primary" @click="openEditTurno(t)">
-        Editar
+        {{ t('inventory.edit') }}
       </button>
       <button class="btn-danger" @click="openDeleteTurno(t)">
-        Eliminar
+        {{ t('inventory.delete') }}
       </button>
     </div>
   </div>
@@ -243,56 +243,56 @@
     </div>
   </div>
 
-  <ModalParam v-if="showModal && modalType === 'usuario'" title="Editar Usuario" submitText="Guardar cambios"
+  <ModalParam v-if="showModal && modalType === 'usuario'" :title="t('parameters.editUser')" :submitText="t('modal.save')"
     @close="closeModal" @submit="editarUsuario">
     <div class="form-group">
-      <label>Username</label>
+      <label>{{ t('parameters.username') }}</label>
       <input v-model="usuarioEditando.username" />
     </div>
 
     <div class="form-group">
-      <label>Email</label>
+      <label>{{ t('modal.email') }}</label>
       <input v-model="usuarioEditando.email" />
     </div>
 
     <div class="form-group">
-      <label>Rol</label>
+      <label>{{ t('parameters.role') }}</label>
       <select v-model="usuarioEditando.rol">
-        <option value="A">Admin</option>
-        <option value="U">Usuario</option>
+        <option value="A">{{ t('parameters.admin') }}</option>
+        <option value="U">{{ t('parameters.user') }}</option>
       </select>
     </div>
   </ModalParam>
 
 
-  <ModalConfirm v-if="showModal && modalType === 'delete'" title="Eliminar Usuario"
-    message="¿Deseas eliminar este usuario?" @close="closeModal" @confirm="eliminarUsuario" />
+  <ModalConfirm v-if="showModal && modalType === 'delete'" :title="t('parameters.deleteUser')"
+    :message="t('modal.deleteConfirm', { name: usuarioEditando?.username })" @close="closeModal" @confirm="eliminarUsuario" />
 
   <!-- ===== Modal Editar Grupo ===== -->
 <ModalParam
   v-if="showModal && modalType === 'grupo'"
-  title="Editar Grupo"
-  submitText="Guardar cambios"
+  :title="t('parameters.editGroup')"
+  :submitText="t('modal.save')"
   @close="closeModal"
   @submit="editarGrupo"
 >
   <ModalParam
   v-if="showModal && modalType === 'grupo'"
-  title="Editar Grupo"
-  submitText="Guardar cambios"
+  :title="t('parameters.editGroup')"
+  :submitText="t('modal.save')"
   @close="closeModal"
   @submit="editarGrupo"
 >
   <div class="form-group">
-    <label>Nombre del Grupo</label>
+    <label>{{ t('table.name') }}</label>
     <input v-model="grupoEditando.nombre" />
   </div>
 
   <div class="form-group">
-    <label>Alumnos asignados</label>
+    <label>{{ t('parameters.assignedUsers') }}</label>
 
     <div v-if="usuariosAsignadosGrupo.length === 0" class="empty">
-      No hay alumnos asignados
+      {{ t('parameters.groupUsers') }}
     </div>
 
     <div
@@ -307,7 +307,7 @@
         class="btn-danger"
         @click="quitarUsuarioDelGrupo(u.id)"
       >
-        Quitar
+        {{ t('parameters.removeUser') }}
       </button>
     </div>
   </div>
@@ -318,8 +318,8 @@
 <!-- ===== Modal Eliminar Grupo ===== -->
 <ModalConfirm
   v-if="showModal && modalType === 'delete-grupo'"
-  title="Eliminar Grupo"
-  message="¿Deseas eliminar este grupo?"
+  :title="t('parameters.deleteGroup')"
+  :message="t('modal.deleteConfirm', { name: grupoEditando?.nombre })"
   @close="closeModal"
   @confirm="eliminarGrupo"
 />
@@ -327,26 +327,26 @@
 <!-- ===== Modal Editar Turno ===== -->
 <ModalParam
   v-if="showModal && modalType === 'turno'"
-  title="Editar Turno"
-  submitText="Guardar cambios"
+  :title="t('parameters.editShift')"
+  :submitText="t('modal.save')"
   @close="closeModal"
   @submit="editarTurno"
 >
   <div class="form-group">
-    <label>Usuario</label>
+    <label>{{ t('parameters.username') }}</label>
     <input v-model="turnoEditando.usuario" disabled />
   </div>
 
   <div class="form-group">
-    <label>Tipo de Turno</label>
+    <label>{{ t('parameters.shiftType') }}</label>
     <select v-model="turnoEditando.tipo">
-      <option value="A">Mesa</option>
-      <option value="M">Cortando Pelo</option>
+      <option value="A">{{ t('parameters.table') }}</option>
+      <option value="M">{{ t('parameters.haircut') }}</option>
     </select>
   </div>
 
   <div class="form-group">
-    <label>Fecha</label>
+    <label>{{ t('parameters.date') }}</label>
     <input type="date" v-model="turnoEditando.fecha" />
   </div>
 </ModalParam>
@@ -354,16 +354,16 @@
 <!-- ===== Modal Eliminar Turno ===== -->
 <ModalConfirm
   v-if="showModal && modalType === 'delete-turno'"
-  title="Eliminar Turno"
-  message="¿Deseas eliminar este turno?"
+  :title="t('parameters.deleteShift')"
+  :message="t('modal.deleteConfirm', { name: turnoEditando?.usuario })"
   @close="closeModal"
   @confirm="eliminarTurno"
 />
 
 <ModalParam
   v-if="showModalInfo"
-  title="Confirmar Turno"
-  :submitText="'Aceptar'"
+  :title="t('parameters.selectGroup')"
+  :submitText="t('modal.save')"
   @close="showModalInfo = false"
   @submit="confirmarTurno"
 >
@@ -372,35 +372,38 @@
 
 <ModalConfirm
   v-if="showModal && modalType === 'confirm-usuario'"
-  title="Crear Usuario"
-  message="¿Deseas crear este usuario?"
+  :title="t('parameters.createUser')"
+  :message="t('modal.deleteConfirm', { name: usuarioEditando?.username })"
   @close="closeModal"
   @confirm="confirmarCrearUsuario"
 />
 
 <ModalConfirm
   v-if="showModal && modalType === 'confirm-grupo'"
-  title="Crear Grupo"
-  message="¿Deseas crear este grupo?"
+  :title="t('parameters.createGroup')"
+  :message="t('modal.deleteConfirm', { name: grupoEditando?.nombre })"
   @close="closeModal"
   @confirm="confirmarCrearGrupo"
 />
 
 <ModalParam
   v-if="showModal && modalType === 'info-asignacion'"
-  title="Usuarios asignados"
-  submitText="Aceptar"
+  :title="t('parameters.assignedUsers')"
+  :submitText="t('modal.save')"
   @submit="closeModal"
 >
-  <p>Usuarios asignados correctamente al grupo.</p>
+  <p>{{ t('parameters.successAssign') }}</p>
 </ModalParam>
 
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import ModalParam from '@/components/ModalParam.vue'
 import ModalConfirm from '@/components/ModalConfirmParam.vue'
+
+const { t } = useI18n()
 
 /* ===== Estado general ===== */
 const activeTab = ref('usuarios')
@@ -621,7 +624,7 @@ const eliminarTurno = () => {
 }
 
 const buscarTurno = ref('')
-const filtroMes = ref('') // formato YYYY-MM
+const filtroMes = ref('') 
 
 const turnosFiltrados = computed(() => {
   return turnos.value.filter(t => {
@@ -634,7 +637,7 @@ const turnosFiltrados = computed(() => {
 
     // Filtro por mes
     if (filtroMes.value) {
-      const turnoMes = t.fecha.slice(0, 7) // YYYY-MM
+      const turnoMes = t.fecha.slice(0, 7) 
       coincide = coincide && turnoMes === filtroMes.value
     }
 
@@ -708,7 +711,7 @@ h1 {
   transition: background-color 0.3s;
 }
 
-/* Botón principal (mismo que submit) */
+/* Botón principal  */
 .btn-primary {
   padding: 0.6rem 1.2rem;
   background-color: #164e63;
@@ -723,7 +726,7 @@ h1 {
   background-color: #0f3b4d;
 }
 
-/* Botón peligro (eliminar) */
+/* Botón eliminar */
 .btn-danger {
   padding: 0.6rem 1.2rem;
   background-color: #d32f2f;
@@ -738,7 +741,7 @@ h1 {
   background-color: #b71c1c;
 }
 
-/* Ajuste visual dentro de la fila */
+
 .actions {
   display: flex;
   gap: 0.5rem;
@@ -801,7 +804,6 @@ button[type="submit"]:hover {
 .password-wrapper input {
   width: 100%;
   padding: 0.6rem 2.5rem 0.6rem 0.6rem;
-  /* espacio para el ojo a la derecha */
   border-radius: 6px;
   border: 1px solid #ccc;
   box-sizing: border-box;

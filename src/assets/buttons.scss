@@ -1,0 +1,90 @@
+@use './variables' as *;
+
+// ============================================
+// BOTONES
+// ============================================
+
+// Botones principales 
+.btn-primary,
+.editar-btn,
+.guardar-btn {
+  background-color: $color-teal;
+  color: black;
+  border: none;
+  border-radius: $border-radius;
+  padding: 10px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s;
+
+  &:hover:not(:disabled) {
+    background-color: $color-teal-dark;
+  }
+
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+}
+
+// Botones añadir
+.btn-add,
+.btn-agregar {
+  background-color: $color-teal-light;
+  color: black;
+  border: none;
+  border-radius: $border-radius-lg;
+  padding: 10px 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+// Botones borrar
+.btn-delete,
+.btn-eliminar,
+.eliminar-btn {
+  background-color: $color-eliminar;
+  color: white;
+  border: none;
+  border-radius: $border-radius;
+  padding: 10px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: $color-eliminar-hover;
+  }
+}
+
+// Botones cancelar
+.btn-cancel,
+.cerrar-btn-secondary {
+  background-color: $color-cancelar;
+  color: white;
+  border: none;
+  border-radius: $border-radius;
+  padding: 10px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: $color-cancelar-hover;
+  }
+}
+
+// Botón cerrar
+.cerrar-btn {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  border: none;
+  background: transparent;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+}

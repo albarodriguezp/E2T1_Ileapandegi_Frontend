@@ -1,33 +1,33 @@
 <template>
   <div class="content">
     <div class="content2">
-      <h1>Hola {{ capitalizar(nombre) }}, estas son tus citas!</h1>
+      <h1>{{ t('home.greeting', { name: capitalizar(nombre) }) }}</h1>
 
       <div class="dashboard d-flex justify-content-center gap-5">
         <div class="miniContenedor">
-          <p>Total citas:</p>
+          <p>{{ t('home.totalAppointments') }}</p>
           <p class="number">{{ citasDelUsuario.length }}</p>
         </div>
         <div class="miniContenedor">
-          <p>Citas de hoy:</p>
+          <p>{{ t('home.today') }}:</p>
           <p class="number">{{ citasDeHoy.length }}</p>
         </div>
         <div class="miniContenedor">
-          <p>Completadas:</p>
+          <p>{{ t('home.completed') }}:</p>
           <p class="number">{{ citasCompletadas.length }}</p>
         </div>
       </div>
       <div class="proximasCitas">
-          <p>Próximas citas:</p>
+          <p>{{ t('home.nextAppointments') }}:</p>
 
           <div v-if="cargando" class="loading">
-            Cargando citas...
+            {{ t('home.loading') }}
           </div>
           <div v-else-if="error" class="error">
             {{ error }}
           </div>
           <div v-else-if="proximasCitas.length === 0" class="sin-citas">
-            No hay citas próximas
+            {{ t('home.noNext') }}
           </div>
           <div v-for="cita in proximasCitas.slice(0, 5)" :key="cita.id" class="cita" @click="abrirVerCita(cita.id)">
             <div class="headerCita d-flex justify-content-between">
@@ -36,10 +36,10 @@
             </div>
             <div class="bodyCita mt-2">
               <p v-if="cita.servicios && cita.servicios.length > 0">
-                <strong>Servicios:</strong> {{ cita.servicios.map(s => s.name).join(', ') }}
+                <strong>{{ t('appointments.services') }}:</strong> {{ cita.servicios.map(s => s.name).join(', ') }}
               </p>
               <p v-if="cita.comments">
-                <strong>Notas:</strong> {{ cita.comments }}
+                <strong>{{ t('home.notes') }}:</strong> {{ cita.comments }}
               </p>
             </div>
           </div>
@@ -69,8 +69,8 @@
     <!-- Modal Confirmación Eliminar -->
     <ModalConfirmParam
       v-if="mostrarConfirmEliminar"
-      title="Eliminar Cita"
-      message="¿Estás seguro de que quieres eliminar esta cita? Esta acción no se puede deshacer."
+      :title="t('appointments.deleteConfirm')"
+      :message="t('appointments.deleteConfirmMsg')"
       @confirm="confirmarEliminar"
       @close="cancelarEliminar"
     />
@@ -79,11 +79,15 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import ModalVerCita from '@/components/ModalVerCita.vue'
 import ModalNuevaCita from '@/components/ModalNuevaCita.vue'
 import ModalConfirmParam from '@/components/ModalConfirmParam.vue'
+import { getAppointmentsByUser, getAppointments, deleteAppointment, getProfile } from '@/services/api'
 
-const nombre = localStorage.getItem('name')
+const { t } = useI18n()
+
+let nombre = ref(localStorage.getItem('name') || '')
 const citas = ref([])
 const cargando = ref(false)
 const error = ref(null)
@@ -156,37 +160,15 @@ const obtenerCitasPorUsuario = async () => {
   cargando.value = true
   error.value = null
 
-  const token = localStorage.getItem('token')
   const idUsuario = localStorage.getItem('user_id')
 
   try {
-    let res = await fetch(
-      `http://localhost:8000/api/appointments?user_id=${idUsuario}`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      }
-    )
-
-    if (!res.ok) {
-      res = await fetch(
-        'http://localhost:8000/api/appointments',
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        }
-      )
+    let data = []
+    try {
+      data = await getAppointmentsByUser(idUsuario)
+    } catch {
+      data = await getAppointments()
     }
-
-    if (!res.ok) {
-      throw new Error(`Error al obtener citas`)
-    }
-
-    const data = await res.json()
 
     citas.value = Array.isArray(data) ? data.map(c => ({
       id: c.id,
@@ -242,20 +224,8 @@ function handleSolicitarEliminar(citaId) {
 }
 
 async function confirmarEliminar() {
-  const token = localStorage.getItem('token')
-  
   try {
-    const res = await fetch(`http://localhost:8000/api/appointments/${citaIdAEliminar.value}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
-    })
-
-    if (!res.ok) {
-      throw new Error('Error al eliminar la cita')
-    }
+    await deleteAppointment(citaIdAEliminar.value)
 
     // Cerrar modal de confirmación
     mostrarConfirmEliminar.value = false
@@ -273,7 +243,19 @@ function cancelarEliminar() {
   citaIdAEliminar.value = null
 }
 
-onMounted(() => {
+// Cargar datos del perfil 
+onMounted(async () => {
+  
+  try {
+    const dataPerfil = await getProfile()
+    localStorage.setItem('name', dataPerfil.name)
+    localStorage.setItem('user_id', dataPerfil.id)
+    nombre.value = dataPerfil.name
+  } catch (err) {
+    console.error('Error al cargar perfil:', err)
+  }
+  
+
   obtenerCitasPorUsuario()
 })
 </script>

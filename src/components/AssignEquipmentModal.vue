@@ -2,25 +2,25 @@
   <div class="modal-overlay">
     <div class="modal">
       <h2>
-        {{ item.is_occupied ? 'Finalizar uso' : 'Asignar equipamiento' }}
+        {{ item.is_occupied ? t('inventory.finishUsage') : t('inventory.assign') }}
       </h2>
 
       <p v-if="!item.is_occupied">
-        Asignando: <strong>{{ item.name }}</strong>
+        {{ t('inventory.assign') }}: <strong>{{ item.name }}</strong>
       </p>
 
       <p v-else>
-        Finalizando uso del equipamiento:
+        {{ t('inventory.finishUsage') }}:
         <strong>{{ item.name }}</strong><br />
-        Responsable actual:
+        {{ t('appointments.responsible') }}:
         <strong>{{ item.assigned_to }}</strong>
       </p>
 
       <!-- Selector de alumno con búsqueda -->
       <div v-if="!item.is_occupied" class="form-group">
-        <label>Alumno responsable</label>
+        <label>{{ t('appointments.student') }}</label>
 
-        <input type="text" v-model="search" placeholder="Buscar alumno..." />
+        <input type="text" v-model="search" :placeholder="t('appointments.selectStudent')" />
 
         <ul v-if="filteredStudents.length" class="dropdown">
           <li v-for="student in filteredStudents" :key="student.id" @click="selectStudent(student)">
@@ -31,17 +31,17 @@
 
 
         <p v-if="search && !filteredStudents.length" class="no-results">
-          No se encontraron alumnos
+          {{ t('inventory.noResults') }}
         </p>
       </div>
 
       <div class="modal-actions">
         <button class="btn-cancel" @click="$emit('close')">
-          Cancelar
+          {{ t('modal.cancel') }}
         </button>
 
         <button class="btn-confirm" @click="confirmAction">
-          {{ item.is_occupied ? 'Finalizar uso' : 'Asignar' }}
+          {{ item.is_occupied ? t('inventory.finishUsage') : t('inventory.assign') }}
         </button>
       </div>
     </div>
@@ -50,20 +50,19 @@
   <!-- MODAL CONFIRMAR FINALIZACIÓN -->
 <div v-if="showConfirmFinish" class="modal-overlay">
   <div class="modal confirm-modal">
-    <h3>¿Finalizar uso?</h3>
+    <h3>{{ t('modal.deleteConfirm', { name: item.name }) }}</h3>
 
     <p>
-      ¿Estás seguro de que deseas finalizar el uso del equipamiento
-      <strong>{{ item.name }}</strong>?
+      {{ t('inventory.finishUsageConfirm', { name: item.name }) }}
     </p>
 
     <div class="modal-actions">
       <button class="btn-cancel" @click="cancelFinish">
-        Cancelar
+        {{ t('modal.cancel') }}
       </button>
 
       <button class="btn-danger" @click="confirmFinish">
-        Sí, finalizar
+        {{ t('inventory.finishUsage') }}
       </button>
     </div>
   </div>
@@ -73,6 +72,10 @@
 
 <script setup>
 import { ref, watch, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { getStudents } from '@/services/api'
+
+const { t } = useI18n()
 
 const props = defineProps({
   item: {
@@ -88,8 +91,6 @@ const selectedStudent = ref(null)
 const students = ref([])
 const showConfirmFinish = ref(false)
 
-const token = localStorage.getItem('token')
-
 // Reset cuando cambia el item
 watch(() => props.item, () => {
   search.value = ''
@@ -100,15 +101,7 @@ watch(() => props.item, () => {
 // Traer alumnos
 onMounted(async () => {
   try {
-    const res = await fetch('http://localhost:8000/api/students', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/json'
-      }
-    })
-
-    const response = await res.json()
-
+    const response = await getStudents()
     if (response.success && Array.isArray(response.data)) {
       students.value = response.data.map(s => ({
         id: s.id,

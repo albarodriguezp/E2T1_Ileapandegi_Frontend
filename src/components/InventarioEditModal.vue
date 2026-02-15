@@ -1,72 +1,67 @@
 <template>
   <div class="modal-overlay" @click.self="emit('close')">
     <div class="modal edit-modal">
-      <h2>Editar Inventario</h2>
+      <h2>{{ t('inventory.edit') }} {{ t('inventory.material') }}</h2>
       <form @submit.prevent="submit">
-        <label>Nombre</label>
+        <label>{{ t('table.name') }}</label>
         <input v-model="local.name" required />
 
-        <label>Lote</label>
+        <label>{{ t('inventory.batch') }}</label>
         <input v-model="local.batch" />
 
-        <label>Marca</label>
+        <label>{{ t('inventory.brand') }}</label>
         <input v-model="local.brand" />
 
-        <label>Stock</label>
+        <label>{{ t('inventory.quantity') }}</label>
         <input type="number" v-model.number="local.stock" required />
 
-        <label>Stock mínimo</label>
+        <label>{{ t('inventory.minStock') }}</label>
         <input type="number" v-model.number="local.min_stock" required />
 
-        <label>Categoría</label>
+        <label>{{ t('inventory.category') }}</label>
         <select v-model="local.category_id" required>
-          <option disabled value="">Seleccione una categoría</option>
+          <option disabled value="">{{ t('appointments.selectClient') }}</option>
           <option v-for="category in categories" :key="category.id" :value="category.id">
             {{ category.name }}
           </option>
         </select>
 
 
-        <label>Fecha caducidad</label>
+        <label>{{ t('inventory.expirationDate') }}</label>
         <input type="date" v-model="local.expiration_date" />
 
-        <label>Descripción</label>
+        <label>{{ t('inventory.description') }}</label>
         <textarea v-model="local.description" />
 
         <div class="actions">
-          <button type="submit">Guardar</button>
-          <button type="button" @click="emit('close')">Cancelar</button>
+          <button type="submit">{{ t('modal.save') }}</button>
+          <button type="button" @click="emit('close')">{{ t('modal.cancel') }}</button>
         </div>
       </form>
     </div>
   </div>
 </template>
 
-<script setup>import { reactive, watch, ref, onMounted } from 'vue'
+<script setup>
+import { reactive, watch, ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { getCategories } from '@/services/api'
 
+const { t } = useI18n()
 const props = defineProps({ item: Object })
 const emit = defineEmits(['close', 'submit'])
 
 const local = reactive({})
 const categories = ref([])
 
-const token = localStorage.getItem('token')
-
 const fetchCategories = async () => {
-  const res = await fetch('http://localhost:8000/api/categorys', {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    }
-  })
-  categories.value = await res.json()
+  categories.value = await getCategories()
 }
 
 watch(
   () => props.item,
   val => {
     Object.assign(local, val)
-    // ⚠️ Si viene category como objeto, asegurar category_id
     if (val?.category?.id) {
       local.category_id = val.category.id
     }
@@ -85,9 +80,7 @@ const submit = () => emit('submit', local)
 .modal-overlay {
   position: fixed;
   inset: 0;
-  /* top:0; right:0; bottom:0; left:0 */
   background: rgba(0, 0, 0, 0.5);
-  /* fondo semi-transparente */
   display: flex;
   align-items: center;
   justify-content: center;

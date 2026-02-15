@@ -1,15 +1,15 @@
 <template>
   <div class="modal-overlay">
     <div class="modal">
-      <h3>¿Eliminar equipamiento?</h3>
+      <h3>{{ t('modal.deleteConfirm', { name: item.name }) }}</h3>
       <p><strong>{{ item.name }}</strong></p>
 
       <div class="actions">
         <button class="btn-delete" @click="$emit('confirm')">
-          Eliminar
+          {{ t('inventory.delete') }}
         </button>
         <button class="btn-edit" @click="$emit('close')">
-          Cancelar
+          {{ t('modal.cancel') }}
         </button>
       </div>
     </div>
@@ -17,6 +17,9 @@
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 defineProps({ item: Object })
 </script>
 <style scoped>

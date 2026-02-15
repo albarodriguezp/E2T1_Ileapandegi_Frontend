@@ -1,4 +1,8 @@
 @import './base.css';
+@import './buttons.scss';
+@import './modals.scss';
+@import './forms.scss';
+@import './tables.scss';
 
 #app {
   width: 100%;
@@ -38,21 +42,15 @@ a,
   }
 }
 
-/* =====================
-   TABLET (≥ 768px)
-   ===================== */
+
 @media (min-width: 768px) {
   #app {
-    /*padding: 1.5rem;QUITADO PARA QUE NO HAYA TANTO MARGEN*/
   }
 }
 
-/* =====================
-   DESKTOP (≥ 1024px)
-   ===================== */
+
 @media (min-width: 1024px) {
   #app {
-    /*padding: 2rem; QUITADO PARA QUE NO HAYA TANTO MARGEN*/
   }
 
   body {

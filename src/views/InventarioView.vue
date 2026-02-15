@@ -2,16 +2,16 @@
   <div class="content">
     <div class="content2">
 
-      <h1>Gestión de Inventario</h1>
+      <h1>{{ t('inventory.title') }}</h1>
 
       <!-- Tabs -->
       <div class="tabs">
         <button :class="{ active: activeTab === 'material' }" @click="activeTab = 'material'">
-          Material
+          {{ t('inventory.material') }}
         </button>
 
         <button :class="{ active: activeTab === 'equipamientos' }" @click="activeTab = 'equipamientos'">
-          Equipamientos
+          {{ t('inventory.equipment') }}
         </button>
       </div>
 
@@ -19,22 +19,22 @@
         <!-- Header -->
         <div class="header">
           <h1>
-            {{ materialView === 'items' ? 'Material' : 'Categorías de Material' }}
+            {{ materialView === 'items' ? t('inventory.material') : t('inventory.materialCategories') }}
           </h1>
 
           <div style="display:flex; gap:0.5rem">
             <button v-if="materialView === 'items'" class="btn-add" @click="openModal('add')">
-              + Agregar material
+              {{ t('inventory.addMaterial') }}
             </button>
 
             <button v-if="materialView === 'items'" class="btn-add" style="background:#455a64"
               @click="materialView = 'categories'">
-              📂 Gestionar categorías
+              📂 {{ t('inventory.manageCategories') }}
             </button>
 
             <button v-if="materialView === 'categories'" class="btn-add" style="background:#455a64"
               @click="materialView = 'items'">
-              ← Volver a materiales
+              {{ t('inventory.backToMaterials') }}
             </button>
           </div>
         </div>
@@ -42,20 +42,20 @@
         <div v-if="materialView === 'items'">
 
           <!-- Buscador -->
-          <input v-model="search" type="text" placeholder="Buscar por nombre, lote o marca..." class="search-input" />
+          <input v-model="search" type="text" :placeholder="t('inventory.searchMaterial')" class="search-input" />
 
           <!-- Tabla -->
           <table class="inventario-table">
             <thead>
               <tr>
-                <th>Lote</th>
-                <th>Nombre</th>
-                <th>Cantidad</th>
-                <th>Categoría</th>
-                <th>Marca</th>
-                <th>Fecha cad</th>
-                <th>Descripción</th>
-                <th>Acciones</th>
+                <th>{{ t('inventory.batch') }}</th>
+                <th>{{ t('inventory.name') }}</th>
+                <th>{{ t('inventory.quantity') }}</th>
+                <th>{{ t('inventory.category') }}</th>
+                <th>{{ t('inventory.brand') }}</th>
+                <th>{{ t('inventory.expirationDate') }}</th>
+                <th>{{ t('inventory.description') }}</th>
+                <th>{{ t('table.actions') }}</th>
               </tr>
             </thead>
 
@@ -69,13 +69,17 @@
                 <td>{{ formatDate(item.expiration_date) }}</td>
                 <td class="description">{{ item.description }}</td>
                 <td class="actions">
-                  <button class="btn-edit" @click="openModal('edit', item)">✏️</button>
-                  <button class="btn-delete" @click="openModal('delete', item)">🗑️</button>
+                  <button class="btn-tabla-edit" @click="openModal('edit', item)">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button class="btn-tabla-delete" @click="openModal('delete', item)">
+                    <i class="bi bi-trash"></i>
+                  </button>
                 </td>
               </tr>
 
               <tr v-if="paginatedData.length === 0">
-                <td colspan="8" class="empty">No hay resultados</td>
+                <td colspan="8" class="empty">{{ t('inventory.noResults') }}</td>
               </tr>
             </tbody>
           </table>
@@ -83,7 +87,7 @@
           <!-- Paginación -->
           <div class="pagination">
             <button @click="prevPage" :disabled="currentPage === 1">«</button>
-            <span>Página {{ currentPage }} de {{ totalPages }}</span>
+            <span>{{ t('inventory.page') }} {{ currentPage }} {{ t('inventory.of') }} {{ totalPages }}</span>
             <button @click="nextPage" :disabled="currentPage === totalPages">»</button>
           </div>
 
@@ -91,17 +95,17 @@
 
         <div v-if="materialView === 'categories'">
           <button class="btn-add" @click="openCategoryModal('add')">
-            + Agregar categoría
+            {{ t('inventory.addCategory') }}
           </button>
 
-          <input v-model="categorySearch" type="text" placeholder="Buscar categoría..." class="search-input" />
+          <input v-model="categorySearch" type="text" :placeholder="t('inventory.searchCategory')" class="search-input" />
 
           <table class="inventario-table">
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Acciones</th>
+                <th>{{ t('table.id') }}</th>
+                <th>{{ t('table.name') }}</th>
+                <th>{{ t('table.actions') }}</th>
               </tr>
             </thead>
 
@@ -110,13 +114,17 @@
                 <td>{{ cat.id }}</td>
                 <td>{{ cat.name }}</td>
                 <td class="actions">
-                  <button class="btn-edit" @click="openCategoryModal('edit', cat)">✏️</button>
-                  <button class="btn-delete" @click="openCategoryModal('delete', cat)">🗑️</button>
+                  <button class="btn-tabla-edit" @click="openCategoryModal('edit', cat)">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button class="btn-tabla-delete" @click="openCategoryModal('delete', cat)">
+                    <i class="bi bi-trash"></i>
+                  </button>
                 </td>
               </tr>
 
               <tr v-if="filteredCategories.length === 0">
-                <td colspan="3" class="empty">No hay categorías</td>
+                <td colspan="3" class="empty">{{ t('inventory.noCategories') }}</td>
               </tr>
             </tbody>
           </table>
@@ -127,36 +135,33 @@
 
 
       <!-- ===== EQUIPAMIENTOS ===== -->
-      <!-- ===== EQUIPAMIENTOS ===== -->
       <div v-if="activeTab === 'equipamientos'">
 
         <div class="header">
-          <h1>Equipamientos</h1>
+          <h1>{{ t('inventory.equipment') }}</h1>
           <button class="btn-add" @click="openEquipmentModal('add')">
-            + Agregar equipamiento
+            {{ t('inventory.addEquipment') }}
           </button>
         </div>
 
         <!-- Selector sub-tabs para Equipamientos -->
         <div class="equipment-subtabs">
-          <button :class="{ active: equipmentView === 'lista' }" @click="equipmentView = 'lista'">Lista
-            Completa</button>
-          <button :class="{ active: equipmentView === 'gestion' }" @click="equipmentView = 'gestion'">Gestión de
-            Equipamientos</button>
+          <button :class="{ active: equipmentView === 'lista' }" @click="equipmentView = 'lista'">{{ t('inventory.completeList') }}</button>
+          <button :class="{ active: equipmentView === 'gestion' }" @click="equipmentView = 'gestion'">{{ t('inventory.equipmentManagement') }}</button>
         </div>
 
         <!-- Vista Gestión con dos columnas -->
         <div v-if="equipmentView === 'gestion'" class="equipment-columns">
           <!-- Equipamientos disponibles -->
           <div class="column">
-            <h2>Disponibles</h2>
+            <h2>{{ t('inventory.available') }}</h2>
             <table class="inventario-table">
               <thead>
                 <tr>
-                  <th>Nombre</th>
-                  <th>Marca</th>
-                  <th>Etiqueta</th>
-                  <th>Acciones</th>
+                  <th>{{ t('table.name') }}</th>
+                  <th>{{ t('inventory.brand') }}</th>
+                  <th>{{ t('inventory.label') }}</th>
+                  <th>{{ t('table.actions') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -165,13 +170,13 @@
                   <td>{{ item.brand }}</td>
                   <td>{{ item.label }}</td>
                   <td class="actions">
-                    <button class="btn-assign" @click="assignEquipment(item)">
-                      Asignar
+                    <button class="btn-tabla-assign" @click="assignEquipment(item)">
+                      <i class="bi bi-person-plus"></i>
                     </button>
                   </td>
                 </tr>
                 <tr v-if="availableEquipments.length === 0">
-                  <td colspan="4" class="empty">No hay equipamientos disponibles</td>
+                  <td colspan="4" class="empty">{{ t('inventory.noAvailableEquipments') }}</td>
                 </tr>
               </tbody>
             </table>
@@ -179,15 +184,15 @@
 
           <!-- Equipamientos ocupados -->
           <div class="column">
-            <h2>Ocupados</h2>
+            <h2>{{ t('inventory.occupied') }}</h2>
             <table class="inventario-table">
               <thead>
                 <tr>
-                  <th>Nombre</th>
-                  <th>Marca</th>
-                  <th>Etiqueta</th>
-                  <th>Responsable</th>
-                  <th>Acciones</th>
+                  <th>{{ t('table.name') }}</th>
+                  <th>{{ t('inventory.brand') }}</th>
+                  <th>{{ t('inventory.label') }}</th>
+                  <th>{{ t('appointments.responsible') }}</th>
+                  <th>{{ t('table.actions') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -197,13 +202,13 @@
                   <td>{{ item.label }}</td>
                   <td>{{ item.responsible }}</td>
                   <td class="actions">
-                    <button class="btn-assign" @click="finishEquipmentUsage(item.student_equipment_id)">
-                      Finalizar uso
+                    <button class="btn-tabla-assign" @click="finishEquipmentUsage(item.student_equipment_id)" :title="t('inventory.finishUsage')">
+                      <i class="bi bi-check-circle"></i>
                     </button>
                   </td>
                 </tr>
                 <tr v-if="occupiedEquipments.length === 0">
-                  <td colspan="5" class="empty">No hay equipamientos ocupados</td>
+                  <td colspan="5" class="empty">{{ t('inventory.noOccupiedEquipments') }}</td>
                 </tr>
               </tbody>
             </table>
@@ -212,17 +217,17 @@
 
         <!-- Vista Lista Completa -->
         <div v-if="equipmentView === 'lista'">
-          <input v-model="equipmentSearch" type="text" placeholder="Buscar por código, nombre o responsable..."
+          <input v-model="equipmentSearch" type="text" :placeholder="t('inventory.searchEquipment')"
             class="search-input" />
 
           <table class="inventario-table">
             <thead>
               <tr>
-                <th>Nombre</th>
-                <th>Marca</th>
-                <th>Etiqueta</th>
-                <th>Descripción</th>
-                <th>Acciones</th>
+                <th>{{ t('table.name') }}</th>
+                <th>{{ t('inventory.brand') }}</th>
+                <th>{{ t('inventory.label') }}</th>
+                <th>{{ t('inventory.description') }}</th>
+                <th>{{ t('table.actions') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -232,19 +237,23 @@
                 <td>{{ item.label }}</td>
                 <td>{{ item.description }}</td>
                 <td class="actions">
-                  <button class="btn-edit" @click="openEquipmentModal('edit', item)">✏️</button>
-                  <button class="btn-delete" @click="openEquipmentModal('delete', item)">🗑️</button>
+                  <button class="btn-tabla-edit" @click="openEquipmentModal('edit', item)">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button class="btn-tabla-delete" @click="openEquipmentModal('delete', item)">
+                    <i class="bi bi-trash"></i>
+                  </button>
                 </td>
               </tr>
               <tr v-if="filteredEquipments.length === 0">
-                <td colspan="5" class="empty">No hay resultados</td>
+                <td colspan="5" class="empty">{{ t('inventory.noResults') }}</td>
               </tr>
             </tbody>
           </table>
 
           <div class="pagination">
             <button @click="equipmentPrevPage" :disabled="equipmentCurrentPage === 1">«</button>
-            <span>Página {{ equipmentCurrentPage }} de {{ equipmentTotalPages }}</span>
+            <span>{{ t('inventory.page') }} {{ equipmentCurrentPage }} {{ t('inventory.of') }} {{ equipmentTotalPages }}</span>
             <button @click="equipmentNextPage" :disabled="equipmentCurrentPage === equipmentTotalPages">»</button>
           </div>
         </div>
@@ -270,7 +279,7 @@
       @close="closeEquipmentModal" @submit="submitEquipment" />
 
     <EquipmentDeleteModal v-if="showEquipmentModal && equipmentModalType === 'delete'" :item="equipmentForm"
-      @close="closeEquipmentModal" @confirm="deleteEquipment" />
+      @close="closeEquipmentModal" @confirm="handleDeleteEquipment" />
 
     <CategoryAddModal v-if="showCategoryModal && categoryModalType === 'add'" @close="closeCategoryModal"
       @submit="submitCategory" />
@@ -279,7 +288,7 @@
       @close="closeCategoryModal" @submit="submitCategory" />
 
     <CategoryDeleteModal v-if="showCategoryModal && categoryModalType === 'delete'" :item="categoryForm"
-      @close="closeCategoryModal" @confirm="deleteCategory" />
+      @close="closeCategoryModal" @confirm="handleDeleteCategory" />
 
     <AssignEquipmentModal v-if="showAssignModal" :item="assignItem" @close="showAssignModal = false"
       @confirm="confirmAssignEquipment" />
@@ -289,9 +298,30 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import InventarioAddModal from '../components/InventarioAddModal.vue'
 import InventarioEditModal from '../components/InventarioEditModal.vue'
 import InventarioDeleteModal from '../components/InventarioDeleteModal.vue'
+import {
+  getConsumables,
+  createConsumable,
+  updateConsumable,
+  deleteConsumable,
+  getEquipments,
+  createEquipment,
+  updateEquipment,
+  deleteEquipment,
+  getStudentEquipmentsActive,
+  finishStudentEquipment,
+  assignStudentEquipment,
+  getCategories,
+  createCategory,
+  updateCategory,
+  deleteCategory
+} from '@/services/api'
+
+const { t } = useI18n()
+
 /* ===== Variables ===== */
 const inventario = ref([])
 const search = ref('')
@@ -305,8 +335,6 @@ const form = ref({})
 
 
 /* ===== API ===== */
-const token = localStorage.getItem('token')
-const apiUrl = 'http://localhost:8000/api/consumables'
 
 /* ===== Tabs ===== */
 const activeTab = ref('material')
@@ -319,16 +347,9 @@ const equipmentForm = ref({})
 const equipmentModalType = ref('')
 const showEquipmentModal = ref(false)
 
-const equipmentApiUrl = 'http://localhost:8000/api/equipments'
 
 const fetchEquipments = async () => {
-  const res = await fetch(equipmentApiUrl, {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    }
-  })
-  equipments.value = await res.json()
+  equipments.value = await getEquipments()
 }
 
 const filteredEquipments = computed(() =>
@@ -353,18 +374,11 @@ const closeEquipmentModal = () => {
 
 
 const submitEquipment = async (data) => {
-  const method = equipmentModalType.value === 'add' ? 'POST' : 'PUT'
-  const url = equipmentModalType.value === 'add'
-    ? equipmentApiUrl
-    : `${equipmentApiUrl}/${data.id}`
-  await fetch(url, {
-    method,
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data)
-  })
+  if (equipmentModalType.value === 'add') {
+    await createEquipment(data)
+  } else {
+    await updateEquipment(data.id, data)
+  }
 
   await fetchEquipments()
   closeEquipmentModal()
@@ -402,9 +416,9 @@ import EquipmentEditModal from '../components/EquipmentEditModal.vue'
 import EquipmentDeleteModal from '../components/EquipmentDeleteModal.vue'
 
 
-const equipmentView = ref('lista') // o 'gestion', según la vista inicial que quieras
+const equipmentView = ref('lista') 
 
-// Equipamientos disponibles = equipments sin student_equipment activo
+// Equipamientos disponibles
 const availableEquipments = computed(() =>
   equipments.value.filter(e =>
     !studentEquipments.value.some(se => se.equipment_id === e.id)
@@ -426,10 +440,7 @@ const occupiedEquipments = computed(() =>
 
 const finishEquipmentUsage = async (occupiedItemId) => {
   console.log("Se finalizaaa" + occupiedItemId);
-  await fetch(`http://localhost:8000/api/student_equipments/${occupiedItemId}/finish`, {
-    method: 'PUT',
-    headers: { 'Authorization': `Bearer ${token}` }
-  })
+  await finishStudentEquipment(occupiedItemId)
 
   await fetchAllEquipments()
 }
@@ -442,13 +453,7 @@ watch(activeTab, (tab) => {
 const studentEquipments = ref([])
 
 const fetchStudentEquipmentsActive = async () => {
-  const res = await fetch('http://localhost:8000/api/student_equipments-active', {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    }
-  })
-  studentEquipments.value = await res.json()
+  studentEquipments.value = await getStudentEquipmentsActive()
 }
 
 
@@ -466,52 +471,30 @@ const assignEquipment = (item) => {
 }
 
 const confirmAssignEquipment = async (payload) => {
-  const token = localStorage.getItem('token')
-
   if (!payload.student_id) {
     // Finalizar uso
-    await fetch(`http://localhost:8000/api/student_equipments/${payload.id}/finish`, { method: 'PUT', headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } })
+    await finishStudentEquipment(payload.id)
   } else {
     // Asignar equipamiento
-    await fetch('http://localhost:8000/api/student_equipments', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-        student_id: payload.student_id,
-        equipment_id: payload.id,
-        start_datetime: new Date().toISOString().slice(0, 19).replace('T', ' ')
-      })
-
+    await assignStudentEquipment({
+      student_id: payload.student_id,
+      equipment_id: payload.id,
+      start_datetime: new Date().toISOString().slice(0, 19).replace('T', ' ')
     })
   }
   await fetchAllEquipments()
 }
 
 
-const deleteEquipment = async () => {
-  await fetch(`${equipmentApiUrl}/${equipmentForm.value.id}`, {
-    method: 'DELETE',
-    headers: {
-      'Authorization': `Bearer ${token}`
-    }
-  })
+const handleDeleteEquipment = async () => {
+  await deleteEquipment(equipmentForm.value.id)
 
   await fetchEquipments()
   closeEquipmentModal()
 }
 
 const fetchInventario = async () => {
-  const res = await fetch(apiUrl, {
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    }
-  })
-  inventario.value = await res.json()
+  inventario.value = await getConsumables()
 }
 
 /* ===== Buscar ===== */
@@ -545,14 +528,14 @@ const formatDate = (date) => date ? new Date(date).toLocaleDateString('es-ES') :
 /* ===== MODAL ===== */
 const openModal = (type, item = {}) => {
   modalType.value = type
-  form.value = { ...item } // clonar el objeto para no mutar el original
+  form.value = { ...item } 
   showModal.value = true
 }
 
 
 const closeModal = () => {
   showModal.value = false
-  modalType.value = ''   // esto es lo que realmente desmonta el modal
+  modalType.value = ''   
 }
 
 /* ===== CRUD ===== */
@@ -564,14 +547,11 @@ const submitForm = async (data) => {
     ? apiUrl
     : `${apiUrl}/${form.value.id}`
 
-  await fetch(url, {
-    method,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`
-    },
-    body: JSON.stringify(form.value)
-  })
+  if (modalType.value === 'add') {
+    await createConsumable(form.value)
+  } else {
+    await updateConsumable(form.value.id, form.value)
+  }
 
   await fetchInventario()
   closeModal()
@@ -580,12 +560,7 @@ const submitForm = async (data) => {
 
 const deleteItem = async () => {
   try {
-    const res = await fetch(`${apiUrl}/${form.value.id}`, {
-      method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
-
-    if (!res.ok) throw new Error('Error al eliminar')
+    await deleteConsumable(form.value.id)
     await fetchInventario()
     closeModal()
   } catch (error) {
@@ -609,16 +584,9 @@ const showCategoryModal = ref(false)
 const categoryModalType = ref('')
 const categoryForm = ref({})
 
-const categoryApiUrl = 'http://localhost:8000/api/categorys'
 
 const fetchCategories = async () => {
-  const res = await fetch(categoryApiUrl, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    }
-  })
-  categories.value = await res.json()
+  categories.value = await getCategories()
 }
 
 const filteredCategories = computed(() =>
@@ -642,31 +610,18 @@ const closeCategoryModal = () => {
   categoryModalType.value = ''
 }
 const submitCategory = async (data) => {
-  const method = categoryModalType.value === 'add' ? 'POST' : 'PUT'
-  const url = categoryModalType.value === 'add'
-    ? categoryApiUrl
-    : `${categoryApiUrl}/${data.id}`
-
-  await fetch(url, {
-    method,
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ name: data.name })
-  })
+  if (categoryModalType.value === 'add') {
+    await createCategory({ name: data.name })
+  } else {
+    await updateCategory(data.id, { name: data.name })
+  }
 
   await fetchCategories()
   closeCategoryModal()
 }
 
-const deleteCategory = async () => {
-  await fetch(`${categoryApiUrl}/${categoryForm.value.id}`, {
-    method: 'DELETE',
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  })
+const handleDeleteCategory = async () => {
+  await deleteCategory(categoryForm.value.id)
 
   await fetchCategories()
   closeCategoryModal()
@@ -714,82 +669,6 @@ const openAssignModal = (item) => {
   padding: 0.6rem 1rem;
   border-radius: 8px;
   border: 1px solid #ccc;
-}
-
-/* Table */
-.inventario-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.inventario-table thead {
-  background: #164e63;
-  color: white;
-}
-
-.inventario-table th,
-.inventario-table td {
-  padding: 0.8rem;
-  font-size: 0.9rem;
-}
-
-.inventario-table tbody tr:nth-child(odd) {
-  background: #c7dadd;
-}
-
-.lowStock {
-  color: #c62828;
-  font-weight: 700;
-}
-
-.actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.btn-edit {
-  background: #1976d2;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 0.3rem 0.6rem;
-}
-
-.btn-delete {
-  background: #d32f2f;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 0.3rem 0.6rem;
-}
-
-/* Pagination */
-.pagination {
-  margin-top: 1rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-}
-
-.pagination button {
-  padding: 0.4rem 0.8rem;
-  border-radius: 6px;
-  border: none;
-  background: #164e63;
-  color: white;
-  cursor: pointer;
-}
-
-.pagination button:disabled {
-  background: #aaa;
-  cursor: not-allowed;
-}
-
-.empty {
-  text-align: center;
-  padding: 1rem;
-  font-style: italic;
 }
 
 /* ===== Responsive ===== */

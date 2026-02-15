@@ -2,73 +2,73 @@
   <div class="modal-backdrop" @click.self="cerrar">
     <div class="modal">
       <button class="cerrar-btn" @click="cerrar">X</button>
-      <h2>Ver Cita</h2>
+      <h2>{{ t('appointments.view') }}</h2>
 
-      <div v-if="cargando" class="loading">Cargando...</div>
+      <div v-if="cargando" class="loading">{{ t('appointments.loadingError') }}</div>
       <div v-else-if="error" class="error">
         <p>{{ error }}</p>
-        <button @click="cargarDetalle" class="retry-btn">Reintentar</button>
+        <button @click="cargarDetalle" class="retry-btn">{{ t('appointments.retry') }}</button>
       </div>
       <div v-else-if="citaDetalle && Object.keys(citaDetalle).length > 0">
         <div class="form-group">
-          <label>Cliente:</label>
+          <label>{{ t('appointments.client') }}:</label>
           <input type="text" :value="citaDetalle.client?.name + ' ' + (citaDetalle.client?.surnames || '')" readonly />
         </div>
 
         <div class="form-group">
-          <label>Estudiante:</label>
+          <label>{{ t('appointments.student') }}:</label>
           <input type="text" :value="citaDetalle.student?.name + ' ' + (citaDetalle.student?.surnames || '')" readonly />
         </div>
 
         <div class="form-group">
-          <label>Sillón:</label>
+          <label>{{ t('appointments.chair') }}:</label>
           <input type="text" :value="'Silla ' + citaDetalle.seat" readonly />
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label>Fecha:</label>
+            <label>{{ t('appointments.date') }}:</label>
             <input type="text" :value="citaDetalle.date" readonly />
           </div>
 
           <div class="form-group">
-            <label>Hora Inicio:</label>
+            <label>{{ t('appointments.startTime') }}:</label>
             <input type="text" :value="citaDetalle.start_time" readonly />
           </div>
 
           <div class="form-group">
-            <label>Hora Fin:</label>
+            <label>{{ t('appointments.endTime') }}:</label>
             <input type="text" :value="citaDetalle.end_time" readonly />
           </div>
         </div>
 
         <div class="form-group" v-if="citaDetalle.services && citaDetalle.services.length > 0">
-          <label>Servicios:</label>
+          <label>{{ t('appointments.services') }}:</label>
           <div class="servicios-lista-readonly">
             <div v-for="s in citaDetalle.services" :key="s.id" class="servicio-item-readonly">
-               {{ s.service?.name || 'Servicio' }} - {{ s.service?.duration || 0 }}min - {{ s.service?.price || 0 }}€
+               {{ s.service?.name || t('appointments.services') }} - {{ s.service?.duration || 0 }}min - {{ s.service?.price || 0 }}€
             </div>
           </div>
         </div>
 
         <div class="form-group precio-total-readonly">
-          <label>Precio Total:</label>
+          <label>{{ t('appointments.totalPrice') }}:</label>
           <input type="text" :value="precioTotal.toFixed(2) + '€'" readonly />
         </div>
 
         <div class="form-group">
-          <label>Comentarios:</label>
-          <textarea :value="citaDetalle.comments || 'Sin comentarios'" readonly rows="3"></textarea>
+          <label>{{ t('appointments.comments') }}:</label>
+          <textarea :value="citaDetalle.comments || t('modal.no_observations')" readonly rows="3"></textarea>
         </div>
 
         <div class="acciones">
-          <button class="eliminar-btn" @click="eliminar">Eliminar</button>
-          <button class="editar-btn" @click="editar">Editar</button>
-          <button class="cerrar-btn-secondary" @click="cerrar">Cerrar</button>
+          <button class="eliminar-btn" @click="eliminar">{{ t('appointments.delete') }}</button>
+          <button class="editar-btn" @click="editar">{{ t('appointments.edit') }}</button>
+          <button class="cerrar-btn-secondary" @click="cerrar">{{ t('modal.close') }}</button>
         </div>
       </div>
       <div v-else class="warning">
-        No se encontraron datos de la cita
+        {{ t('appointments.errorLoading') }}
       </div>
     </div>
   </div>
@@ -76,6 +76,10 @@
 
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { getAppointment } from '@/services/api'
+
+const { t } = useI18n()
 
 const props = defineProps({ 
   id: {
@@ -100,36 +104,20 @@ const precioTotal = computed(() => {
 
 async function cargarDetalle() {
   if (!props.id) {
-    error.value = 'ID no válido'
+    error.value = t('appointments.errorLoading')
     return
   }
 
   cargando.value = true
   error.value = null
 
-  const token = localStorage.getItem('token')
-
   try {
-    const url = `http://localhost:8000/api/appointments/${props.id}`
-
-    const res = await fetch(url, {
-      headers: { 
-        'Content-Type': 'application/json', 
-        'Authorization': `Bearer ${token}` 
-      }
-    })
-
-
-    if (!res.ok) {
-      throw new Error(`Error ${res.status}: ${res.statusText}`)
-    }
-
-    const data = await res.json()
+    const data = await getAppointment(props.id)
     citaDetalle.value = data
 
   } catch (e) {
 
-    error.value = e.message || 'Error al cargar la cita'
+    error.value = e.message || t('appointments.errorLoading')
   } finally {
     cargando.value = false
   }
@@ -310,55 +298,6 @@ input[readonly], textarea[readonly] {
   padding-top: 15px;
   border-top: 2px solid #ddd;
 }
-
-.editar-btn {
-  background-color: #82d8d8;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 16px;
-  color: white;
-  transition: background-color 0.2s;
-}
-
-.editar-btn:hover {
-  background-color: #6bc5c5;
-}
-
-.cerrar-btn-secondary {
-  background-color: #95a5a6;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 16px;
-  color: white;
-  transition: background-color 0.2s;
-}
-
-.cerrar-btn-secondary:hover {
-  background-color: #7f8c8d;
-}
-
-.eliminar-btn {
-  background-color: #e74c3c;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 16px;
-  color: white;
-  transition: background-color 0.2s;
-}
-
-.eliminar-btn:hover {
-  background-color: #c0392b;
-}
-
 
 @media (max-width: 700px) {
   .modal {

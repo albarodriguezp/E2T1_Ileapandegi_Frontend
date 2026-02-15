@@ -44,7 +44,7 @@
         </textarea>
       </div>
 
-      <button class="btn btn-info w-100 mt-2" @click="guardar">{{ t('modal.save') }}</button>
+      <button class="btn-add w-100 mt-2" @click="guardar">{{ t('modal.save') }}</button>
     </div>
   </div>
 </template>
@@ -137,33 +137,10 @@ const guardar = () => {
   
 }
 
-.btn-info {
-  margin-top: 10px;
-  background-color: #9CE0DB !important;
-  border: none;
-  border-radius: 8px;
-  padding: 8px 20px;
-  font-weight: 600;
-  cursor: pointer;
-  color: black;
-  box-shadow: none;
-  outline: none;
-  transition: none;
-}
 .avatar {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.btn-info:hover,
-.btn-info:focus,
-.btn-info:active {
-  background-color: #9CE0DB !important;
-  box-shadow: none !important;
-  outline: none !important;
-  color: black !important;
-  transition: none !important;
 }
 
 </style>

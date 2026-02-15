@@ -3,15 +3,15 @@
     <div class="content2">
       <div class="header">
         <button class="btn-volver" @click="router.push('/citas')">
-          ← Volver a Citas
+          {{ t('appointmentDetails.back') }}
         </button>
         <div class="navegacion-fecha">
           <button class="btn-nav" @click="cambiarDia(-1)">←</button>
-          <h1>Citas {{ diaReactivo }}/{{ mesReactivo + 1 }}/{{ anoReactivo }}</h1>
+          <h1>{{ t('appointments.title') }} {{ diaReactivo }}/{{ mesReactivo + 1 }}/{{ anoReactivo }}</h1>
           <button class="btn-nav" @click="cambiarDia(1)">→</button>
         </div>
         <button class="btn-nueva-cita" @click="mostrarModal = true">
-          + Nueva Cita
+          {{ t('appointmentDetails.newAppointment') }}
         </button>
       </div>
 
@@ -23,7 +23,7 @@
               <div class="columna-horas-header"></div>
               <div class="contenedor-headers-sillones">
                 <div v-for="silla in sillones" :key="silla" class="silla">
-                  Silla {{ silla }}
+                  {{ t('daySchedule.furniture') }} {{ silla }}
                 </div>
               </div>
             </div>
@@ -91,8 +91,8 @@
     <!-- Modal Confirmación Eliminar -->
     <ModalConfirmParam
       v-if="mostrarConfirmEliminar"
-      title="Eliminar Cita"
-      message="¿Estás seguro de que quieres eliminar esta cita? Esta acción no se puede deshacer."
+      :title="t('appointments.delete')"
+      :message="t('appointments.deleteConfirmMsg')"
       @confirm="confirmarEliminar"
       @close="cancelarEliminar"
     />
@@ -102,12 +102,15 @@
 <script setup>
 import { computed, ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import ModalNuevaCita from '../components/ModalNuevaCita.vue'
 import ModalVerCita from '../components/ModalVerCita.vue'
 import ModalConfirmParam from '../components/ModalConfirmParam.vue'
+import { getAppointmentsByDate, deleteAppointment } from '@/services/api'
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 
 const diaReactivo = ref(Number(route.params.dia))
 const mesReactivo = ref(Number(route.params.mes))
@@ -170,24 +173,8 @@ const obtenerCitas = async () => {
   cargando.value = true
   error.value = null
 
-  const token = localStorage.getItem('token')
-
   try {
-    const res = await fetch(
-      `http://localhost:8000/api/appointments/by-date?date=${fechaStr.value}`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      }
-    )
-
-    if (!res.ok) {
-      throw new Error('Error al obtener citas')
-    }
-
-    const data = await res.json()
+    const data = await getAppointmentsByDate(fechaStr.value)
 
     const appointments = Array.isArray(data) ? data : []
     citas.value = appointments.map(c => {
@@ -267,20 +254,8 @@ function handleSolicitarEliminar(citaId) {
 }
 
 async function confirmarEliminar() {
-  const token = localStorage.getItem('token')
-  
   try {
-    const res = await fetch(`http://localhost:8000/api/appointments/${citaIdAEliminar.value}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
-    })
-
-    if (!res.ok) {
-      throw new Error('Error al eliminar la cita')
-    }
+    await deleteAppointment(citaIdAEliminar.value)
 
     // Cerrar modal de confirmación
     mostrarConfirmEliminar.value = false

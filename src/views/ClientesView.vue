@@ -4,16 +4,11 @@
       <!-- Título -->
       <h1>{{ $t('clients.title') }}</h1>
 
-      <!-- Buscador -->
-      <div class="buscador">
-        <div class="icono-circulo">
-          <i class="bi bi-search"></i>
-        </div>
+      <!-- Buscador -->   
         <BarraBusqueda 
           v-model="busqueda" 
           :placeholder="$t('clients.search')" 
         />
-      </div>
 
       <!-- Acciones -->
       <div class="acciones">
@@ -33,8 +28,9 @@
             <th>{{ $t('table.name') }}</th>
             <th>{{ $t('table.surnames') }}</th>
             <th>{{ $t('table.phone') }}</th>
-            <th>
-              {{ $t('table.actions') }}
+            <th>{{ $t('table.actions') }}</th>
+            <th class="columna-seleccionar">
+              
               <input type="checkbox" v-model="seleccionadosTodos" @change="seleccionarTodos">
             </th>
           </tr>
@@ -42,23 +38,24 @@
         <tbody>
           <tr v-for="cliente in clientesFiltrados" :key="cliente.id">
             <td>{{ cliente.id }}</td>
-            <td>
-              <button class="btn btn-link p-0" @click="abrirModalVerCliente(cliente)">
-                {{ cliente.name }}
-              </button>
-            </td>
+            <td>{{ cliente.name }}</td>
             <td>{{ cliente.surnames }}</td>
             <td>{{ cliente.telephone }}</td>
             <td class="acciones-tabla">
-              <button class="btn-icono" @click="solicitarEliminarCliente(cliente)">
-                <i class="bi bi-trash eliminar"></i>
+              <button class="btn-tabla-view" @click="abrirModalVerCliente(cliente)">
+                <i class="bi bi-pencil"></i>
               </button>
+              <button class="btn-tabla-delete" @click="solicitarEliminarCliente(cliente)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+            <td class="columna-seleccionar">
               <input type="checkbox" v-model="seleccionados" :value="cliente.id">
             </td>
           </tr>
 
           <tr v-if="clientesFiltrados.length === 0">
-            <td colspan="5" style="text-align:center; color:gray;">
+            <td colspan="6" style="text-align:center; color:gray;">
               {{ $t('clients.none') }}
             </td>
           </tr>
@@ -93,6 +90,7 @@ import ModalNuevoCliente from '@/components/ModalNuevoCliente.vue'
 import ModalInformacion from '@/components/ModalInformativo.vue'
 import ModalConfirmacion from '@/components/ModalConfirmacion.vue'
 import ModalVerCliente from '@/components/ModalVerCliente.vue'
+import { getClients, createClient, updateClient, deleteClient } from '@/services/api'
 
 /* ===============================
    i18n
@@ -208,16 +206,8 @@ const seleccionarTodos = () => {
 const obtenerClientes = async () => {
   cargando.value = true
   error.value = null
-  const token = localStorage.getItem('token')
   try {
-    const res = await fetch('http://localhost:8000/api/clients', {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
-    })
-    if (!res.ok) throw new Error('Error al obtener clientes')
-    clientes.value = await res.json()
+    clientes.value = await getClients()
   } catch (err) {
     error.value = err.message
   } finally {
@@ -229,7 +219,6 @@ const obtenerClientes = async () => {
    GUARDAR CLIENTE
 ================================ */
 const guardarCliente = async (cliente) => {
-  const token = localStorage.getItem('token')
   const payload = {
     name: cliente.name,
     surnames: cliente.surnames,
@@ -238,16 +227,7 @@ const guardarCliente = async (cliente) => {
     email: cliente.email || null
   }
   try {
-    const res = await fetch('http://localhost:8000/api/clients', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(payload)
-    })
-    if (!res.ok) throw new Error('Error al guardar cliente')
+    await createClient(payload)
     await obtenerClientes()
   } catch (err) {
     console.error(err)
@@ -258,18 +238,8 @@ const guardarCliente = async (cliente) => {
    ACTUALIZAR CLIENTE
 ================================ */
 const actualizarCliente = async (clienteActualizado) => {
-  const token = localStorage.getItem('token')
   try {
-    const res = await fetch(`http://localhost:8000/api/clients/${clienteActualizado.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(clienteActualizado)
-    })
-    if (!res.ok) throw new Error('Error al actualizar cliente')
-    const data = await res.json()
+    const data = await updateClient(clienteActualizado.id, clienteActualizado)
     const index = clientes.value.findIndex(c => c.id === data.id)
     if (index !== -1) clientes.value[index] = { ...clientes.value[index], ...data }
   } catch (err) {
@@ -281,18 +251,17 @@ const actualizarCliente = async (clienteActualizado) => {
    CONFIRMAR ELIMINACIÓN
 ================================ */
 const confirmarEliminarConfirmado = async () => {
-  const token = localStorage.getItem('token')
   try {
     if (eliminarMultiple.value) {
       await Promise.all(
         seleccionados.value.map(id =>
-          fetch(`http://localhost:8000/api/clients/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } })
+          deleteClient(id)
         )
       )
       seleccionados.value = []
       seleccionadosTodos.value = false
     } else if (clienteAEliminar.value) {
-      await fetch(`http://localhost:8000/api/clients/${clienteAEliminar.value.id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } })
+      await deleteClient(clienteAEliminar.value.id)
       clienteAEliminar.value = null
     }
     await obtenerClientes()
@@ -320,122 +289,17 @@ onMounted(() => {
   gap: 10px;
 }
 
-.acciones-tabla {
-  display: flex;
-  align-items: center;
-  gap: 14px;
+/* poner columnas acciones y seleccionar a la derecha */
+.tabla-clientes th:nth-child(5),
+.tabla-clientes th:nth-child(6),
+.tabla-clientes td:nth-child(5),
+.tabla-clientes td:nth-child(6) {
+  text-align: center;
 }
 
-.btn-eliminar {
-  background-color: #EBB3B3;
-  color: black;
-  border-radius: 10px;
-  border-color: #EBB3B3;
-  font-weight: bold;
-  padding: 10px 20px;
-}
-
-.btn-agregar {
-  background-color: #9CE0DB;
-  color: black;
-  border-radius: 10px;
-  border-color: #9CE0DB;
-  font-weight: bold;
-  padding: 10px 20px;
-}
-
-.buscador {
-  margin-top: 1cm;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.icono-buscador {
-  font-size: 1.4rem;
-  color: gray;
-}
-
-.icono-circulo {
-  width: 40px;
-  height: 40px;
-  background-color: #9CE0DB;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.icono-circulo i {
-  color: black;
-  font-size: 1.2rem;
-}
-
-.tabla-clientes {
-  margin-top: 0.5cm;
-  width: 100%;
-  border-collapse: collapse;
-  border-radius: 8px;
-  overflow: hidden;
-  font-family: Arial, sans-serif;
-  padding-top: 8rem;
-}
-
-.tabla-clientes thead {
-  background-color: #154E68;
-  color: white;
-}
-
-.tabla-clientes th {
-  padding: 12px;
-  text-align: left;
-  font-weight: 600;
-}
-
-
-.tabla-clientes td {
-  padding: 12px;
-  color: #000;
-}
-
-
-.tabla-clientes tbody tr:nth-child(odd) {
-  background-color: #B6CCD1;
-}
-
-.tabla-clientes tbody tr:nth-child(even) {
-  background-color: #F7F7F7;
-}
-
-.acciones-tabla input[type="checkbox"] {
-  transform: scale(1.4);
-  cursor: pointer;
-}
-.tabla-clientes td.acciones {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.eliminiar-multiple {
-  color: black;
-  cursor: pointer;
-  font-size: 1.6rem;
-}
-.btn-icono {
-  background: none;
-  border: none;
-  padding: 1px; 
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.eliminar {
-  color: red;
-  cursor: pointer;
-  font-size: 1.6rem;  
+.tabla-clientes th:nth-child(5),
+.tabla-clientes th:nth-child(6) {
+  padding-right: 12px;
 }
 
 </style>

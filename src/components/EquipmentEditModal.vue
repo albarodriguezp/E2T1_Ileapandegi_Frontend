@@ -1,19 +1,19 @@
 <template>
   <div class="modal-overlay">
     <div class="modal">
-      <h2>Editar equipamiento</h2>
+      <h2>{{ t('inventory.edit') }} {{ t('inventory.equipment') }}</h2>
 
-      <input v-model="localForm.name" placeholder="Nombre" />
-      <input v-model="localForm.brand" placeholder="Marca" />
-      <input v-model="localForm.label" placeholder="Etiqueta" />
-      <input v-model="localForm.description" placeholder="Descripción" />
+      <input v-model="localForm.name" :placeholder="t('table.name')" />
+      <input v-model="localForm.brand" :placeholder="t('inventory.brand')" />
+      <input v-model="localForm.label" :placeholder="t('inventory.label')" />
+      <input v-model="localForm.description" :placeholder="t('inventory.description')" />
 
       <div class="actions">
         <button class="btn-add" @click="$emit('submit', localForm)">
-          Guardar cambios
+          {{ t('modal.save') }}
         </button>
         <button class="btn-delete" @click="$emit('close')">
-          Cancelar
+          {{ t('modal.cancel') }}
         </button>
       </div>
     </div>
@@ -22,6 +22,9 @@
 
 <script setup>
 import { reactive, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   item: Object

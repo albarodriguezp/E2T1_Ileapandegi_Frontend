@@ -5,10 +5,10 @@
       <h1>{{ $t('clients.title') }}</h1>
 
       <!-- Buscador -->   
-        <BarraBusqueda 
-          v-model="busqueda" 
-          :placeholder="$t('clients.search')" 
-        />
+      <BarraBusqueda 
+        v-model="busqueda" 
+        :placeholder="$t('clients.search')" 
+      />
 
       <!-- Acciones -->
       <div class="acciones">
@@ -95,14 +95,7 @@ import { getClients, createClient, updateClient, deleteClient } from '@/services
 /* ===============================
    i18n
 ================================ */
-const { t, locale } = useI18n()
-
-// Idioma reactivo
-const idioma = ref(locale.value)
-const cambiarIdioma = () => {
-  locale.value = idioma.value
-  localStorage.setItem('lang', idioma.value)
-}
+const { t } = useI18n()
 
 /* ===============================
    ESTADOS
@@ -287,9 +280,32 @@ onMounted(() => {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+  margin-bottom: 1rem;
 }
 
-/* poner columnas acciones y seleccionar a la derecha */
+.btn-eliminar,
+.btn-agregar {
+  width: auto;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-agregar {
+  background-color: #9CE0DB;
+  color: black;
+}
+
+.btn-agregar:hover {
+  background-color: #7ec9c3;
+}
+
+
+
+/* Centrar columnas acciones y seleccionar */
 .tabla-clientes th:nth-child(5),
 .tabla-clientes th:nth-child(6),
 .tabla-clientes td:nth-child(5),
@@ -301,5 +317,4 @@ onMounted(() => {
 .tabla-clientes th:nth-child(6) {
   padding-right: 12px;
 }
-
 </style>

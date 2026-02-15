@@ -127,6 +127,7 @@ function cerrarModal() {
   font-size: 0.85em;
   margin: 2px 0 8px 0;
 }
+
 .modal-backdrop {
   position: fixed;
   top: 0;
@@ -141,7 +142,54 @@ function cerrarModal() {
 }
 
 .modal {
+
   width: 360px;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  height: auto;
+  max-height: 90vh;
+  overflow: visible;
 }
 
+.cerrar-btn {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  border: none;
+  background: transparent;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+input {
+  padding: 6px 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.guardar-btn {
+  margin-top: 10px;
+  background-color: #82d8d8;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.guardar-btn:hover {
+  background-color: #6bc5c5;
+}
 </style>

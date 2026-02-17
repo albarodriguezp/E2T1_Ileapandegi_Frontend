@@ -1,6 +1,20 @@
 const API_URL = 'http://localhost:8000/api'
 
 export const getToken = () => localStorage.getItem('token')
+import axios from 'axios'
+
+const api = axios.create({
+  baseURL: "http://localhost:8000/api"
+})
+
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem('token') // o donde guardes
+  if (token) config.headers.Authorization = `Bearer ${token}`
+  return config
+})
+
+export default api
+
 
 const safeJson = async (res) => {
   try {
@@ -172,8 +186,8 @@ export const finishStudentEquipment = async (id) => {
 
 export const getMonthOccupancy = async (year, month) => {
   return apiJson(
-    `/appointments/occupancy/month?year=${year}&month=${month + 1}`, 
-    {}, 
+    `/appointments/occupancy/month?year=${year}&month=${month + 1}`,
+    {},
     'Error al obtener ocupación del mes'
   )
 }

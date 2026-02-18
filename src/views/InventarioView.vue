@@ -27,13 +27,11 @@
               {{ t('inventory.addMaterial') }}
             </button>
 
-            <button v-if="materialView === 'items'" class="btn-add" style="background:#455a64"
-              @click="materialView = 'categories'">
+            <button v-if="materialView === 'items'" class="btn-manage" @click="materialView = 'categories'">
               📂 {{ t('inventory.manageCategories') }}
             </button>
 
-            <button v-if="materialView === 'categories'" class="btn-add" style="background:#455a64"
-              @click="materialView = 'items'">
+            <button v-if="materialView === 'categories'" class="btn-back" @click="materialView = 'items'">
               {{ t('inventory.backToMaterials') }}
             </button>
           </div>
@@ -659,8 +657,8 @@ const openAssignModal = (item) => {
 }
 
 .btn-add {
-  background: #2e7d32;
-  color: white;
+  background: #9CE0DB;
+  color: black;
   border: none;
   padding: 0.6rem 1.2rem;
   border-radius: 8px;
@@ -669,7 +667,35 @@ const openAssignModal = (item) => {
 }
 
 .btn-add:hover {
-  background: #1b5e20;
+  background: #82d8d8;
+}
+
+.btn-manage {
+  background: #1d5a70;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-manage:hover {
+  background: #164e63;
+}
+
+.btn-back {
+  background: #3b9e89;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-back:hover {
+  background: #2d7f6d;
 }
 
 /* Search */
@@ -689,7 +715,9 @@ const openAssignModal = (item) => {
     align-items: flex-start;
   }
 
-  .btn-add {
+  .btn-add,
+  .btn-manage,
+  .btn-back {
     width: 100%;
   }
 
@@ -712,7 +740,9 @@ const openAssignModal = (item) => {
     padding: 0.4rem;
   }
 
-  .btn-add {
+  .btn-add,
+  .btn-manage,
+  .btn-back {
     padding: 0.5rem;
   }
 }

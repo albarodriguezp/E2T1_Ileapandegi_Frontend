@@ -142,12 +142,12 @@ const submit = () => emit('submit', form)
 }
 
 .modal button[type="submit"] {
-  background: #1976d2;
-  color: white;
+  background: #9CE0DB;
+  color: black;
 }
 
 .modal button[type="submit"]:hover {
-  background: #115293;
+  background: #9CE0DB;
 }
 
 .modal button[type="button"] {

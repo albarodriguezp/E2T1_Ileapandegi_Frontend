@@ -32,7 +32,7 @@
     "appointments": "CITAS",
     "profile": "PERFIL",
     "settings": "GESTION",
-    "logout": "CERRAR SESIÓN"
+    "logout": "logout"
 
   },
   "modal": {

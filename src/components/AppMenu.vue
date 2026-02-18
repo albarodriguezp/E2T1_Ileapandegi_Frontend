@@ -110,7 +110,7 @@ watch(
   color: white;
   display: flex;
   flex-direction: column;
-  padding: 2rem 1rem;
+  padding: 1rem 0.85rem;
   user-select: none;
 }
 
@@ -119,7 +119,7 @@ watch(
 }
 
 .logo {
-  margin-bottom: 3rem;
+  margin-bottom: 1.5rem;
   display: flex;
   justify-content: center;
 }
@@ -142,12 +142,12 @@ watch(
 }
 
 .menu li {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.35rem;
 }
 
 .menu a {
   display: block;
-  padding: 1rem 1.5rem;
+  padding: 0.75rem 1rem;
   color: white;
   text-decoration: none;
   border-radius: 0.5rem;
@@ -170,8 +170,8 @@ watch(
   gap: 0.55rem;
   width: 100%;
   margin-top: auto;
-  margin-bottom: 0.75rem;
-  padding: 0.85rem 1rem;
+  margin-bottom: 0.5rem;
+  padding: 0.7rem 0.9rem;
   border: 1px solid #ef5350;
   border-radius: 0.5rem;
   background: linear-gradient(180deg, #ef5350 0%, #d32f2f 100%);

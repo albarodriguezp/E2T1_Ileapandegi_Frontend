@@ -32,7 +32,7 @@
     "appointments": "HITZORDUAK",
     "profile": "PROFILA",
     "settings": "KUDEAKETA",
-    "logout": "SAIOA ITXI"
+    "logout": "logout"
   },
   "modal": {
     "name": "Izena",
@@ -81,7 +81,6 @@
     "retry": "Berriro saiatu",
     "client": "Bezeroa",
     "student": "Ikasleak",
-    "selectStudent": "Ikaslea aukeratu",
     "chair": "Aulkia",
     "date": "Data",
     "startTime": "Hasiera Ordua",

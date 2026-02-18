@@ -31,7 +31,9 @@
     "portfolio": "PORTFOLIO",
     "appointments": "CITAS",
     "profile": "PERFIL",
-    "settings": "GESTION"
+    "settings": "GESTION",
+    "logout": "CERRAR SESIÓN"
+
   },
   "modal": {
     "name": "Nombre",

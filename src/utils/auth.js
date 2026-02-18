@@ -17,9 +17,11 @@ export const checkAuth = async () => {
 export const logout = async () => {
   const token = getToken()
 
-  if (token) {
-    await apiRequest('/logout', { method: 'POST' })
+  try {
+    if (token) {
+      await apiRequest('/logout', { method: 'POST' })
+    }
+  } finally {
+    localStorage.removeItem('token')
   }
-
-  localStorage.removeItem('token')
 }

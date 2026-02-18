@@ -31,7 +31,8 @@
     "portfolio": "PORTFOLIOA",
     "appointments": "HITZORDUAK",
     "profile": "PROFILA",
-    "settings": "KUDEAKETA"
+    "settings": "KUDEAKETA",
+    "logout": "SAIOA ITXI"
   },
   "modal": {
     "name": "Izena",

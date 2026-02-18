@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     <div class="content2">
-      <h1>{{ t('home.greeting', { name: capitalizar(nombre) }) }}</h1>
+      <h1 class="inicio-greeting">{{ t('home.greeting', { name: capitalizar(nombre) }) }}</h1>
 
       <div class="dashboard d-flex justify-content-center gap-5">
         <div class="miniContenedor">
@@ -332,12 +332,22 @@ onMounted(async () => {
 }
 
 @media (max-width: 768px) {
+  .inicio-greeting {
+    display: none;
+  }
+
   .dashboard {
-    gap: 1rem !important;
+    display: none !important;
   }
 
   .hide-mobile-card {
     display: none;
   }
+
+  .proximasCitas {
+    margin-top: 0;
+  }
 }
+
 </style>
+

@@ -44,3 +44,14 @@
 .modal.modal-lg {
   width: 800px;
 }
+
+@media (max-width: 768px) {
+  .modal,
+  .modal.modal-sm,
+  .modal.modal-md,
+  .modal.modal-lg {
+    width: calc(100vw - 1.5rem);
+    max-width: calc(100vw - 1.5rem);
+    padding: 16px;
+  }
+}

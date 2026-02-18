@@ -45,44 +45,46 @@
           <input v-model="search" type="text" :placeholder="t('inventory.searchMaterial')" class="search-input" />
 
           <!-- Tabla -->
-          <table class="inventario-table">
-            <thead>
-              <tr>
-                <th>{{ t('inventory.batch') }}</th>
-                <th>{{ t('inventory.name') }}</th>
-                <th>{{ t('inventory.quantity') }}</th>
-                <th>{{ t('inventory.category') }}</th>
-                <th>{{ t('inventory.brand') }}</th>
-                <th>{{ t('inventory.expirationDate') }}</th>
-                <th>{{ t('inventory.description') }}</th>
-                <th>{{ t('table.actions') }}</th>
-              </tr>
-            </thead>
+          <div class="table-scroll">
+            <table class="inventario-table">
+              <thead>
+                <tr>
+                  <th>{{ t('inventory.batch') }}</th>
+                  <th>{{ t('inventory.name') }}</th>
+                  <th>{{ t('inventory.quantity') }}</th>
+                  <th>{{ t('inventory.category') }}</th>
+                  <th>{{ t('inventory.brand') }}</th>
+                  <th>{{ t('inventory.expirationDate') }}</th>
+                  <th>{{ t('inventory.description') }}</th>
+                  <th>{{ t('table.actions') }}</th>
+                </tr>
+              </thead>
 
-            <tbody>
-              <tr v-for="item in paginatedData" :key="item.id">
-                <td>{{ item.batch }}</td>
-                <td>{{ item.name }}</td>
-                <td :class="{ lowStock: item.stock <= item.min_stock }">{{ item.stock }}</td>
-                <td>{{ item.category.name }}</td>
-                <td>{{ item.brand }}</td>
-                <td>{{ formatDate(item.expiration_date) }}</td>
-                <td class="description">{{ item.description }}</td>
-                <td class="actions">
-                  <button class="btn-tabla-edit" @click="openModal('edit', item)">
-                    <i class="bi bi-pencil"></i>
-                  </button>
-                  <button class="btn-tabla-delete" @click="openModal('delete', item)">
-                    <i class="bi bi-trash"></i>
-                  </button>
-                </td>
-              </tr>
+              <tbody>
+                <tr v-for="item in paginatedData" :key="item.id">
+                  <td>{{ item.batch }}</td>
+                  <td>{{ item.name }}</td>
+                  <td :class="{ lowStock: item.stock <= item.min_stock }">{{ item.stock }}</td>
+                  <td>{{ item.category.name }}</td>
+                  <td>{{ item.brand }}</td>
+                  <td>{{ formatDate(item.expiration_date) }}</td>
+                  <td class="description">{{ item.description }}</td>
+                  <td class="actions">
+                    <button class="btn-tabla-edit" @click="openModal('edit', item)">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn-tabla-delete" @click="openModal('delete', item)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
 
-              <tr v-if="paginatedData.length === 0">
-                <td colspan="8" class="empty">{{ t('inventory.noResults') }}</td>
-              </tr>
-            </tbody>
-          </table>
+                <tr v-if="paginatedData.length === 0">
+                  <td colspan="8" class="empty">{{ t('inventory.noResults') }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
           <!-- Paginación -->
           <div class="pagination">
@@ -100,34 +102,36 @@
 
           <input v-model="categorySearch" type="text" :placeholder="t('inventory.searchCategory')" class="search-input" />
 
-          <table class="inventario-table">
-            <thead>
-              <tr>
-                <th>{{ t('table.id') }}</th>
-                <th>{{ t('table.name') }}</th>
-                <th>{{ t('table.actions') }}</th>
-              </tr>
-            </thead>
+          <div class="table-scroll">
+            <table class="inventario-table">
+              <thead>
+                <tr>
+                  <th>{{ t('table.id') }}</th>
+                  <th>{{ t('table.name') }}</th>
+                  <th>{{ t('table.actions') }}</th>
+                </tr>
+              </thead>
 
-            <tbody>
-              <tr v-for="cat in filteredCategories" :key="cat.id">
-                <td>{{ cat.id }}</td>
-                <td>{{ cat.name }}</td>
-                <td class="actions">
-                  <button class="btn-tabla-edit" @click="openCategoryModal('edit', cat)">
-                    <i class="bi bi-pencil"></i>
-                  </button>
-                  <button class="btn-tabla-delete" @click="openCategoryModal('delete', cat)">
-                    <i class="bi bi-trash"></i>
-                  </button>
-                </td>
-              </tr>
+              <tbody>
+                <tr v-for="cat in filteredCategories" :key="cat.id">
+                  <td>{{ cat.id }}</td>
+                  <td>{{ cat.name }}</td>
+                  <td class="actions">
+                    <button class="btn-tabla-edit" @click="openCategoryModal('edit', cat)">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn-tabla-delete" @click="openCategoryModal('delete', cat)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
 
-              <tr v-if="filteredCategories.length === 0">
-                <td colspan="3" class="empty">{{ t('inventory.noCategories') }}</td>
-              </tr>
-            </tbody>
-          </table>
+                <tr v-if="filteredCategories.length === 0">
+                  <td colspan="3" class="empty">{{ t('inventory.noCategories') }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -155,63 +159,67 @@
           <!-- Equipamientos disponibles -->
           <div class="column">
             <h2>{{ t('inventory.available') }}</h2>
-            <table class="inventario-table">
-              <thead>
-                <tr>
-                  <th>{{ t('table.name') }}</th>
-                  <th>{{ t('inventory.brand') }}</th>
-                  <th>{{ t('inventory.label') }}</th>
-                  <th>{{ t('table.actions') }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="item in availableEquipments" :key="item.id">
-                  <td>{{ item.name }}</td>
-                  <td>{{ item.brand }}</td>
-                  <td>{{ item.label }}</td>
-                  <td class="actions">
-                    <button class="btn-tabla-assign" @click="assignEquipment(item)">
-                      <i class="bi bi-person-plus"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr v-if="availableEquipments.length === 0">
-                  <td colspan="4" class="empty">{{ t('inventory.noAvailableEquipments') }}</td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="table-scroll">
+              <table class="inventario-table">
+                <thead>
+                  <tr>
+                    <th>{{ t('table.name') }}</th>
+                    <th>{{ t('inventory.brand') }}</th>
+                    <th>{{ t('inventory.label') }}</th>
+                    <th>{{ t('table.actions') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="item in availableEquipments" :key="item.id">
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.brand }}</td>
+                    <td>{{ item.label }}</td>
+                    <td class="actions">
+                      <button class="btn-tabla-assign" @click="assignEquipment(item)">
+                        <i class="bi bi-person-plus"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr v-if="availableEquipments.length === 0">
+                    <td colspan="4" class="empty">{{ t('inventory.noAvailableEquipments') }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
 
           <!-- Equipamientos ocupados -->
           <div class="column">
             <h2>{{ t('inventory.occupied') }}</h2>
-            <table class="inventario-table">
-              <thead>
-                <tr>
-                  <th>{{ t('table.name') }}</th>
-                  <th>{{ t('inventory.brand') }}</th>
-                  <th>{{ t('inventory.label') }}</th>
-                  <th>{{ t('appointments.responsible') }}</th>
-                  <th>{{ t('table.actions') }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="item in occupiedEquipments" :key="item.student_equipment_id">
-                  <td>{{ item.name }}</td>
-                  <td>{{ item.brand }}</td>
-                  <td>{{ item.label }}</td>
-                  <td>{{ item.responsible }}</td>
-                  <td class="actions">
-                    <button class="btn-tabla-assign" @click="finishEquipmentUsage(item.student_equipment_id)" :title="t('inventory.finishUsage')">
-                      <i class="bi bi-check-circle"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr v-if="occupiedEquipments.length === 0">
-                  <td colspan="5" class="empty">{{ t('inventory.noOccupiedEquipments') }}</td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="table-scroll">
+              <table class="inventario-table">
+                <thead>
+                  <tr>
+                    <th>{{ t('table.name') }}</th>
+                    <th>{{ t('inventory.brand') }}</th>
+                    <th>{{ t('inventory.label') }}</th>
+                    <th>{{ t('appointments.responsible') }}</th>
+                    <th>{{ t('table.actions') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="item in occupiedEquipments" :key="item.student_equipment_id">
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.brand }}</td>
+                    <td>{{ item.label }}</td>
+                    <td>{{ item.responsible }}</td>
+                    <td class="actions">
+                      <button class="btn-tabla-assign" @click="finishEquipmentUsage(item.student_equipment_id)" :title="t('inventory.finishUsage')">
+                        <i class="bi bi-check-circle"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr v-if="occupiedEquipments.length === 0">
+                    <td colspan="5" class="empty">{{ t('inventory.noOccupiedEquipments') }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
@@ -220,36 +228,38 @@
           <input v-model="equipmentSearch" type="text" :placeholder="t('inventory.searchEquipment')"
             class="search-input" />
 
-          <table class="inventario-table">
-            <thead>
-              <tr>
-                <th>{{ t('table.name') }}</th>
-                <th>{{ t('inventory.brand') }}</th>
-                <th>{{ t('inventory.label') }}</th>
-                <th>{{ t('inventory.description') }}</th>
-                <th>{{ t('table.actions') }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="item in equipmentPaginatedData" :key="item.id">
-                <td>{{ item.name }}</td>
-                <td>{{ item.brand }}</td>
-                <td>{{ item.label }}</td>
-                <td>{{ item.description }}</td>
-                <td class="actions">
-                  <button class="btn-tabla-edit" @click="openEquipmentModal('edit', item)">
-                    <i class="bi bi-pencil"></i>
-                  </button>
-                  <button class="btn-tabla-delete" @click="openEquipmentModal('delete', item)">
-                    <i class="bi bi-trash"></i>
-                  </button>
-                </td>
-              </tr>
-              <tr v-if="filteredEquipments.length === 0">
-                <td colspan="5" class="empty">{{ t('inventory.noResults') }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-scroll">
+            <table class="inventario-table">
+              <thead>
+                <tr>
+                  <th>{{ t('table.name') }}</th>
+                  <th>{{ t('inventory.brand') }}</th>
+                  <th>{{ t('inventory.label') }}</th>
+                  <th>{{ t('inventory.description') }}</th>
+                  <th>{{ t('table.actions') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in equipmentPaginatedData" :key="item.id">
+                  <td>{{ item.name }}</td>
+                  <td>{{ item.brand }}</td>
+                  <td>{{ item.label }}</td>
+                  <td>{{ item.description }}</td>
+                  <td class="actions">
+                    <button class="btn-tabla-edit" @click="openEquipmentModal('edit', item)">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn-tabla-delete" @click="openEquipmentModal('delete', item)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr v-if="filteredEquipments.length === 0">
+                  <td colspan="5" class="empty">{{ t('inventory.noResults') }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
           <div class="pagination">
             <button @click="equipmentPrevPage" :disabled="equipmentCurrentPage === 1">«</button>

@@ -36,6 +36,14 @@ a,
   overflow-y: auto;
 }
 
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
 @media (hover: hover) {
   a:hover {
     background-color: hsla(160, 100%, 37%, 0.2);
@@ -56,6 +64,45 @@ a,
   body {
     display: grid;
     place-items: center;
+  }
+}
+
+@media (max-width: 768px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
+  #app {
+    background: #fff;
+  }
+
+  .content {
+    background: transparent;
+    padding: 1rem;
+    max-height: none;
+  }
+
+  .content2 {
+    border-radius: 12px;
+    padding: 1rem;
+    height: auto;
+    overflow: visible;
+  }
+
+  .content2 {
+    max-width: 100%;
+  }
+
+  .content2 table {
+    width: 100%;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    max-width: 100%;
   }
 }
 

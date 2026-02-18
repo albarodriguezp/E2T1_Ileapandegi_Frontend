@@ -8,11 +8,11 @@
           <p>{{ t('home.totalAppointments') }}</p>
           <p class="number">{{ citasDelUsuario.length }}</p>
         </div>
-        <div class="miniContenedor">
+        <div class="miniContenedor hide-mobile-card">
           <p>{{ t('home.today') }}:</p>
           <p class="number">{{ citasDeHoy.length }}</p>
         </div>
-        <div class="miniContenedor">
+        <div class="miniContenedor hide-mobile-card">
           <p>{{ t('home.completed') }}:</p>
           <p class="number">{{ citasCompletadas.length }}</p>
         </div>
@@ -329,5 +329,15 @@ onMounted(async () => {
 .sin-citas {
   background: #f5f5f5;
   color: #666;
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    gap: 1rem !important;
+  }
+
+  .hide-mobile-card {
+    display: none;
+  }
 }
 </style>

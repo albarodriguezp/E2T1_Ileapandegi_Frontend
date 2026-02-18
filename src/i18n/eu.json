@@ -102,6 +102,7 @@
     "deleteConfirmMsg": "Ziur zaude hitzordu hau ezabatu nahi duzula? Ekintza hau ezin da desegin."
   },
   "inventory": {
+    "name": "Izena",
     "title": "Inbentarioaren Kudeaketa",
     "material": "Materialak",
     "materials": "Materialak",

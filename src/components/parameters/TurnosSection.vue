@@ -6,49 +6,46 @@
       <h2>{{ t('parameters.createShift') }}</h2>
 
       <form @submit.prevent="crearTurno">
+        <!-- Selección de estudiante -->
         <div class="form-group">
           <label>{{ t('parameters.searchUserShift') }}</label>
-          <input v-model="buscarUsuarioTurno" />
+          <input v-model="buscarUsuarioTurno" placeholder="Buscar usuario" />
 
           <div class="checkbox-list">
-            <div
-              v-for="u in usuariosFiltradosTurno"
-              :key="u.id"
-              class="checkbox-item"
-            >
-              <input
-                type="radio"
-                :value="u.username"
-                v-model="turno.usuario"
-              />
-              <label>{{ u.username }}</label>
+            <div v-for="u in usuariosFiltradosTurno" :key="u.id" class="checkbox-item">
+              <input type="radio" :value="u.id" v-model="turno.student_id" required />
+              <label>{{ u.name }} {{ u.surnames }}</label>
             </div>
           </div>
         </div>
 
+        <!-- Tipo de turno -->
         <div class="form-group">
           <label>{{ t('parameters.shiftType') }}</label>
-          <select v-model="turno.tipo">
+          <select v-model="turno.type" required>
             <option value="A">{{ t('parameters.table') }}</option>
             <option value="M">{{ t('parameters.haircut') }}</option>
           </select>
         </div>
 
+        <!-- Fecha -->
         <div class="form-group">
           <label>{{ t('parameters.date') }}</label>
-          <input type="date" v-model="turno.fecha" required />
+          <input type="date" v-model="turno.date" required />
         </div>
 
-        <button type="submit" class="btn-primary">{{ t('parameters.createShift') }}</button>
+        <button type="submit" class="btn-primary">
+          {{ t('parameters.createShift') }}
+        </button>
       </form>
     </div>
 
-    <!-- ===== Gestión ===== -->
+    <!-- ===== Gestión de Turnos ===== -->
     <div class="col">
       <h2>{{ t('parameters.shiftManagement') }}</h2>
 
       <div class="form-group">
-        <input v-model="buscarTurno" :placeholder="t('parameters.searchUserShift')" />
+        <input v-model="buscarTurno" placeholder="Buscar turno por usuario" />
       </div>
 
       <div class="form-group">
@@ -60,45 +57,37 @@
         {{ t('parameters.noShifts') }}
       </div>
 
-      <div
-        v-for="t in turnosFiltrados"
-        :key="t.id"
-        class="turno-row"
-      >
+      <div v-for="turnoItem in turnosFiltrados" :key="turnoItem.id" class="turno-row">
         <div class="turno-info">
-          <strong>{{ t.usuario }}</strong>
+          <strong>{{ turnoItem.student.name }} {{ turnoItem.student.surnames }}</strong>
           <small>
-            {{ t.tipo === 'A' ? t('parameters.table') : t('parameters.haircut') }} · {{ t.fecha }}
+            {{ turnoItem.type === 'A' ? t('parameters.table') : t('parameters.haircut') }} · {{ turnoItem.date }}
           </small>
         </div>
 
         <div class="actions">
-          <button class="btn-primary" @click="openEditTurno(t)">
+          <button class="btn-primary" @click="openEditTurno(turnoItem)">
             {{ t('inventory.edit') }}
           </button>
-          <button class="btn-danger" @click="openDeleteTurno(t)">
+          <button class="btn-danger" @click="openDeleteTurno(turnoItem)">
             {{ t('inventory.delete') }}
           </button>
         </div>
       </div>
+
     </div>
 
-    <!-- ===== Modal Editar ===== -->
-    <ModalParam
-      v-if="showModal && modalType === 'turno'"
-      :title="t('parameters.editShift')"
-      :submitText="t('modal.save')"
-      @close="closeModal"
-      @submit="editarTurno"
-    >
+    <!-- ===== Modal Editar Turno ===== -->
+    <ModalParam v-if="showModal && modalType === 'turno'" :title="t('parameters.editShift')"
+      :submitText="t('modal.save')" @close="closeModal" @submit="editarTurno">
       <div class="form-group">
         <label>{{ t('parameters.username') }}</label>
-        <input v-model="turnoEditando.usuario" disabled />
+        <input :value="turnoEditando.student.name + ' ' + turnoEditando.student.surnames" disabled />
       </div>
 
       <div class="form-group">
         <label>{{ t('parameters.shiftType') }}</label>
-        <select v-model="turnoEditando.tipo">
+        <select v-model="turnoEditando.type">
           <option value="A">{{ t('parameters.table') }}</option>
           <option value="M">{{ t('parameters.haircut') }}</option>
         </select>
@@ -106,54 +95,89 @@
 
       <div class="form-group">
         <label>{{ t('parameters.date') }}</label>
-        <input type="date" v-model="turnoEditando.fecha" />
+        <input type="date" v-model="turnoEditando.date" />
       </div>
     </ModalParam>
 
-    <!-- ===== Modal Eliminar ===== -->
-    <ModalConfirm
-      v-if="showModal && modalType === 'delete-turno'"
-      :title="t('parameters.deleteShift')"
-      :message="t('modal.deleteConfirm', { name: turnoEditando?.usuario })"
-      @close="closeModal"
-      @confirm="eliminarTurno"
-    />
-
+    <!-- ===== Modal Eliminar Turno ===== -->
+    <ModalConfirm v-if="showModal && modalType === 'delete-turno'" :title="t('parameters.deleteShift')"
+      :message="t('modal.deleteConfirm', { name: turnoEditando?.student?.name })" @close="closeModal"
+      @confirm="eliminarTurno" />
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import api from '@/services/api'
 import ModalParam from '@/components/ModalParam.vue'
 import ModalConfirm from '@/components/ModalConfirmParam.vue'
 
 const { t } = useI18n()
 
+// ===== Estados =====
+const usuarios = ref([])
+const turnos = ref([])
+
+const buscarUsuarioTurno = ref('')
+const turno = ref({ student_id: '', type: 'A', date: '' })
+const turnoEditando = ref(null)
+
+const buscarTurno = ref('')
+const filtroMes = ref('')
+
 const showModal = ref(false)
 const modalType = ref(null)
 
-const usuarios = ref([
-  { id: 1, username: 'Jon' },
-  { id: 2, username: 'Anna' },
-  { id: 3, username: 'Luis' }
-])
-
-const buscarUsuarioTurno = ref('')
-const turno = ref({ usuario: '', tipo: 'A', fecha: '' })
-const turnos = ref([])
-const turnoEditando = ref(null)
-
+// ===== Computeds =====
 const usuariosFiltradosTurno = computed(() => {
   if (!buscarUsuarioTurno.value) return usuarios.value
   return usuarios.value.filter(u =>
-    u.username.toLowerCase().includes(buscarUsuarioTurno.value.toLowerCase())
+    u.name.toLowerCase().includes(buscarUsuarioTurno.value.toLowerCase()) ||
+    u.surnames.toLowerCase().includes(buscarUsuarioTurno.value.toLowerCase())
   )
 })
 
-const crearTurno = () => {
-  turnos.value.push({ ...turno.value, id: Date.now() })
-  turno.value = { usuario: '', tipo: 'A', fecha: '' }
+const turnosFiltrados = computed(() => {
+  return turnos.value.filter(t => {
+    let coincide = true
+    if (buscarTurno.value) {
+      coincide = t.student.name.toLowerCase().includes(buscarTurno.value.toLowerCase())
+    }
+    if (filtroMes.value) {
+      coincide = t.date.slice(0, 7) === filtroMes.value
+    }
+    return coincide
+  })
+})
+
+// ===== Métodos =====
+const fetchUsuarios = async () => {
+  try {
+    const res = await api.get('/students')
+    usuarios.value = res.data.data
+  } catch (err) {
+    console.error('Error cargando usuarios:', err)
+  }
+}
+
+const fetchTurnos = async () => {
+  try {
+    const res = await api.get('/shifts')
+    turnos.value = res.data
+  } catch (err) {
+    console.error('Error cargando turnos:', err)
+  }
+}
+
+const crearTurno = async () => {
+  try {
+    await api.post('/shifts', { ...turno.value })
+    turno.value = { student_id: '', type: 'A', date: '' }
+    await fetchTurnos()
+  } catch (err) {
+    console.error('Error creando turno:', err)
+  }
 }
 
 const openEditTurno = (t) => {
@@ -162,10 +186,33 @@ const openEditTurno = (t) => {
   showModal.value = true
 }
 
+const editarTurno = async () => {
+  try {
+    await api.put(`/shifts/${turnoEditando.value.id}`, {
+      type: turnoEditando.value.type,
+      date: turnoEditando.value.date
+    })
+    await fetchTurnos()
+    closeModal()
+  } catch (err) {
+    console.error('Error editando turno:', err)
+  }
+}
+
 const openDeleteTurno = (t) => {
   turnoEditando.value = t
   modalType.value = 'delete-turno'
   showModal.value = true
+}
+
+const eliminarTurno = async () => {
+  try {
+    await api.delete(`/shifts/${turnoEditando.value.id}`)
+    await fetchTurnos()
+    closeModal()
+  } catch (err) {
+    console.error('Error eliminando turno:', err)
+  }
 }
 
 const closeModal = () => {
@@ -173,39 +220,14 @@ const closeModal = () => {
   modalType.value = null
 }
 
-const editarTurno = () => {
-  const index = turnos.value.findIndex(t => t.id === turnoEditando.value.id)
-  turnos.value[index] = turnoEditando.value
-  closeModal()
-}
-
-const eliminarTurno = () => {
-  turnos.value = turnos.value.filter(t => t.id !== turnoEditando.value.id)
-  closeModal()
-}
-
-const buscarTurno = ref('')
-const filtroMes = ref('')
-
-const turnosFiltrados = computed(() => {
-  return turnos.value.filter(t => {
-    let coincide = true
-
-    if (buscarTurno.value) {
-      coincide = t.usuario.toLowerCase().includes(buscarTurno.value.toLowerCase())
-    }
-
-    if (filtroMes.value) {
-      const turnoMes = t.fecha.slice(0, 7)
-      coincide = coincide && turnoMes === filtroMes.value
-    }
-
-    return coincide
-  })
+// ===== Montado =====
+onMounted(async () => {
+  await fetchUsuarios()
+  await fetchTurnos()
 })
 </script>
+
 <style scoped>
-/* ===== Turnos en columnas ===== */
 .turnos-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -247,6 +269,7 @@ const turnosFiltrados = computed(() => {
   max-height: 150px;
   overflow-y: auto;
   padding: 0.5rem;
+  margin-top: 0.3rem;
 }
 
 .checkbox-item {
@@ -264,23 +287,12 @@ const turnosFiltrados = computed(() => {
   gap: 0.5rem;
 }
 
-.col .form-group input[type="month"] {
-  padding: 0.5rem;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  width: 100%;
-  box-sizing: border-box;
-  margin-top: 0.3rem;
-}
-
-/* Responsive */
 @media (max-width: 900px) {
   .turnos-grid {
     grid-template-columns: 1fr;
   }
 }
 
-/* Botones */
 .btn-primary {
   padding: 0.6rem 1.2rem;
   background-color: #164e63;

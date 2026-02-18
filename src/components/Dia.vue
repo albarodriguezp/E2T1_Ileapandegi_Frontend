@@ -43,12 +43,32 @@ function handleClick() {
 <style scoped>
 .dia {
   color: rgb(8, 8, 8);
-  padding: 1rem 1rem 5rem;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0.75rem 0.75rem 3.25rem;
+  min-height: 96px;
   border-radius: 20px;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
   position: relative;
   border: 3px solid transparent;
+}
+
+@media (max-width: 768px) {
+  .dia {
+    padding: 0.55rem 0.55rem 2.25rem;
+    min-height: 78px;
+    border-radius: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dia {
+    padding: 0.45rem 0.45rem 1.6rem;
+    min-height: 64px;
+    border-radius: 10px;
+  }
 }
 
 .dia:hover {

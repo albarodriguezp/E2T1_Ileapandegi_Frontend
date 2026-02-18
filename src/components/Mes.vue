@@ -127,10 +127,16 @@ const diasMes = computed(() => {
 <style scoped>
 .mes {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 1rem;
   width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
   box-sizing: border-box;
+}
+
+.mes > div {
+  min-width: 0;
 }
 
 .cabecera {
@@ -142,23 +148,23 @@ const diasMes = computed(() => {
 
 @media (max-width: 768px) {
   .mes {
-    gap: 0.75rem;
+    gap: 0.55rem;
   }
 
   .cabecera {
-    font-size: 0.9rem;
-    padding: 0.4rem;
+    font-size: 0.85rem;
+    padding: 0.3rem;
   }
 }
 
 @media (max-width: 480px) {
   .mes {
-    gap: 0.5rem;
+    gap: 0.35rem;
   }
 
   .cabecera {
-    font-size: 0.75rem;
-    padding: 0.25rem;
+    font-size: 0.7rem;
+    padding: 0.2rem;
   }
 }
 </style>

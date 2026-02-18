@@ -34,6 +34,20 @@
     "settings": "KUDEAKETA",
     "logout": "logout"
   },
+  "months": {
+    "january": "Urtarrila",
+    "february": "Otsaila",
+    "march": "Martxoa",
+    "april": "Apirila",
+    "may": "Maiatza",
+    "june": "Ekaina",
+    "july": "Uztaila",
+    "august": "Abuztua",
+    "september": "Iraila",
+    "october": "Urria",
+    "november": "Azaroa",
+    "december": "Abendua"
+  },
   "modal": {
     "name": "Izena",
     "surnames": "Abizenak",

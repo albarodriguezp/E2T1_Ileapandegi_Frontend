@@ -31,10 +31,20 @@ const hoy = new Date()
 const mesActual = ref(hoy.getMonth())
 const anoActual = ref(hoy.getFullYear())
 
-const meses = [
-  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-]
+const meses = computed(() => [
+  t('months.january'),
+  t('months.february'),
+  t('months.march'),
+  t('months.april'),
+  t('months.may'),
+  t('months.june'),
+  t('months.july'),
+  t('months.august'),
+  t('months.september'),
+  t('months.october'),
+  t('months.november'),
+  t('months.december')
+])
 
 // se crean los años para seleccion (5 antes y 5 despues)
 const anosDisponibles = computed(() => {

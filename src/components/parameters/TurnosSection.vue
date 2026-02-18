@@ -228,22 +228,44 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.tab-section {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
 .turnos-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .col {
   background: white;
   padding: 1.5rem;
   border-radius: 12px;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.col input,
+.col select {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .turno-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
   padding: .6rem 0;
   border-bottom: 1px solid #e0e0e0;
 }
@@ -251,6 +273,12 @@ onMounted(async () => {
 .turno-info {
   display: flex;
   flex-direction: column;
+  min-width: 0;
+}
+
+.turno-info strong,
+.turno-info small {
+  overflow-wrap: anywhere;
 }
 
 .turno-info small {
@@ -285,11 +313,29 @@ onMounted(async () => {
 .actions {
   display: flex;
   gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 @media (max-width: 900px) {
   .turnos-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .col {
+    padding: 1rem;
+  }
+
+  .actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .btn-primary,
+  .btn-danger {
+    width: 100%;
   }
 }
 

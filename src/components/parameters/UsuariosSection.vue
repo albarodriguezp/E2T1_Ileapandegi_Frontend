@@ -270,17 +270,30 @@ const eliminarUsuario = async () => {
 
 
 <style scoped>
+.tab-section {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
 /* ===== Usuarios en 2 columnas ===== */
 .usuarios-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .col {
   background: white;
   padding: 1.5rem;
   border-radius: 12px;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 /* Usuario fila */
@@ -288,6 +301,8 @@ const eliminarUsuario = async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
   padding: .6rem 0;
   border-bottom: 1px solid #e0e0e0;
 }
@@ -295,6 +310,12 @@ const eliminarUsuario = async () => {
 .user-info {
   display: flex;
   flex-direction: column;
+  min-width: 0;
+}
+
+.user-info strong,
+.user-info small {
+  overflow-wrap: anywhere;
 }
 
 .user-info small {
@@ -305,6 +326,8 @@ const eliminarUsuario = async () => {
 .actions {
   display: flex;
   gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 /* Responsive */
@@ -341,6 +364,9 @@ const eliminarUsuario = async () => {
 
 .form-group input,
 .form-group select {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   padding: 0.5rem;
   border-radius: 6px;
   border: 1px solid #ccc;
@@ -349,5 +375,21 @@ const eliminarUsuario = async () => {
 .error {
   color: #d32f2f;
   font-size: 0.85rem;
+}
+
+@media (max-width: 640px) {
+  .col {
+    padding: 1rem;
+  }
+
+  .actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .btn-primary,
+  .btn-danger {
+    width: 100%;
+  }
 }
 </style>

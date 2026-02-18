@@ -8,7 +8,8 @@ export const useUsersStore = defineStore('users', () => {
   // Traer usuarios desde API
   const fetchUsuarios = async () => {
     const res = await api.get('/users')
-    usuarios.value = res.data
+    // Solo usuarios activos
+    usuarios.value = res.data.filter((u) => u.deleted_at === null)
   }
 
   // Crear usuario en API y store
@@ -27,16 +28,15 @@ export const useUsersStore = defineStore('users', () => {
   // Actualizar usuario en API y store
   const updateUsuario = async (user) => {
     await api.put(`/users/${user.id}`, user)
-    const index = usuarios.value.findIndex(u => u.id === user.id)
+    const index = usuarios.value.findIndex((u) => u.id === user.id)
     if (index !== -1) usuarios.value[index] = user
   }
 
   // Eliminar usuario en API y store
   const deleteUsuario = async (id) => {
     await api.delete(`/users/${id}`)
-    usuarios.value = usuarios.value.filter(u => u.id !== id)
+    usuarios.value = usuarios.value.filter((u) => u.id !== id)
   }
 
   return { usuarios, addUsuario, fetchUsuarios, updateUsuario, deleteUsuario } // Asegúrate de incluir esta función en el return
-
 })

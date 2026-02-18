@@ -31,7 +31,7 @@
     "portfolio": "PORTFOLIOA",
     "appointments": "HITZORDUAK",
     "profile": "PROFILA",
-    "settings": "PARAMETRIZAZIOA"
+    "settings": "KUDEAKETA"
   },
   "modal": {
     "name": "Izena",
@@ -167,7 +167,7 @@
   },
  
   "parameters": {
-    "title": "Parametrizazioa (Admin)",
+    "title": "Kudeaketa (Admin)",
     "users": "Erabiltzaileak",
     "groups": "Taldeak",
     "shifts": "Txandak",
@@ -185,9 +185,9 @@
     "searchGroupUser": "Erabiltzailea bilatu...",
     "groupUsers": "Taldearen Erabiltzaileak",
     "assignUsersBtn": "Erabiltzaileak Esleitu",
-    "createShift": "Turna Sortu",
+    "createShift": "Txanda Sortu",
     "editUser": "Erabiltzailea Editatu",
-    "editShift": "Turna Editatu",
+    "editShift": "Txanda Editatu",
     "editGroup": "Taldea Editatu",
     "deleteUser": "Erabiltzailea Ezabatu",
     "deleteShift": "Turna Ezabatu",
@@ -197,7 +197,7 @@
     "role": "Rola",
     "admin": "Admin",
     "user": "Erabiltzailea",
-    "shiftType": "Turnaren Mota",
+    "shiftType": "Txanda Mota",
     "table": "Taula",
     "haircut": "Ilearen Ebaketa",
     "date": "Data",

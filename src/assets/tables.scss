@@ -207,3 +207,37 @@ input[type="checkbox"] {
     color: #2c3e50;
   }
 }
+
+.table-scroll {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tabla-clientes,
+  .inventario-table {
+    min-width: 640px;
+
+    thead th,
+    tbody td {
+      padding: 10px 8px;
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+  }
+
+  .acciones-tabla,
+  .actions {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+}

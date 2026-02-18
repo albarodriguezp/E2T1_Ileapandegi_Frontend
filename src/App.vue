@@ -26,4 +26,11 @@ const route = useRoute()
   min-height: 100vh;
   justify-content: center;
 }
+
+@media (max-width: 768px) {
+  .app-layout {
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+}
 </style>

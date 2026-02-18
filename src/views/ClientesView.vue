@@ -21,46 +21,48 @@
       </div>
 
       <!-- Tabla clientes -->
-      <table class="tabla-clientes">
-        <thead>
-          <tr>
-            <th>{{ $t('table.id') }}</th>
-            <th>{{ $t('table.name') }}</th>
-            <th>{{ $t('table.surnames') }}</th>
-            <th>{{ $t('table.phone') }}</th>
-            <th>{{ $t('table.actions') }}</th>
-            <th class="columna-seleccionar">
-              
-              <input type="checkbox" v-model="seleccionadosTodos" @change="seleccionarTodos">
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="cliente in clientesFiltrados" :key="cliente.id">
-            <td>{{ cliente.id }}</td>
-            <td>{{ cliente.name }}</td>
-            <td>{{ cliente.surnames }}</td>
-            <td>{{ cliente.telephone }}</td>
-            <td class="acciones-tabla">
-              <button class="btn-tabla-view" @click="abrirModalVerCliente(cliente)">
-                <i class="bi bi-pencil"></i>
-              </button>
-              <button class="btn-tabla-delete" @click="solicitarEliminarCliente(cliente)">
-                <i class="bi bi-trash"></i>
-              </button>
-            </td>
-            <td class="columna-seleccionar">
-              <input type="checkbox" v-model="seleccionados" :value="cliente.id">
-            </td>
-          </tr>
+      <div class="table-scroll">
+        <table class="tabla-clientes">
+          <thead>
+            <tr>
+              <th>{{ $t('table.id') }}</th>
+              <th>{{ $t('table.name') }}</th>
+              <th>{{ $t('table.surnames') }}</th>
+              <th>{{ $t('table.phone') }}</th>
+              <th>{{ $t('table.actions') }}</th>
+              <th class="columna-seleccionar">
+                
+                <input type="checkbox" v-model="seleccionadosTodos" @change="seleccionarTodos">
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="cliente in clientesFiltrados" :key="cliente.id">
+              <td>{{ cliente.id }}</td>
+              <td>{{ cliente.name }}</td>
+              <td>{{ cliente.surnames }}</td>
+              <td>{{ cliente.telephone }}</td>
+              <td class="acciones-tabla">
+                <button class="btn-tabla-view" @click="abrirModalVerCliente(cliente)">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn-tabla-delete" @click="solicitarEliminarCliente(cliente)">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </td>
+              <td class="columna-seleccionar">
+                <input type="checkbox" v-model="seleccionados" :value="cliente.id">
+              </td>
+            </tr>
 
-          <tr v-if="clientesFiltrados.length === 0">
-            <td colspan="6" style="text-align:center; color:gray;">
-              {{ $t('clients.none') }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+            <tr v-if="clientesFiltrados.length === 0">
+              <td colspan="6" style="text-align:center; color:gray;">
+                {{ $t('clients.none') }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       <!-- Modales -->
       <ModalConfirmacion

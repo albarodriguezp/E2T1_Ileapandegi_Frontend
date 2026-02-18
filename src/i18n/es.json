@@ -207,6 +207,11 @@
   "citas": {
     "title": "Citas"
   },
+
+  "deleteUser": {
+    "title": "Eliminar usuarios",
+    "delete":"Eliminar"
+  },
   "appointmentDetails": {
     "page": "Página",
     "dayDetail": "Detalle del Día",

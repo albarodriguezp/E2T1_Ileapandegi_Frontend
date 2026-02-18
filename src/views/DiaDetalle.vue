@@ -289,6 +289,7 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
   margin-bottom: 2rem;
 }
 
@@ -322,6 +323,7 @@ onMounted(() => {
   font-size: 14px;
   color: white;
   transition: background-color 0.2s;
+  white-space: nowrap;
 }
 
 .btn-volver:hover {
@@ -337,6 +339,7 @@ onMounted(() => {
   font-weight: 600;
   cursor: pointer;
   font-size: 16px;
+  white-space: nowrap;
 }
 
 .btn-nueva-cita:hover {
@@ -487,5 +490,65 @@ onMounted(() => {
   color: #333;
   margin-top: 4px;
   text-align: center;
+}
+
+@media (max-width: 900px) {
+  .header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      'back new'
+      'nav nav';
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .btn-volver {
+    grid-area: back;
+    justify-self: start;
+    width: auto;
+  }
+
+  .btn-nueva-cita {
+    grid-area: new;
+    justify-self: end;
+    width: auto;
+  }
+
+  .navegacion-fecha {
+    grid-area: nav;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .navegacion-fecha h1 {
+    margin: 0;
+    font-size: 1rem;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .btn-nav {
+    padding: 6px 12px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 520px) {
+  .contenido-centrado {
+    margin-top: 1.5rem;
+    padding: 0 0.5rem;
+  }
+
+  .btn-volver,
+  .btn-nueva-cita {
+    font-size: 13px;
+    padding: 8px 10px;
+  }
+
+  .navegacion-fecha h1 {
+    font-size: 0.9rem;
+  }
 }
 </style>

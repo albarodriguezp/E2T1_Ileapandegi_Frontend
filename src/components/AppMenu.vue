@@ -39,6 +39,10 @@
           <router-link to="/parametrizacion" active-class="active" @click="closeMenu">{{ t('menu.settings') }}</router-link>
         </li>
       </ul>
+      <button class="btn-logout" type="button" @click="handleLogout">
+        <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+        <span>{{ t('menu.logout') }}</span>
+      </button>
       <div class="idioma">
         <IdiomaSelector />
       </div>
@@ -49,12 +53,14 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import IdiomaSelector from '@/components/SelectorIdioma.vue'
 import { getProfile } from '@/services/api'
+import { logout } from '@/utils/auth'
 
 const { t } = useI18n()
 const route = useRoute()
+const router = useRouter()
 
 const rol = ref('')
 const isMenuOpen = ref(false)
@@ -65,6 +71,17 @@ const toggleMenu = () => {
 
 const closeMenu = () => {
   isMenuOpen.value = false
+}
+
+const handleLogout = async () => {
+  try {
+    await logout()
+  } catch (error) {
+    console.error('Error al cerrar sesión:', error)
+  } finally {
+    closeMenu()
+    router.push({ name: 'login' })
+  }
 }
 
 // Cargar rol del usuario 
@@ -146,6 +163,41 @@ watch(
   margin-top: auto; 
 }
 
+.btn-logout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  width: 100%;
+  margin-top: auto;
+  margin-bottom: 0.75rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid #ef5350;
+  border-radius: 0.5rem;
+  background: linear-gradient(180deg, #ef5350 0%, #d32f2f 100%);
+  color: #fff;
+  letter-spacing: 0.4px;
+  font-weight: 600;
+  cursor: pointer;
+  text-transform: uppercase;
+  box-shadow: 0 3px 10px rgba(211, 47, 47, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.btn-logout:hover {
+  filter: brightness(1.05);
+  box-shadow: 0 5px 14px rgba(211, 47, 47, 0.45);
+  transform: translateY(-1px);
+}
+
+.btn-logout:active {
+  transform: translateY(0);
+}
+
+.btn-logout i {
+  font-size: 1rem;
+}
+
 .hamburger {
   display: none;
 }
@@ -214,6 +266,12 @@ watch(
   .idioma {
     margin-top: 1rem;
     padding: 0 1rem 1rem;
+  }
+
+  .btn-logout {
+    margin: 0 1rem;
+    width: calc(100% - 2rem);
+    justify-content: center;
   }
 }
 </style>

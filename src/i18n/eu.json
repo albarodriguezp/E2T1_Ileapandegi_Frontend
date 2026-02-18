@@ -31,7 +31,8 @@
     "portfolio": "PORTFOLIOA",
     "appointments": "HITZORDUAK",
     "profile": "PROFILA",
-    "settings": "PARAMETRIZAZIOA"
+    "settings": "PARAMETRIZAZIOA",
+    "logout": "SAIOA ITXI"
   },
   "modal": {
     "name": "Izena",

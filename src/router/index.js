@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { checkAuth, logout } from '@/utils/auth'
+import { getProfile } from '@/services/api'
 
 import LoginView from '../views/LoginView.vue'
 import InicioView from '../views/InicioView.vue'
@@ -60,7 +61,7 @@ const routes = [
     path: '/parametrizacion',
     name: 'parametrizacion',
     component: ParametrizacionView,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true, requiresAdmin: true }
   }
 
 ]
@@ -90,6 +91,20 @@ router.beforeEach(async (to, from, next) => {
     if (!isValid) {
       await logout()
       return next({ name: 'login' })
+    }
+
+    // Verificar si necesita rol admin
+    if (to.meta.requiresAdmin) {
+      try {
+        const profile = await getProfile()
+        if (profile.rol !== 'A') {
+          
+          return next({ name: 'inicio' })
+        }
+      } catch (error) {
+        console.error('Error al verificar rol:', error)
+        return next({ name: 'inicio' })
+      }
     }
   }
 

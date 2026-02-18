@@ -102,6 +102,7 @@
     "deleteConfirmMsg": "¿Estás seguro de que quieres eliminar esta cita? Esta acción no se puede deshacer."
   },
   "inventory": {
+    "name": "Nombre",
     "title": "Gestión de Inventario",
     "material": "Material",
     "materials": "Materiales",

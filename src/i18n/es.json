@@ -31,7 +31,7 @@
     "portfolio": "PORTFOLIO",
     "appointments": "CITAS",
     "profile": "PERFIL",
-    "settings": "PARAMETRIZACIÓN"
+    "settings": "GESTION"
   },
   "modal": {
     "name": "Nombre",
@@ -162,7 +162,7 @@
     "completed": "Completadas"
   },
   "parameters": {
-    "title": "Parametrización",
+    "title": "Gestión",
     "users": "Usuarios",
     "groups": "Grupos",
     "shifts": "Turnos",
@@ -190,7 +190,17 @@
     "confirmUser": "Crear Usuario",
     "deleteConfirm": "Eliminar Usuario",
     "deleteShiftConfirm": "Eliminar Turno",
-    "deleteShiftMsg": "¿Deseas eliminar este turno?"
+    "deleteShiftMsg": "¿Deseas eliminar este turno?",
+    "createGroup": "Crear Grupo",
+    "groupManagement": "Gestion de grupos",
+    "assignUsersToGroup":"Asignar usuarios a grupos",
+    "searchGroupUser": "Buscar usuarios",
+    "createShift":"Crear turno",
+    "searchUserShift":"Buscar usuario",
+    "shiftType":"Tipo de turno",
+    "shiftManagement":"Gestion de turno",
+    "filterByMonth":"Filtrar por meses",
+    "noShifts":"No se han encontrado"
   },
   "citas": {
     "title": "Citas"

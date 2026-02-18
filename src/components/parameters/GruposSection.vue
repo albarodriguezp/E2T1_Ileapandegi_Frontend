@@ -271,27 +271,33 @@ const quitarEstudianteDelGrupo = async (studentId) => {
 }
 
 const asignarEstudiantes = async () => {
-  if (
-    !grupoSeleccionado.value ||
-    estudiantesSeleccionados.value.length === 0
-  ) {
+  if (!grupoSeleccionado.value || estudiantesSeleccionados.value.length === 0) {
     alert('Selecciona grupo y estudiantes.')
     return
   }
 
-  const grupoActual = groups.value.find(
-    g => g.id === grupoSeleccionado.value
-  )
-
+  const grupoActual = groups.value.find(g => g.id === grupoSeleccionado.value)
   if (!grupoActual) return
 
-  grupoActual.students = estudiantesSeleccionados.value.map(id => ({
-    student_id: id
-  }))
+  // Traemos los estudiantes actuales del grupo
+  const estudiantesExistentes = students.value
+    .filter(est => est.group_id === grupoActual.id)
+    .map(est => est.id)
+
+  // Unimos los existentes con los seleccionados (evitando duplicados)
+  const nuevosEstudiantes = Array.from(new Set([...estudiantesExistentes, ...estudiantesSeleccionados.value]))
 
   try {
-    await groupsStore.updateGroup(grupoActual)
+    // Actualizamos cada estudiante nuevo
+    for (const studentId of nuevosEstudiantes) {
+      const estudiante = students.value.find(est => est.id === studentId)
+      if (estudiante) {
+        estudiante.group_id = grupoActual.id
+        await studentsStore.updateStudent(estudiante)
+      }
+    }
 
+    // Limpiamos selección
     estudiantesSeleccionados.value = []
     grupoSeleccionado.value = ''
 
@@ -301,6 +307,7 @@ const asignarEstudiantes = async () => {
     console.error('Error asignando estudiantes:', err)
   }
 }
+
 
 const closeModal = () => {
   showModal.value = false

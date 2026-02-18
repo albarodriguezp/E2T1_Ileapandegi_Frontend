@@ -162,6 +162,8 @@
     "completed": "Completadas"
   },
   "parameters": {
+    "removeUser": "Quitar",
+    "assignUsersBtn": "Asignar",
     "title": "Gestión",
     "users": "Usuarios",
     "groups": "Grupos",

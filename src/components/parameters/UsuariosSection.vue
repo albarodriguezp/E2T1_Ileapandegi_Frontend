@@ -202,7 +202,10 @@ const crearUsuarioYStudent = async () => {
     // Reset de los formularios
     usuario.value = { username: '', email: '', password: '', rol: 'U' }
     student.value = { name: '', surnames: '', group_id: null }
-
+    await usersStore.fetchUsuarios()
+    await studentsStore.fetchStudents()
+    await groupsStore.fetchGroups()
+    
   } catch (err) {
     console.error('Error creando usuario y student:', err)
 
@@ -347,5 +350,4 @@ const eliminarUsuario = async () => {
   color: #d32f2f;
   font-size: 0.85rem;
 }
-
 </style>

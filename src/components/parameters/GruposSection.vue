@@ -15,11 +15,11 @@
       </form>
     </div>
 
-    <!-- ===== Asignar Usuarios ===== -->
+    <!-- ===== Asignar Estudiantes ===== -->
     <div class="col">
       <h2>{{ t('parameters.assignUsersToGroup') }}</h2>
 
-      <form @submit.prevent="asignarUsuarios">
+      <form @submit.prevent="asignarEstudiantes">
         <div class="form-group">
           <label>{{ t('parameters.selectGroup') }}</label>
           <select v-model="grupoSeleccionado">
@@ -27,7 +27,6 @@
             <option v-for="g in groupsStore.groups" :key="g.id" :value="g.id">
               {{ g.name }}
             </option>
-
           </select>
         </div>
 
@@ -37,21 +36,17 @@
         </div>
 
         <div class="checkbox-list">
-          <div v-for="u in usuariosParaAsignar" :key="u.id" class="checkbox-item">
-            <input type="checkbox" :value="u.id" v-model="usuariosSeleccionados"
+          <div v-for="u in estudiantesParaAsignar" :key="u.id" class="checkbox-item">
+            <input type="checkbox" :value="u.id" v-model="estudiantesSeleccionados"
               :disabled="u.disabled || !grupoSeleccionado" />
             <label>
-              {{ u.username }}
-              <span v-if="u.grupoAsignado"> ({{ t('parameters.inGroup', { group: u.grupoAsignado }) }})</span>
+              {{ u.name }}
+              <span v-if="u.group_id"> ({{ t('parameters.inGroup', { group: u.group_id }) }})</span>
             </label>
           </div>
         </div>
 
-
-
-        <button type="submit" class="btn-primary">
-          {{ t('parameters.assignUsersBtn') }}
-        </button>
+        <button type="submit" class="btn-primary">{{ t('parameters.assignUsersBtn') }}</button>
       </form>
     </div>
 
@@ -89,8 +84,8 @@
         </div>
 
         <div v-for="u in usuariosAsignadosGrupo" :key="u.id" class="assigned-user">
-          <span>{{ u.username }}</span>
-          <button type="button" class="btn-danger" @click="quitarUsuarioDelGrupo(u.id)">
+          <span>{{ u.name }}</span>
+          <button type="button" class="btn-danger" @click="quitarEstudianteDelGrupo(u.id)">
             {{ t('parameters.removeUser') }}
           </button>
         </div>
@@ -100,7 +95,6 @@
     <!-- ===== Modal Eliminar Grupo ===== -->
     <ModalConfirm v-if="showModal && modalType === 'delete-grupo'" :title="t('parameters.deleteGroup')"
       :message="t('modal.deleteConfirm', { name: grupoEditando?.name })" @close="closeModal" @confirm="eliminarGrupo" />
-
   </div>
 </template>
 
@@ -112,15 +106,17 @@ import ModalConfirm from '@/components/ModalConfirmParam.vue'
 
 import { useUsersStore } from '@/stores/useUsersStore'
 import { useGroupsStore } from '@/stores/useGroupsStore'
+import { useStudentsStore } from '@/stores/useStudentsStore'
 
 const { t } = useI18n()
 
 // ===== STORES =====
 const usersStore = useUsersStore()
 const groupsStore = useGroupsStore()
+const studentsStore = useStudentsStore()
 
-const usuarios = usersStore.usuarios
 const grupos = groupsStore.grupos
+const estudiantes = studentsStore.students
 
 // ===== ESTADOS =====
 const showModal = ref(false)
@@ -130,19 +126,18 @@ const nuevoGrupo = ref({ name: '' })
 
 const grupoSeleccionado = ref('')
 const buscarUsuarioGrupo = ref('')
-const usuariosSeleccionados = ref([])
+const estudiantesSeleccionados = ref([])
 
 const grupoEditando = ref(null)
 
-
 const usuariosAsignadosGrupo = computed(() => {
-  if (!grupoEditando.value || !usuarios.value) return []
+  if (!grupoEditando.value || !estudiantes) return []
 
-  const students = grupoEditando.value.students || []
+  return estudiantes.filter(est => est.group_id === grupoEditando.value.id)
+})
 
-  return usuarios.value.filter(u =>
-    students.some(s => s.user_id === u.id)
-  )
+const estudiantesParaAsignar = computed(() => {
+  return estudiantes.filter(est => !est.group_id)
 })
 
 
@@ -150,26 +145,26 @@ const usuariosAsignadosGrupo = computed(() => {
 const crearGrupo = async () => {
   if (!nuevoGrupo.value.name) return
   try {
-    await groupsStore.addGroup({ name: nuevoGrupo.value.name, usuarios: [] })
+    await groupsStore.addGroup({ name: nuevoGrupo.value.name, students: [] })
     nuevoGrupo.value.name = ''
+    await groupsStore.fetchGroups()
   } catch (err) {
-    console.error(err)
+    console.error('Error creando grupo:', err)
   }
 }
 
 const openEditGrupo = (g) => {
-  console.log(g);
+  grupoEditando.value = { ...g }
   modalType.value = 'grupo'
   showModal.value = true
 }
-
 
 const editarGrupo = async () => {
   try {
     await groupsStore.updateGroup(grupoEditando.value)
     closeModal()
   } catch (err) {
-    console.error(err)
+    console.error('Error editando grupo:', err)
   }
 }
 
@@ -181,10 +176,63 @@ const openDeleteGrupo = (g) => {
 
 const eliminarGrupo = async () => {
   try {
+    if (grupoEditando.value.students.length > 0) {
+      alert('Este grupo tiene estudiantes asignados. No se puede eliminar hasta que se remuevan.')
+      return
+    }
+
     await groupsStore.deleteGroup(grupoEditando.value.id)
     closeModal()
   } catch (err) {
-    console.error(err)
+    console.error('Error eliminando grupo:', err)
+  }
+}
+
+const quitarEstudianteDelGrupo = async (studentId) => {
+      const estudiante = estudiantes.find(est => est.id === studentId)
+
+      console.log(estudiante);
+  try {
+    // Encontramos al estudiante en la lista de estudiantes
+    const estudiante = estudiantes.find(est => est.id === studentId)
+    if (!estudiante) return
+    // Actualizamos el group_id a null para quitarlo del grupo
+    estudiante.group_id = null
+
+    // Llamamos al método updateStudent para actualizar la base de datos
+    await studentsStore.updateStudent(estudiante)
+
+    // Luego, actualizamos el grupo eliminando al estudiante
+    grupoEditando.value.students = grupoEditando.value.students.filter(student => student.id !== studentId)
+
+    // Refrescamos la lista de estudiantes para que se refleje en la tabla de asignación
+    await studentsStore.fetchStudents()
+    await groupsStore.fetchGroups()
+
+  } catch (err) {
+    console.error('Error quitando estudiante del grupo:', err)
+  }
+}
+
+
+const asignarEstudiantes = async () => {
+  if (!grupoSeleccionado.value || estudiantesSeleccionados.value.length === 0) {
+    alert('Por favor, selecciona un grupo y estudiantes para asignar.')
+    return
+  }
+
+  const grupoActual = grupos.value.find(g => g.id === grupoSeleccionado.value)
+  if (!grupoActual) return
+
+  grupoActual.students = estudiantesSeleccionados.value.map(id => ({ student_id: id }))
+
+  try {
+    await groupsStore.updateGroup(grupoActual)
+    estudiantesSeleccionados.value = []
+    grupoSeleccionado.value = ''
+    await groupsStore.fetchGroups()
+  } catch (err) {
+    console.error('Error asignando estudiantes al grupo:', err)
   }
 }
 
@@ -193,43 +241,12 @@ const closeModal = () => {
   modalType.value = null
 }
 
-const quitarUsuarioDelGrupo = (userId) => {
-  grupoEditando.value.usuarios =
-    grupoEditando.value.usuarios.filter(id => id !== userId)
-}
-
-// ===== ASIGNAR USUARIOS A GRUPO =====
-const asignarUsuarios = async () => {
-  const grupoActual = grupos.value.find(g => g.id === grupoSeleccionado.value)
-  if (!grupoActual) return
-
-  // Aquí construyes el array de estudiantes a enviar
-  grupoActual.students = usuariosSeleccionados.value.map(id => ({ user_id: id }))
-
-  try {
-    await groupsStore.updateGroup(grupoActual)
-    usuariosSeleccionados.value = []
-    grupoSeleccionado.value = ''
-  } catch (err) {
-    console.error(err)
-  }
-}
-
-
 // ===== CARGAR DATOS =====
 onMounted(async () => {
   await usersStore.fetchUsuarios()
   await groupsStore.fetchGroups()
-
-  console.log('Grupos cargados:', groupsStore.groups)
-  groupsStore.groups.forEach(g => {
-    console.log(`Grupo: ${g.name}, ID: ${g.id}, Usuarios:`, g.students.map(s => s.name))
-  })
+  await studentsStore.fetchStudents()
 })
-
-
-
-
 </script>
 
 <style scoped>
